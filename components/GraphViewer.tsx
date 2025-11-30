@@ -65,7 +65,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery })
         
         // 1. The Star/Planet (Sphere)
         // Scale the radius: Main nodes get distinctively larger and glowing
-        const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; // Add base size 
+        const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
         const geometry = new THREE.SphereGeometry(radius, 32, 32);
         
         // "Star" material - glowing for main nodes, standard for others
@@ -81,19 +81,32 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery })
         group.add(sphere);
 
         // 2. Text Label
-        const sprite = new SpriteText(node.label);
-        sprite.color = isMain ? '#ffffff' : color; // White text for main nodes
-        // Font size scaled by importance
-        sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
-        // Position text above the sphere
-        sprite.position.y = radius + sprite.textHeight * 0.6 + 0.5; 
+        // Fix: Handle both default export and named export scenarios for SpriteText
+        // This prevents "SpriteText is not a constructor" errors in some builds
+        const SpriteTextClass = (SpriteText as any).default || SpriteText;
         
-        // Optional background for legibility
-        sprite.backgroundColor = '#00000080'; 
-        sprite.padding = 1;
-        sprite.borderRadius = 3;
-        
-        group.add(sprite);
+        if (SpriteTextClass) {
+          const sprite = new SpriteTextClass(node.label);
+          sprite.color = isMain ? '#ffffff' : color; // White text for main nodes
+          
+          // Font size logic
+          sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
+          
+          // Position text above the sphere with a small buffer
+          sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0; 
+          
+          // Optional background for legibility
+          sprite.backgroundColor = '#00000080'; 
+          sprite.padding = 1;
+          sprite.borderRadius = 3;
+          
+          // Vital: Ensure text renders on top of everything else so it doesn't clip inside spheres
+          sprite.material.depthTest = false;
+          sprite.material.depthWrite = false;
+          sprite.renderOrder = 999;
+          
+          group.add(sprite);
+        }
 
         return group;
       }}

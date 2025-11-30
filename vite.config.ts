@@ -1,19 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ СБОРКИ VERCEL:
-      // Перенаправляем ошибочный импорт 'three/webgpu' на основной пакет 'three'.
-      // Это устраняет ошибку "Missing ./webgpu specifier".
-      'three/webgpu': 'three'
+      // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ:
+      // Вместо пакета 'three', мы направляем запрос на наш файл-заглушку.
+      // Теперь импорт { WebGPURenderer } пройдет успешно.
+      'three/webgpu': resolve(__dirname, 'three-webgpu.js')
     },
-    // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ОТОБРАЖЕНИЯ ТЕКСТА:
-    // Принудительно объединяем все копии three в одну.
-    // Это устраняет ошибку "Multiple instances of Three.js".
+    // Оставляем дедупликацию для решения проблемы с текстом
     dedupe: ['three']
   },
   optimizeDeps: {

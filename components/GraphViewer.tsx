@@ -80,7 +80,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery })
         
         if (SpriteTextClass) {
           const sprite = new SpriteTextClass(node.label);
-          sprite.color = isMain ? '#FFD700' : color;
+          sprite.color = color; //isMain ? '#FFD700' : color;
           sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
           //sprite.color = 'white'; 
           //sprite.textHeight = 8; // Сделаем покрупнее для проверки

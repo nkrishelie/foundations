@@ -80,11 +80,13 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery })
         
         if (SpriteTextClass) {
           const sprite = new SpriteTextClass(node.label);
-          sprite.color = isMain ? '#ffffff' : color;
-          sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
-          
+          //sprite.color = isMain ? '#ffffff' : color;
+          //sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
+          sprite.color = 'white'; 
+          sprite.textHeight = 8; // Сделаем покрупнее для проверки
+          sprite.position.y = 8; // Поднимем повыше
           // Position
-          sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
+          //sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
           
           // Styling
           sprite.backgroundColor = '#00000080';
@@ -95,6 +97,10 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery })
           sprite.material.depthTest = false;
           sprite.material.depthWrite = false;
           sprite.renderOrder = 999;
+
+          sprite.renderOrder = 999;
+          sprite.material.depthTest = false; 
+          sprite.material.depthWrite = false;
           
           group.add(sprite);
         }

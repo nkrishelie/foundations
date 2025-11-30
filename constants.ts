@@ -1,5 +1,5 @@
 
-import { Discipline, LinkType } from './types';
+import { Discipline, LinkType, Language } from './types';
 
 export const DISCIPLINE_COLORS: Record<Discipline, string> = {
   [Discipline.LOGIC]: '#3b82f6',       // Blue
@@ -23,3 +23,26 @@ export const LINK_COLORS: Record<LinkType, string> = {
 };
 
 export const INITIAL_CAMERA_POSITION = { x: 0, y: 0, z: 400 };
+
+// Translations for Disciplines (Legend)
+export const DISCIPLINE_LABELS: Record<Discipline, Record<Language, string>> = {
+  [Discipline.LOGIC]: { en: 'Mathematical Logic', ru: 'Мат. Логика' },
+  [Discipline.SET_THEORY]: { en: 'Set Theory', ru: 'Теория Множеств' },
+  [Discipline.MODEL_THEORY]: { en: 'Model Theory', ru: 'Теория Моделей' },
+  [Discipline.COMPUTABILITY]: { en: 'Computability Theory', ru: 'Теория Вычислимости' },
+  [Discipline.ALGEBRA]: { en: 'General Algebra', ru: 'Общая Алгебра' },
+  [Discipline.PROOF_THEORY]: { en: 'Proof Theory', ru: 'Теория Доказательств' },
+  [Discipline.TOPOLOGY]: { en: 'Topology', ru: 'Топология' },
+  [Discipline.ORDER_THEORY]: { en: 'Order Theory', ru: 'Теория Порядков' },
+  [Discipline.FOUNDATIONS]: { en: 'Foundations', ru: 'Основания' },
+};
+
+// Translations for Link Types (Legend)
+export const LINK_LABELS: Record<LinkType, Record<Language, string>> = {
+  [LinkType.EXTENDS]: { en: 'Extends', ru: 'Расширяет' },
+  [LinkType.PROVES]: { en: 'Proves', ru: 'Доказывает' },
+  [LinkType.MODELS]: { en: 'Models', ru: 'Моделирует' },
+  [LinkType.EQUIVALENT]: { en: 'Equivalent', ru: 'Эквивалентно' },
+  [LinkType.CONTAINS]: { en: 'Contains', ru: 'Содержит' },
+  [LinkType.RELATED]: { en: 'Related', ru: 'Связано' },
+};

@@ -20,14 +20,16 @@ export enum LinkType {
   RELATED = 'Related To'
 }
 
+export type Language = 'en' | 'ru';
+
 export interface GraphNode {
   id: string;
   label: string;
   group: Discipline;
   description: string;
-  details?: string[]; // Theorems, formulas, or deeper explanations
-  synonyms?: string[]; // Search keywords in Russian or other aliases
-  val?: number; // Size weight
+  details?: string[]; 
+  synonyms?: string[]; 
+  val?: number; 
   x?: number;
   y?: number;
   z?: number;

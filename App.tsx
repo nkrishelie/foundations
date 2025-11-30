@@ -1,11 +1,16 @@
-import React, { useMemo, useState } from 'react';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { GraphViewer } from './components/GraphViewer';
 import { UIOverlay } from './components/UIOverlay';
 import { getGraphData } from './services/dataService';
-import { GraphNode } from './types';
+import { GraphNode, Language } from './types';
 
 const App: React.FC = () => {
-  const data = useMemo(() => getGraphData(), []);
+  const [language, setLanguage] = useState<Language>('en');
+  
+  // Re-generate graph data whenever language changes
+  const data = useMemo(() => getGraphData(language), [language]);
+  
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -34,6 +39,8 @@ const App: React.FC = () => {
           selectedNode={selectedNode} 
           onSearch={setSearchQuery}
           onCloseSidebar={() => setSelectedNode(null)}
+          currentLang={language}
+          onToggleLang={(lang) => setLanguage(lang)}
         />
       </div>
     </div>

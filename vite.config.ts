@@ -1,17 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    // Эта настройка критична для устранения ошибки "Multiple instances"
-    alias: {
-      'three': resolve(__dirname, './node_modules/three')
-    }
+    // ВМЕСТО alias используем dedupe.
+    // Это решает проблему "Multiple instances", не ломая пути на Vercel.
+    dedupe: ['three']
   },
-  // Принудительная оптимизация зависимостей
+  // На всякий случай включаем оптимизацию
   optimizeDeps: {
     include: ['three', 'react-force-graph-3d', 'three-spritetext']
   }

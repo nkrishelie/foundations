@@ -1,4 +1,3 @@
-
 {
   "name": "mathlogic-nexus-3d",
   "private": true,
@@ -13,7 +12,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-force-graph-3d": "^1.24.2",
-    "three": "^0.160.0"
+    "three": "^0.160.0",
+    "three-spritetext": "^1.8.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

@@ -1,4 +1,3 @@
-
 import { GraphData, Discipline, LinkType, Language } from '../types';
 
 interface LocalizedContent {
@@ -13,6 +12,24 @@ interface NodeDefinition {
   synonyms?: string[];
   content: Record<Language, LocalizedContent>;
 }
+
+// Helper for Unicode replacements
+const uni = (str: string) => str
+  .replace(/\\mathbb{N}/g, 'ℕ')
+  .replace(/\\mathbb{Z}/g, 'ℤ')
+  .replace(/\\mathbb{Q}/g, 'ℚ')
+  .replace(/\\mathbb{R}/g, 'ℝ')
+  .replace(/\\mathbb{C}/g, 'ℂ')
+  .replace(/\\mathbb{A}/g, '𝔸')
+  .replace(/\\to/g, '→')
+  .replace(/\\rightarrow/g, '→')
+  .replace(/\\vdash/g, '⊢')
+  .replace(/\\forall/g, '∀')
+  .replace(/\\exists/g, '∃')
+  .replace(/\\square/g, '□')
+  .replace(/\\diamond/g, '◇')
+  .replace(/\\le/g, '≤')
+  .replace(/\\ge/g, '≥');
 
 const RAW_NODES: Record<string, NodeDefinition> = {
   // --- FOUNDATIONS ---
@@ -107,8 +124,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     group: Discipline.LOGIC,
     val: 8,
     content: {
-      en: { label: 'System K', description: 'The minimal normal modal logic.', details: ['Distribution Axiom (K)', 'Necessitation Rule'] },
-      ru: { label: 'Система K', description: 'Минимальная нормальная модальная логика.', details: ['Аксиома K', 'Правило усиления'] }
+      en: { label: 'System K', description: 'The minimal normal modal logic.', details: ['Distribution Axiom (K): □(p → q) → (□p → □q)', 'Necessitation Rule: ⊢ p ⇒ ⊢ □p'] },
+      ru: { label: 'Система K', description: 'Минимальная нормальная модальная логика.', details: ['Аксиома K: □(p → q) → (□p → □q)', 'Правило усиления: ⊢ p ⇒ ⊢ □p'] }
     }
   },
   'modal_K4': {
@@ -116,7 +133,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 8,
     content: {
       en: { label: 'System K4', description: 'Transitive modal logic.', details: ['Axiom 4: □p → □□p', 'Transitive Frames'] },
-      ru: { label: 'Система K4', description: 'Транзитивная модальная логика.', details: ['Аксиома 4', 'Транзитивные шкалы'] }
+      ru: { label: 'Система K4', description: 'Транзитивная модальная логика.', details: ['Аксиома 4: □p → □□p', 'Транзитивные шкалы'] }
     }
   },
   'modal_S4': {
@@ -126,12 +143,12 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       en: {
         label: 'System S4',
         description: 'Reflexive and transitive modal logic. Topology of the "interior" operator.',
-        details: ['Axiom T', 'Topological Semantics', 'Gödel Translation']
+        details: ['Axiom T: □p → p', 'Topological Semantics', 'Gödel Translation']
       },
       ru: {
         label: 'Система S4',
         description: 'Рефлексивная и транзитивная модальная логика. Топология оператора внутренности.',
-        details: ['Аксиома T', 'Топологическая семантика', 'Гёделев перевод']
+        details: ['Аксиома T: □p → p', 'Топологическая семантика', 'Гёделев перевод']
       }
     }
   },
@@ -143,12 +160,12 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       en: {
         label: 'Gödel-Löb Logic (GL)',
         description: 'The logic of provability. Captures the behavior of the "Provable_PA" predicate.',
-        details: ['Löb\'s Axiom', 'Well-founded frames', 'Solovay\'s Theorem', 'Fixed Point Theorem']
+        details: ['Löb\'s Axiom: □(□p → p) → □p', 'Well-founded frames', 'Solovay\'s Theorem', 'Fixed Point Theorem']
       },
       ru: {
         label: 'Логика Гёделя-Лёба (GL)',
         description: 'Логика доказуемости. Описывает поведение предиката доказуемости в арифметике.',
-        details: ['Аксиома Лёба', 'Обратно фундированные шкалы', 'Теорема Соловея', 'Теорема о неподвижной точке']
+        details: ['Аксиома Лёба: □(□p → p) → □p', 'Обратно фундированные шкалы', 'Теорема Соловея', 'Теорема о неподвижной точке']
       }
     }
   },
@@ -238,12 +255,12 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       en: {
         label: 'Peano Arithmetic (PA)',
         description: 'Axiomatic theory of natural numbers with induction.',
-        details: ['Axiom of Induction', 'Gödel\'s Incompleteness', 'Standard Model N', 'Non-standard models']
+        details: ['Axiom of Induction', 'Gödel\'s Incompleteness', 'Standard Model ℕ', 'Non-standard models']
       },
       ru: {
         label: 'Арифметика Пеано (PA)',
         description: 'Аксиоматическая теория натуральных чисел с индукцией.',
-        details: ['Аксиома индукции', 'Неполнота Гёделя', 'Стандартная модель N', 'Нестандартные модели']
+        details: ['Аксиома индукции', 'Неполнота Гёделя', 'Стандартная модель ℕ', 'Нестандартные модели']
       }
     }
   },
@@ -390,6 +407,23 @@ const RAW_NODES: Record<string, NodeDefinition> = {
         label: 'Теория порядков',
         description: 'Изучение бинарных отношений, описывающих упорядочивание.',
         details: ['Частичные порядки', 'Решетки', 'Булевы алгебры', 'Вполне упорядочение']
+      }
+    }
+  },
+  // NEWLY ADDED NODE: Theory of Order
+  'theory_order': {
+    group: Discipline.ORDER_THEORY,
+    val: 15,
+    content: {
+      en: { 
+        label: 'Theory of Order', 
+        description: 'Axiomatic theory defining general properties of order relations (partial, linear, well-orders).', 
+        details: ['Reflexivity', 'Transitivity', 'Antisymmetry'] 
+      },
+      ru: { 
+        label: 'Теория порядка', 
+        description: 'Аксиоматическая теория, определяющая общие свойства отношений порядка.', 
+        details: ['Рефлексивность', 'Транзитивность', 'Антисимметричность'] 
       }
     }
   },
@@ -951,8 +985,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
 };
 
 const RAW_LINKS = [
-    // ... (Using the same structure, we don't translate link IDs, just logic)
-    // Copying the structure from the previous context but ensuring it matches the node keys
+    // Language & Logic
     { source: 'math_lang', target: 'pred_logic', type: LinkType.CONTAINS },
     { source: 'pred_logic', target: 'prop_logic', type: LinkType.CONTAINS },
     { source: 'pred_logic', target: 'theory_order', type: LinkType.CONTAINS },
@@ -966,6 +999,7 @@ const RAW_LINKS = [
     { source: 'intuitionistic_logic', target: 'modal_S4', type: LinkType.EQUIVALENT },
     { source: 'modal_GL', target: 'theory_PA', type: LinkType.MODELS },
     
+    // Computability
     { source: 'comp_theory', target: 'lambda_calc', type: LinkType.CONTAINS },
     { source: 'lambda_calc', target: 'lambda_reductions', type: LinkType.CONTAINS },
     { source: 'lambda_calc', target: 'combinators', type: LinkType.EQUIVALENT },
@@ -979,6 +1013,7 @@ const RAW_LINKS = [
     { source: 'curry_howard', target: 'prop_logic', type: LinkType.RELATED },
     { source: 'system_f', target: 'theory_PA2', type: LinkType.RELATED },
 
+    // Arithmetics
     { source: 'theory_PA', target: 'model_N', type: LinkType.MODELS },
     { source: 'theory_PA', target: 'model_nonstd', type: LinkType.MODELS },
     { source: 'model_nonstd', target: 'model_N_ZxQ', type: LinkType.RELATED },
@@ -987,6 +1022,7 @@ const RAW_LINKS = [
     { source: 'theory_PA2', target: 'theory_PA', type: LinkType.EXTENDS },
     { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT },
     
+    // Set Theory
     { source: 'zfc', target: 'theory_HF', type: LinkType.CONTAINS },
     { source: 'zfc', target: 'model_quine', type: LinkType.RELATED },
     { source: 'zfc', target: 'model_N', type: LinkType.CONTAINS },
@@ -998,6 +1034,7 @@ const RAW_LINKS = [
     { source: 'model_L', target: 'incompleteness', type: LinkType.RELATED },
     { source: 'model_L', target: 'cardinal_aleph1', type: LinkType.CONTAINS },
     
+    // Order & Lattices
     { source: 'order_theory', target: 'poset', type: LinkType.CONTAINS },
     { source: 'order_theory', target: 'theory_order', type: LinkType.CONTAINS },
     { source: 'theory_order', target: 'theory_DLO', type: LinkType.EXTENDS },
@@ -1018,6 +1055,7 @@ const RAW_LINKS = [
     { source: 'heyting_alg', target: 'intuitionistic_logic', type: LinkType.MODELS },
     { source: 'lattice', target: 'thm_knaster', type: LinkType.RELATED },
 
+    // Model Theory
     { source: 'theory_ACF', target: 'model_C', type: LinkType.MODELS },
     { source: 'theory_ACF', target: 'model_A', type: LinkType.MODELS },
     { source: 'theory_ACF', target: 'thm_morley', type: LinkType.RELATED },
@@ -1033,6 +1071,7 @@ const RAW_LINKS = [
     { source: 'theory_tf_groups', target: 'model_Q', type: LinkType.RELATED },
     { source: 'model_C', target: 'model_R', type: LinkType.EXTENDS },
     
+    // Topology
     { source: 'topology', target: 'stone_space', type: LinkType.CONTAINS },
     { source: 'stone_space', target: 'bool_alg', type: LinkType.EQUIVALENT },
     { source: 'stone_space', target: 'clop_alg', type: LinkType.CONTAINS },
@@ -1042,6 +1081,7 @@ const RAW_LINKS = [
     { source: 'modal_S4', target: 'topology', type: LinkType.RELATED },
     { source: 'modal_GL', target: 'scattered_space', type: LinkType.RELATED },
     
+    // Meta
     { source: 'mt_concepts', target: 'model_N', type: LinkType.RELATED },
     { source: 'mt_concepts', target: 'auto_group', type: LinkType.RELATED },
     { source: 'mt_concepts', target: 'thm_los_vaught', type: LinkType.RELATED },
@@ -1068,9 +1108,9 @@ export const getGraphData = (lang: Language = 'en'): GraphData => {
       group: node.group,
       val: node.val,
       synonyms: node.synonyms,
-      label: content.label,
-      description: content.description,
-      details: content.details
+      label: uni(content.label),
+      description: uni(content.description),
+      details: content.details.map(uni)
     };
   });
 

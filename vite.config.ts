@@ -5,13 +5,10 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-resolve: {
-    // Вместо жестких алиасов используем dedupe.
-    // Это говорит Vite: "Если разные пакеты просят 'three', дай им всем одну и ту же копию".
-    dedupe: ['three', 'react', 'react-dom'],
-  },
-  // Опционально: отключаем слишком строгие проверки чанков, если они мешают
-  build: {
-    chunkSizeWarningLimit: 1600,
+  resolve: {
+    // 'dedupe' forces Vite to resolve the listed dependencies to the same copy 
+    // in node_modules, fixing the "Multiple instances of Three.js" warning.
+    // Unlike 'alias', this preserves subpath imports (e.g. three/webgpu).
+    dedupe: ['three', 'react', 'react-dom']
   }
 })

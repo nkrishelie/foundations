@@ -5,11 +5,17 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    // ВМЕСТО alias используем dedupe.
-    // Это решает проблему "Multiple instances", не ломая пути на Vercel.
+    alias: {
+      // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ СБОРКИ VERCEL:
+      // Перенаправляем ошибочный импорт 'three/webgpu' на основной пакет 'three'.
+      // Это устраняет ошибку "Missing ./webgpu specifier".
+      'three/webgpu': 'three'
+    },
+    // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ОТОБРАЖЕНИЯ ТЕКСТА:
+    // Принудительно объединяем все копии three в одну.
+    // Это устраняет ошибку "Multiple instances of Three.js".
     dedupe: ['three']
   },
-  // На всякий случай включаем оптимизацию
   optimizeDeps: {
     include: ['three', 'react-force-graph-3d', 'three-spritetext']
   }

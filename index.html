@@ -1,26 +1,34 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MathLogic Nexus 3D</title>
-    <script type="importmap">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body { margin: 0; overflow: hidden; background-color: #000005; color: #e2e8f0; }
+      /* Scrollbar styling for the sidebar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #0f172a; }
+      ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+  <script type="importmap">
 {
   "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/": "https://unpkg.com/three@0.160.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
     "three-spritetext": "https://aistudiocdn.com/three-spritetext@^1.10.0",
-    "react-force-graph-3d": "https://aistudiocdn.com/react-force-graph-3d@^1.29.0",
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
     "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
-    "vite": "https://aistudiocdn.com/vite@^7.2.4"
+    "react-force-graph-3d": "https://aistudiocdn.com/react-force-graph-3d@^1.29.0",
+    "three": "https://aistudiocdn.com/three@^0.181.2",
+    "path": "https://aistudiocdn.com/path@^0.12.7"
   }
 }
 </script>
-  </head>
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>

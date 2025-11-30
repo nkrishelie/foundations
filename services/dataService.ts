@@ -1,4 +1,3 @@
-
 import { GraphData, Discipline, LinkType, Language } from '../types';
 
 interface LocalizedContent {
@@ -14,8 +13,8 @@ interface NodeDefinition {
   content: Record<Language, LocalizedContent>;
 }
 
-// Helper for Unicode replacements to avoid LaTeX rendering issues in SpriteText
-const latexToUnicode = (str: string): string => str
+// Helper for Unicode replacements
+const uni = (str: string) => str
   .replace(/\\mathbb{N}/g, 'ℕ')
   .replace(/\\mathbb{Z}/g, 'ℤ')
   .replace(/\\mathbb{Q}/g, 'ℚ')
@@ -411,7 +410,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       }
     }
   },
-  // ENSURED NODE: Theory of Order
+  // NEWLY ADDED NODE: Theory of Order
   'theory_order': {
     group: Discipline.ORDER_THEORY,
     val: 15,
@@ -1109,9 +1108,9 @@ export const getGraphData = (lang: Language = 'en'): GraphData => {
       group: node.group,
       val: node.val,
       synonyms: node.synonyms,
-      label: latexToUnicode(content.label),
-      description: latexToUnicode(content.description),
-      details: content.details.map(latexToUnicode)
+      label: uni(content.label),
+      description: uni(content.description),
+      details: content.details.map(uni)
     };
   });
 

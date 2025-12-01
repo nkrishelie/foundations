@@ -7,7 +7,6 @@ interface Props {
   onToggleLang: (lang: Language) => void;
 }
 
-// Словарь текстов
 const CONTENT = {
   en: {
     subtitle: "Interactive 3D Knowledge Graph",
@@ -45,7 +44,7 @@ const CONTENT = {
     joystickTitle: "Экранный Джойстик",
     joystickDesc: "Используйте джойстик в левом нижнем углу для навигации без мыши.",
     langSearchTitle: "Язык и Поиск",
-    langSearchDesc: "Переключайте RU/EN в верхней панели. Используйте поиск для мгновенного нахождения теорем.",
+    langSearchDesc: "Переключайте RU/EN в верхней панели. Используйте поиск для нахождения теорем.",
     legendTitle: "Легенда и Категории",
     legendDesc: "Узлы раскрашены по дисциплинам. См. панель «Легенда» справа для расшифровки цветов.",
     startBtn: "Начать Исследование 🚀",
@@ -54,18 +53,22 @@ const CONTENT = {
 };
 
 export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang, onToggleLang }) => {
-  const t = CONTENT[currentLang]; // Выбираем тексты на текущем языке
+  const t = CONTENT[currentLang];
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 animate-in fade-in duration-500">
       
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-w-3xl w-full p-8 relative overflow-hidden flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar">
+      {/* ИЗМЕНЕНИЯ РАЗМЕРОВ:
+         1. max-w-4xl (шире)
+         2. p-6 (меньше внутренние отступы, было p-8)
+         3. max-h-screen (чтобы точно не вылезало)
+      */}
+      <div className="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-w-4xl w-full p-6 relative overflow-hidden flex flex-col max-h-[95vh] overflow-y-auto custom-scrollbar">
         
-        {/* Декоративная линия */}
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
 
-        {/* Переключатель языков (Абсолютное позиционирование в углу) */}
-        <div className="absolute top-4 right-4 flex space-x-1 bg-slate-800/80 p-1 rounded-lg border border-slate-600/50">
+        {/* Переключатель языков */}
+        <div className="absolute top-4 right-4 flex space-x-1 bg-slate-800/80 p-1 rounded-lg border border-slate-600/50 z-10">
           <button 
             onClick={() => onToggleLang('ru')} 
             className={`px-2 py-1 rounded text-xs font-bold transition-all ${currentLang === 'ru' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
@@ -80,78 +83,77 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang, onToggleLa
           </button>
         </div>
 
-        {/* Заголовок */}
-        <div className="text-center mb-8 mt-2">
-          <h2 className="text-4xl font-bold text-white mb-2">
+        {/* Заголовок (уменьшили margin-bottom с 8 до 6 и размер шрифта) */}
+        <div className="text-center mb-6 mt-1">
+          <h2 className="text-3xl font-bold text-white mb-1">
             MathLogic <span className="text-blue-400">Nexus</span>
           </h2>
-          <p className="text-slate-400 text-lg">{t.subtitle}</p>
+          <p className="text-slate-400 text-base">{t.subtitle}</p>
         </div>
 
-        {/* Секция 1: Мышь */}
-        <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4 border-b border-slate-700/50 pb-2">
+        {/* Секция 1: Мышь (уменьшили отступы) */}
+        <h3 className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3 border-b border-slate-700/50 pb-1">
           {t.mouseTitle}
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="flex flex-col items-center p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
-            <div className="text-2xl mb-2">🖱️</div>
-            <strong className="text-white mb-1 text-xs sm:text-sm">{t.leftDrag}</strong>
-            <span className="text-slate-500 text-[10px] sm:text-xs">{t.rotate}</span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div className="flex flex-col items-center p-2.5 bg-slate-800/50 rounded-xl border border-slate-700/50">
+            <div className="text-xl mb-1">🖱️</div>
+            <strong className="text-white mb-0.5 text-xs sm:text-sm">{t.leftDrag}</strong>
+            <span className="text-slate-500 text-[10px]">{t.rotate}</span>
           </div>
-          <div className="flex flex-col items-center p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
-            <div className="text-2xl mb-2">✋</div>
-            <strong className="text-white mb-1 text-xs sm:text-sm">{t.rightDrag}</strong>
-            <span className="text-slate-500 text-[10px] sm:text-xs">{t.pan}</span>
+          <div className="flex flex-col items-center p-2.5 bg-slate-800/50 rounded-xl border border-slate-700/50">
+            <div className="text-xl mb-1">✋</div>
+            <strong className="text-white mb-0.5 text-xs sm:text-sm">{t.rightDrag}</strong>
+            <span className="text-slate-500 text-[10px]">{t.pan}</span>
           </div>
-          <div className="flex flex-col items-center p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
-            <div className="text-2xl mb-2">📜</div>
-            <strong className="text-white mb-1 text-xs sm:text-sm">{t.scroll}</strong>
-            <span className="text-slate-500 text-[10px] sm:text-xs">{t.zoom}</span>
+          <div className="flex flex-col items-center p-2.5 bg-slate-800/50 rounded-xl border border-slate-700/50">
+            <div className="text-xl mb-1">📜</div>
+            <strong className="text-white mb-0.5 text-xs sm:text-sm">{t.scroll}</strong>
+            <span className="text-slate-500 text-[10px]">{t.zoom}</span>
           </div>
-          <div className="flex flex-col items-center p-3 bg-blue-900/20 rounded-xl border border-blue-500/50 shadow-[0_0_10px_rgba(59,130,246,0.15)]">
-            <div className="text-2xl mb-2">👆</div>
-            <strong className="text-blue-100 mb-1 text-xs sm:text-sm">{t.click}</strong>
-            <span className="text-blue-300 text-[10px] sm:text-xs">{t.details}</span>
+          <div className="flex flex-col items-center p-2.5 bg-blue-900/20 rounded-xl border border-blue-500/50 shadow-sm">
+            <div className="text-xl mb-1">👆</div>
+            <strong className="text-blue-100 mb-0.5 text-xs sm:text-sm">{t.click}</strong>
+            <span className="text-blue-300 text-[10px]">{t.details}</span>
           </div>
         </div>
 
-        {/* Секция 2: Интерфейс */}
-        <h3 className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-4 border-b border-slate-700/50 pb-2">
+        {/* Секция 2: Интерфейс (уменьшили шрифт описаний) */}
+        <h3 className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3 border-b border-slate-700/50 pb-1">
           {t.interfaceTitle}
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-sm text-slate-300">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm text-slate-300">
           <div className="flex items-start space-x-3">
-            <span className="text-2xl bg-slate-800 rounded p-1">🎮</span>
+            <span className="text-xl bg-slate-800 rounded p-1">🎮</span>
             <div>
-              <strong className="text-white block mb-1">{t.joystickTitle}</strong>
-              <p className="text-slate-400 text-xs leading-relaxed">{t.joystickDesc}</p>
+              <strong className="text-white block mb-0.5 text-sm">{t.joystickTitle}</strong>
+              <p className="text-slate-400 text-xs leading-snug">{t.joystickDesc}</p>
             </div>
           </div>
           <div className="flex items-start space-x-3">
-            <span className="text-2xl bg-slate-800 rounded p-1">🌐</span>
+            <span className="text-xl bg-slate-800 rounded p-1">🌐</span>
             <div>
-              <strong className="text-white block mb-1">{t.langSearchTitle}</strong>
-              <p className="text-slate-400 text-xs leading-relaxed">{t.langSearchDesc}</p>
+              <strong className="text-white block mb-0.5 text-sm">{t.langSearchTitle}</strong>
+              <p className="text-slate-400 text-xs leading-snug">{t.langSearchDesc}</p>
             </div>
           </div>
           <div className="flex items-start space-x-3">
-            <span className="text-2xl bg-slate-800 rounded p-1">🎨</span>
+            <span className="text-xl bg-slate-800 rounded p-1">🎨</span>
             <div>
-              <strong className="text-white block mb-1">{t.legendTitle}</strong>
-              <p className="text-slate-400 text-xs leading-relaxed">{t.legendDesc}</p>
+              <strong className="text-white block mb-0.5 text-sm">{t.legendTitle}</strong>
+              <p className="text-slate-400 text-xs leading-snug">{t.legendDesc}</p>
             </div>
           </div>
         </div>
 
         {/* Описание и Кнопка */}
-        <p className="text-slate-400 text-sm text-center mb-6 max-w-lg mx-auto">
-          {t.descMain}
-        </p>
-
-        <div className="text-center mt-auto">
+        <div className="mt-auto pt-2 text-center">
+          <p className="text-slate-400 text-xs mb-4 max-w-lg mx-auto">
+            {t.descMain}
+          </p>
           <button 
             onClick={onStart}
-            className="px-16 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02] shadow-lg shadow-purple-500/25 active:scale-95"
+            className="px-12 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02] shadow-lg shadow-purple-500/25 active:scale-95 text-sm sm:text-base"
           >
             {t.startBtn}
           </button>

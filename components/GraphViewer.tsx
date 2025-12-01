@@ -98,27 +98,29 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
     isInited.current = false;
   }, [activeLanguage]);
 
-  // --- НАСТРОЙКА ФИЗИКИ (LAYOUT) ---
+// --- НАСТРОЙКА ФИЗИКИ (LAYOUT) ---
   useEffect(() => {
-    const fg = graphRef.current;
-    if (fg) {
-      // 1. Сила отталкивания (Charge). 
-      // Значение по умолчанию около -50. Мы ставим -800, чтобы узлы сильно отлетали друг от друга.
-      // Это дает пространство для чтения текста.
-      fg.d3Force('charge').strength(-800);
+    // Ждем, пока данные загрузятся
+    if (!data || data.nodes.length === 0) return;
 
-      // 2. Длина связей (Link Distance).
-      // Увеличиваем длину пружин, чтобы связи не стягивали граф в точку.
-      fg.d3Force('link').distance(70);
+    // Небольшая задержка, чтобы внутренний движок D3 успел инициализироваться
+    const timer = setTimeout(() => {
+      const fg = graphRef.current;
+      if (fg) {
+        // Используем ?. (опциональную цепочку) для безопасности
+        // 1. Отталкивание (разлетаемся сильнее)
+        fg.d3Force('charge')?.strength(-800);
 
-      // 3. (Опционально) Центрирование
-      // Небольшая сила, тянущая все к центру (0,0,0), чтобы граф не улетел в бесконечность
-      // fg.d3Force('center').strength(0.05);
-      
-      // Перезапускаем разогрев движка, чтобы применить новые силы
-      fg.d3ReheatSimulation();
-    }
-  }, []);
+        // 2. Длина связей (даем простор)
+        fg.d3Force('link')?.distance(70);
+
+        // Перезапуск симуляции с новыми параметрами
+        fg.d3ReheatSimulation();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [data]); // <--- Важно: запускаем только когда пришли данные
   
   // Focus on search result
   useEffect(() => {

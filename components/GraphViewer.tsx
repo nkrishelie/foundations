@@ -109,10 +109,10 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       if (fg) {
         // Используем ?. (опциональную цепочку) для безопасности
         // 1. Отталкивание (разлетаемся сильнее)
-        fg.d3Force('charge')?.strength(-800);
+        fg.d3Force('charge')?.strength(-120);
 
         // 2. Длина связей (даем простор)
-        fg.d3Force('link')?.distance(70);
+        fg.d3Force('link')?.distance(35);
 
         // Перезапуск симуляции с новыми параметрами
         fg.d3ReheatSimulation();

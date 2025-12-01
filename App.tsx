@@ -11,33 +11,6 @@ const App: React.FC = () => {
   // Re-generate graph data whenever language changes
   const data = useMemo(() => getGraphData(language), [language]);
 
-// --- ВСТАВИТЬ ЭТОТ БЛОК ---
-  // Debug: Поиск потерянных узлов (Orphans Check)
-  useEffect(() => {
-    const linkedNodeIds = new Set<string>();
-    
-    // 1. Собираем ID всех узлов, у которых есть связи
-    data.links.forEach((link: any) => {
-      // Библиотека может превращать source/target в объекты, поэтому проверяем оба варианта
-      const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-      const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-      linkedNodeIds.add(sourceId);
-      linkedNodeIds.add(targetId);
-    });
-
-    // 2. Ищем узлы, которых нет в списке связей
-    const orphans = data.nodes.filter(n => !linkedNodeIds.has(n.id));
-
-    if (orphans.length > 0) {
-      console.warn(`⚠️ НАЙДЕНО ${orphans.length} ИЗОЛИРОВАННЫХ УЗЛОВ!`);
-      console.table(orphans.map(n => ({ id: n.id, label: n.label })));
-      console.log('Добавьте связи для этих узлов в RAW_LINKS (dataService.ts)');
-    } else {
-      console.log('✅ Целостность данных в порядке: изолированных узлов нет.');
-    }
-  }, [data]);
-  // --- КОНЕЦ БЛОКА ---
-  
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 

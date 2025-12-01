@@ -279,7 +279,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         onNodeClick(node);
       }}
       
-      d3VelocityDecay={0.1}
+      d3VelocityDecay={0.2}
       d3AlphaDecay={0.01}
       onEngineStop={() => {
         if (!isInited.current && graphRef.current) {
@@ -289,7 +289,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       }}
       controlType="orbit"
       enableNodeDrag={true}
-      warmupTicks={100}
+      warmupTicks={200}
       cooldownTicks={100}
     />
   );

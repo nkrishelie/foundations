@@ -36,7 +36,8 @@ const App: React.FC = () => {
       {/* UI Layer */}
       <div className="absolute inset-0 z-10 pointer-events-none">
         <UIOverlay 
-          nodes={data.nodes} // <--- ДОБАВИТЬ ЭТУ СТРОКУ
+          nodes={data.nodes}
+          links={data.links}
           selectedNode={selectedNode} 
           onSearch={(query) => {
             setSearchQuery(query);

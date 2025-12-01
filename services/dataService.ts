@@ -1370,10 +1370,210 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       en: { label: '$\\Gamma_0$ (Feferman-Schütte)', description: 'The proof-theoretic ordinal of Predicative Analysis.', details: ['Veblen Hierarchy', 'ATR₀ ordinal'] },
       ru: { label: '$\\Gamma_0$ (Фефермана-Шютте)', description: 'Доказательно-теоретический ординал предикативного анализа.', details: ['Иерархия Веблена', 'Ординал ATR₀'] }
     }
+  },
+  // --- CONSTRUCTIVE MATH & INTUITIONISM ---
+  'bhk_interpretation': {
+    group: Discipline.LOGIC,
+    val: 14,
+    synonyms: ['BHK', 'Брауэр-Гейтинг-Колмогоров'],
+    content: {
+      en: {
+        label: 'BHK Interpretation',
+        description: 'The standard semantics for intuitionistic logic. Explains logical connectives via proofs/constructions.',
+        details: ['Proof of $A \\to B$ is a construction', 'Constructive existence', 'Problem classification (Kolmogorov)']
+      },
+      ru: {
+        label: 'Интерпретация BHK',
+        description: 'Стандартная семантика интуиционистской логики. Объясняет связки через доказательства/построения.',
+        details: ['Доказательство $A \\to B$ — это построение', 'Конструктивное существование', 'Классификация задач (Колмогоров)']
+      }
+    }
+  },
+  'heyting_arithmetic': {
+    group: Discipline.LOGIC,
+    val: 16,
+    synonyms: ['HA', 'Арифметика Гейтинга'],
+    content: {
+      en: {
+        label: 'Heyting Arithmetic (HA)',
+        description: 'Intuitionistic version of Peano Arithmetic (PA). Same axioms, but underlying logic is Intuitionistic.',
+        details: ['Disjunction Property', 'Existence Property', 'Conservative over PA for $\\Pi^0_2$']
+      },
+      ru: {
+        label: 'Арифметика Гейтинга (HA)',
+        description: 'Интуиционистская версия арифметики Пеано (PA). Те же аксиомы, но логика интуиционистская.',
+        details: ['Дизъюнктивное свойство', 'Экзистенциальное свойство', 'Консервативна над PA для $\\Pi^0_2$']
+      }
+    }
+  },
+  'realizability': {
+    group: Discipline.LOGIC,
+    val: 14,
+    synonyms: ['Реализуемость', 'Realizability'],
+    content: {
+      en: {
+        label: 'Kleene Realizability',
+        description: 'Semantics connecting intuitionistic logic with computability. Formulas are "realized" by numbers (programs).',
+        details: ['Formula $e \\Vdash \\phi$', 'Analysis of HA', 'Church\'s Thesis provable in HA+ECT']
+      },
+      ru: {
+        label: 'Реализуемость по Клини',
+        description: 'Семантика, связывающая интуиционизм и вычислимость. Формулы "реализуются" числами (программами).',
+        details: ['Формула $e \\Vdash \\phi$', 'Анализ HA', 'Тезис Чёрча доказуем в HA+ECT']
+      }
+    }
+  },
+  'markov_principle': {
+    group: Discipline.LOGIC,
+    val: 10,
+    synonyms: ['Принцип Маркова', 'MP'],
+    content: {
+      en: {
+        label: 'Markov\'s Principle (MP)',
+        description: 'Constructive principle: If a Turing machine doesn\'t loop forever, it halts.',
+        details: ['$\\neg\\neg\\exists x P(x) \\to \\exists x P(x)$ (for decidable P)', 'Valid in Russian Constructivism']
+      },
+      ru: {
+        label: 'Принцип Маркова (MP)',
+        description: 'Конструктивный принцип: Если машина Тьюринга не зацикливается вечно, она останавливается.',
+        details: ['$\\neg\\neg\\exists x P(x) \\to \\exists x P(x)$ (для разрешимых P)', 'Принят в русской школе конструктивизма']
+      }
+    }
+  },
+
+  // --- LAMBDA & COMBINATORS ---
+  'church_rosser': {
+    group: Discipline.COMPUTABILITY,
+    val: 12,
+    synonyms: ['Теорема Чёрча-Россера', 'Confluence'],
+    content: {
+      en: {
+        label: 'Church-Rosser Thm',
+        description: 'Confluence property of $\\lambda$-calculus. Order of reduction does not matter for the final result.',
+        details: ['Diamond Property', 'Uniqueness of Normal Form', 'Consistency of $\\lambda$-calculus']
+      },
+      ru: {
+        label: 'Теорема Чёрча-Россера',
+        description: 'Свойство конфлюэнтности $\\lambda$-исчисления. Порядок вычислений не влияет на конечный результат.',
+        details: ['Свойство ромба', 'Единственность нормальной формы', 'Непротиворечивость $\\lambda$-исчисления']
+      }
+    }
+  },
+  'ski_combinators': {
+    group: Discipline.COMPUTABILITY,
+    val: 12,
+    synonyms: ['SKI', 'Комбинаторы'],
+    content: {
+      en: {
+        label: 'S, K, I Combinators',
+        description: 'Basis for Combinatory Logic. Can express any computable function without variables.',
+        details: ['$Kxy = x$', '$Sxyz = xz(yz)$', 'Connection to Hilbert Axioms']
+      },
+      ru: {
+        label: 'Комбинаторы S, K, I',
+        description: 'Базис комбинаторной логики. Позволяют выразить любую вычислимую функцию без переменных.',
+        details: ['$Kxy = x$', '$Sxyz = xz(yz)$', 'Связь с аксиомами Гильберта']
+      }
+    }
+  },
+  'fixed_point_comb': {
+    group: Discipline.COMPUTABILITY,
+    val: 12,
+    synonyms: ['Y Combinator', 'Y-комбинатор', 'Неподвижная точка'],
+    content: {
+      en: {
+        label: 'Fixed Point Combinator',
+        description: 'A higher-order function that computes a fixed point ($f(Yf) = Yf$). Allows recursion in $\\lambda$-calculus.',
+        details: ['Y Combinator', 'Recursion', '$\\lambda f.(\\lambda x.f(xx))(\\lambda x.f(xx))$']
+      },
+      ru: {
+        label: 'Комбинатор неподвижной точки',
+        description: 'Функция высшего порядка, вычисляющая неподвижную точку. Обеспечивает рекурсию в $\\lambda$-исчислении.',
+        details: ['Y-комбинатор', 'Рекурсия', '$\\lambda f.(\\lambda x.f(xx))(\\lambda x.f(xx))$']
+      }
+    }
+  },
+
+  // --- RECURSION THEORY THEOREMS ---
+  'smn_theorem': {
+    group: Discipline.COMPUTABILITY,
+    val: 12,
+    synonyms: ['s-m-n теорема', 'Параметризация'],
+    content: {
+      en: {
+        label: 's-m-n Theorem',
+        description: 'Parameterization theorem. Allows partial application of arguments in computable functions.',
+        details: ['Partial evaluation', 'Currying in Computability', 'Kleene']
+      },
+      ru: {
+        label: 's-m-n теорема',
+        description: 'Теорема о параметризации. Позволяет фиксировать часть аргументов вычислимой функции.',
+        details: ['Частичное вычисление', 'Каррирование в вычислимости', 'Клини']
+      }
+    }
+  },
+  'rice_theorem': {
+    group: Discipline.COMPUTABILITY,
+    val: 12,
+    synonyms: ['Теорема Райса'],
+    content: {
+      en: {
+        label: 'Rice\'s Theorem',
+        description: 'Any non-trivial semantic property of a program is undecidable.',
+        details: ['Index sets', 'Undecidability', 'Extensional properties']
+      },
+      ru: {
+        label: 'Теорема Райса',
+        description: 'Любое нетривиальное семантическое свойство программы алгоритмически неразрешимо.',
+        details: ['Индексные множества', 'Неразрешимость', 'Экстенсиональные свойства']
+      }
+    }
+  },
+  'recursion_theorem': {
+    group: Discipline.COMPUTABILITY,
+    val: 14,
+    synonyms: ['Теорема о рекурсии', 'Kleene Recursion'],
+    content: {
+      en: {
+        label: 'Kleene\'s Recursion Thm',
+        description: 'A program can obtain its own source code during execution.',
+        details: ['Fixed Point in Computability', 'Quines', 'Self-reference']
+      },
+      ru: {
+        label: 'Теорема о рекурсии',
+        description: 'Программа может получить доступ к собственному исходному коду во время выполнения.',
+        details: ['Неподвижная точка в вычислимости', 'Куайны', 'Самореференция']
+      }
+    }
   }
 };
 
 const RAW_LINKS = [
+    // Constructive Math & Intuitionism
+    { source: 'intuitionistic_logic', target: 'bhk_interpretation', type: LinkType.RELATED },
+    { source: 'bhk_interpretation', target: 'math_lang', type: LinkType.RELATED }, // Semantics of proofs
+    { source: 'heyting_arithmetic', target: 'intuitionistic_logic', type: LinkType.MODELS },
+    { source: 'heyting_arithmetic', target: 'theory_PA', type: LinkType.RELATED }, // HA is intuitionistic PA
+    { source: 'realizability', target: 'heyting_arithmetic', type: LinkType.RELATED }, // Semantics for HA
+    { source: 'realizability', target: 'comp_theory', type: LinkType.CONTAINS }, // Uses codes of programs
+    { source: 'markov_principle', target: 'heyting_arithmetic', type: LinkType.EXTENDS }, // MP extends constructive logic
+    { source: 'markov_principle', target: 'comp_theory', type: LinkType.RELATED }, // Halting based
+
+    // Lambda & Combinators
+    { source: 'lambda_calc', target: 'church_rosser', type: LinkType.PROVES },
+    { source: 'lambda_calc', target: 'fixed_point_comb', type: LinkType.CONTAINS },
+    { source: 'ski_combinators', target: 'combinators', type: LinkType.EXTENDS },
+    { source: 'ski_combinators', target: 'inference_rules', type: LinkType.RELATED }, // K and S correspond to axioms
+    { source: 'ski_combinators', target: 'curry_howard', type: LinkType.RELATED },
+    { source: 'fixed_point_comb', target: 'recursion_theorem', type: LinkType.EQUIVALENT }, // Y combinator vs Kleene Recursion
+
+    // Recursion Theory
+    { source: 'comp_theory', target: 'smn_theorem', type: LinkType.PROVES },
+    { source: 'comp_theory', target: 'rice_theorem', type: LinkType.PROVES },
+    { source: 'comp_theory', target: 'recursion_theorem', type: LinkType.PROVES },
+    { source: 'rice_theorem', target: 'incompleteness', type: LinkType.RELATED }, // Undecidability connection
+    { source: 'recursion_theorem', target: 'incompleteness', type: LinkType.RELATED }, // Used in Gödel's proof (diagonalization)
+  
     // Language & Logic
     { source: 'math_lang', target: 'pred_logic', type: LinkType.CONTAINS },
     { source: 'pred_logic', target: 'prop_logic', type: LinkType.CONTAINS },

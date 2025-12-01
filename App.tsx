@@ -1,4 +1,4 @@
-
+import { WelcomeModal } from './components/WelcomeModal';
 import React, { useState, useEffect, useMemo } from 'react';
 import { GraphViewer } from './components/GraphViewer';
 import { UIOverlay } from './components/UIOverlay';
@@ -13,7 +13,7 @@ const App: React.FC = () => {
 
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [showWelcome, setShowWelcome] = useState(true); // Показывать по умолчанию
   const handleNodeClick = (node: GraphNode) => {
     setSelectedNode(node);
   };
@@ -24,6 +24,11 @@ const App: React.FC = () => {
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
+      {/* МОДАЛЬНОЕ ОКНО (Показываем, если showWelcome === true) */}
+      {showWelcome && (
+        <WelcomeModal onStart={() => setShowWelcome(false)} />
+      )}
+      
       {/* 3D Scene */}
       <div className="absolute inset-0 z-0" onClick={handleBackgroundClick}>
         <GraphViewer 

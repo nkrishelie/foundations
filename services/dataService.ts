@@ -472,7 +472,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   // --- ARITHMETIC ---
   'theory_PA': {
     group: Discipline.LOGIC,
-    val: 25,
+    val: 30,
     synonyms: ['Арифметика Пеано', 'PA'],
     content: {
       en: {
@@ -617,7 +617,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   // --- SET THEORY ---
   'zfc': {
     group: Discipline.SET_THEORY,
-    val: 30,
+    val: 35,
     synonyms: ['Теория множеств', 'ЗФЦ', 'ZFC'],
     content: {
       en: {
@@ -957,7 +957,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   },
   'mt_concepts': {
     group: Discipline.MODEL_THEORY,
-    val: 25,
+    val: 35,
     synonyms: ['Теория моделей'],
     content: {
       en: {
@@ -1403,7 +1403,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   // --- TOPOLOGY ---
   'topology': {
     group: Discipline.TOPOLOGY,
-    val: 15,
+    val: 25,
     synonyms: ['Топология'],
     content: {
       en: {

@@ -13,7 +13,9 @@
     "react-dom": "^18.2.0",
     "react-force-graph-3d": "^1.24.2",
     "three": "^0.160.0",
-    "three-spritetext": "^1.8.2"
+    "three-spritetext": "^1.8.2",
+    "katex": "^0.16.9",           
+    "react-latex-next": "^3.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

@@ -1184,10 +1184,13 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     group: Discipline.MODEL_THEORY,
     val: 14,
     content: {
-      en: { label: 'EF Games', description: 'Ehrenfeucht-Fraïssé Games for determining elementary equivalence.', details: ['Back-and-forth', 'Quantifier Rank'] },
-      ru: { label: 'Игры ЭФ', description: 'Игры Эренфойхта-Фраисси для определения элементарной эквивалентности.', details: ['Back-and-forth', 'Кванторный ранг'] }
+      en: { label: 'EF Games', description: 'Ehrenfeucht-Fraïssé Games for determining elementary equivalence.', 
+           details: ['Back-and-forth', 'Quantifier Rank'] },
+      ru: { label: 'Игры ЭФ', description: 'Игры Эренфойхта-Фраисси для определения элементарной эквивалентности.', 
+           details: ['Back-and-forth', 'Кванторный ранг'] }
     }
   },
+          
   'thm_tarski_truth': {
     group: Discipline.LOGIC,
     val: 14,
@@ -1195,13 +1198,13 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     content: {
       en: {
         label: 'Tarski\'s Undefinability',
-        description: 'Arithmetical truth cannot be defined within arithmetic itself.',
-        details: ['Truth predicate', 'Hierarchy of formulae', 'Diagonalization', 'Limits of formalism']
+        description: 'Truth in the standard model $\\mathbb{N}$ cannot be defined within arithmetic itself.',
+        details: ['No truth predicate $Tr(x)$', 'Hierarchy of formulae', 'Diagonalization', 'Limits of formalism']
       },
       ru: {
-        label: 'Невыразимость Истины',
-        description: 'Арифметическая истина не может быть определена внутри самой арифметики.',
-        details: ['Предикат истины', 'Иерархия формул', 'Диагонализация', 'Пределы формализма']
+        label: 'Невыразимость истины (Тарский)',
+        description: 'Истинность в стандартной модели $\\mathbb{N}$ не может быть определена средствами самой арифметики.',
+        details: ['Нет предиката истины $Tr(x)$', 'Иерархия формул', 'Диагонализация', 'Пределы формализма']
       }
     }
   },
@@ -1881,6 +1884,127 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       }
     }
   },
+  // --- ИЗВЛЕЧЕНО ИЗ D3.tex (ARITHMETIC DEEP DIVE) ---
+  'sequence_coding': {
+    group: Discipline.LOGIC,
+    val: 14,
+    synonyms: ['Кодирование последовательностей', 'Гёделева нумерация', 'Beta-function'],
+    content: {
+      en: {
+        label: 'Sequence Coding',
+        description: 'Method to encode finite sequences of numbers into a single number. Crucial for Arithmetization of Syntax.',
+        details: ['Gödel\'s $\\beta$-function', 'Chinese Remainder Theorem', 'Fundamental Theorem of Arithmetic']
+      },
+      ru: {
+        label: 'Кодирование последовательностей',
+        description: 'Метод кодирования конечных последовательностей чисел одним числом. Ключ к арифметизации синтаксиса.',
+        details: ['$\\beta$-функция Гёделя', 'Китайская теорема об остатках', 'Основная теорема арифметики']
+      }
+    }
+  },
+  'goodstein_theorem': {
+    group: Discipline.PROOF_THEORY,
+    val: 16,
+    synonyms: ['Теорема Гудстейна', 'Goodstein'],
+    content: {
+      en: {
+        label: 'Goodstein\'s Theorem',
+        description: 'A combinatorial number-theoretic statement unprovable in Peano Arithmetic (PA).',
+        details: ['Independent of PA', 'Provable in $Z_2$ or $\\mathsf{PA} + \\epsilon_0$', 'Hereditary base-$n$ notation']
+      },
+      ru: {
+        label: 'Теорема Гудстейна',
+        description: 'Теоретико-числовое утверждение, недоказуемое в арифметике Пеано (PA).',
+        details: ['Независима от PA', 'Доказуема в $Z_2$ или $\\mathsf{PA} + \\epsilon_0$', 'Наследственное представление']
+      }
+    }
+  },
+  // --- ИЗВЛЕЧЕНО ИЗ D4.tex & levelC1.tex (SET THEORY) ---
+  'cantor_theorem': {
+    group: Discipline.SET_THEORY,
+    val: 16,
+    synonyms: ['Теорема Кантора', 'Power Set Cardinality'],
+    content: {
+      en: {
+        label: 'Cantor\'s Theorem',
+        description: 'Strict inequality between a set and its power set: $|A| < |\\mathcal{P}(A)|$.',
+        details: ['Diagonal Argument', 'No surjection $A \\to \\mathcal{P}(A)$', 'Foundation of transfinite hierarchy']
+      },
+      ru: {
+        label: 'Теорема Кантора',
+        description: 'Строгое неравенство между множеством и его булеаном: $|A| < |\\mathcal{P}(A)|$.',
+        details: ['Диагональный аргумент', 'Нет сюръекции $A \\to \\mathcal{P}(A)$', 'Основа трансфинитной иерархии']
+      }
+    }
+  },
+  'ultrafilter': {
+    group: Discipline.ORDER_THEORY, // Или Topology/Set Theory
+    val: 14,
+    synonyms: ['Ультрафильтр'],
+    content: {
+      en: {
+        label: 'Ultrafilter',
+        description: 'A maximal proper filter on a Boolean algebra (or set). Represents a "large" subset concept.',
+        details: ['Principal vs Non-principal', 'Ultrafilter Lemma', 'Used in Ultraproducts']
+      },
+      ru: {
+        label: 'Ультрафильтр',
+        description: 'Максимальный собственный фильтр на булевой алгебре. Формализует понятие "большого" множества.',
+        details: ['Главные и неглавные', 'Лемма об ультрафильтре', 'Используется в ультрапроизведениях']
+      }
+    }
+  },
+  'bpi': {
+    group: Discipline.SET_THEORY,
+    val: 14,
+    synonyms: ['BPI', 'Boolean Prime Ideal'],
+    content: {
+      en: {
+        label: 'Boolean Prime Ideal Thm (BPI)',
+        description: 'Every Boolean algebra has a prime ideal. Weaker than AC, stronger than ZF.',
+        details: ['Equivalent to Stone Rep.', 'Equivalent to Ultrafilter Lemma', 'Compactness of Logic']
+      },
+      ru: {
+        label: 'Теорема о простом идеале (BPI)',
+        description: 'В любой булевой алгебре есть простой идеал. Слабее AC, сильнее ZF.',
+        details: ['Эквивалентна теореме Стоуна', 'Лемма об ультрафильтре', 'Компактность логики']
+      }
+    }
+  },
+  'transitive_set': {
+    group: Discipline.SET_THEORY,
+    val: 10,
+    synonyms: ['Транзитивное множество'],
+    content: {
+      en: {
+        label: 'Transitive Set',
+        description: 'A set $X$ where every element is also a subset ($y \\in x \\in X \\implies y \\in X$).',
+        details: ['Basis for Ordinals', 'Von Neumann construction', 'Most models of ZFC are transitive']
+      },
+      ru: {
+        label: 'Транзитивное множество',
+        description: 'Множество $X$, элементы которого являются его подмножествами ($y \\in x \\in X \\implies y \\in X$).',
+        details: ['Базис для ординалов', 'Конструкция фон Неймана', 'Модели ZFC обычно транзитивны']
+      }
+    }
+  },
+  'skolem_paradox': {
+    group: Discipline.MODEL_THEORY,
+    val: 12,
+    synonyms: ['Парадокс Скулема'],
+    content: {
+      en: {
+        label: 'Skolem\'s Paradox',
+        description: 'ZFC has a countable model (if consistent), yet proves the existence of uncountable sets.',
+        details: ['Relativity of "countable"', 'Löwenheim-Skolem Thm', 'External vs Internal view']
+      },
+      ru: {
+        label: 'Парадокс Скулема',
+        description: 'ZFC имеет счетную модель (если непротиворечива), но доказывает существование несчетных множеств.',
+        details: ['Относительность "счетности"', 'Теорема Лёвенгейма-Сколема', 'Внешний и внутренний взгляд']
+      }
+    }
+  },
 };
 
 const RAW_LINKS = [
@@ -2194,6 +2318,43 @@ const RAW_LINKS = [
     
     { source: 'modal_GL', target: 'scattered_space', type: LinkType.MODELS }, 
     { source: 'scattered_space', target: 'topology', type: LinkType.EXTENDS },
+
+    // --- FROM D3.tex (Arithmetic & Incompleteness) ---
+    // Кодирование последовательностей нужно для арифметизации синтаксиса
+    { source: 'sequence_coding', target: 'theory_PA', type: LinkType.CONTAINS },
+    { source: 'sequence_coding', target: 'crt', type: LinkType.RELATED }, // CRT is used for coding (Beta-function)
+    { source: 'incompleteness', target: 'sequence_coding', type: LinkType.RELATED }, // Gödel numbering relies on this
+    
+    // Теорема Гудстейна - пример независимости от PA
+    { source: 'theory_PA', target: 'goodstein_theorem', type: LinkType.RELATED }, 
+    { source: 'goodstein_theorem', target: 'epsilon_0', type: LinkType.RELATED }, // Доказывается с помощью трансфинитной индукции до Epsilon-0
+    { source: 'goodstein_theorem', target: 'ordinal_arithmetic', type: LinkType.RELATED }, // Формулируется в терминах ординалов (база n)
+
+    // Невыразимость истины
+    { source: 'theory_PA', target: 'thm_tarski_truth', type: LinkType.RELATED },
+    { source: 'thm_tarski_truth', target: 'incompleteness', type: LinkType.RELATED }, // Связанные результаты
+
+    // --- FROM D4.tex & levelC1.tex (Set Theory) ---
+    // Кантор
+    { source: 'zfc', target: 'cantor_theorem', type: LinkType.PROVES },
+    { source: 'cantor_theorem', target: 'cardinal_arithmetic', type: LinkType.RELATED }, // Основа кардинальной арифметики
+
+    // Транзитивные множества и Ординалы
+    { source: 'ordinal_arithmetic', target: 'transitive_set', type: LinkType.EXTENDS }, // Ординал - это транзитивное множество, вполне упорядоченное эпсилон
+    { source: 'cumulative_hierarchy', target: 'transitive_set', type: LinkType.RELATED }, // Уровни V_alpha транзитивны
+
+    // Ультрафильтры и BPI
+    { source: 'ultrafilter', target: 'bool_alg', type: LinkType.RELATED }, // Определяется на булевой алгебре
+    { source: 'ultraproduct', target: 'ultrafilter', type: LinkType.CONTAINS }, // Использует ультрафильтр для построения
+    { source: 'stone_space', target: 'ultrafilter', type: LinkType.RELATED }, // Точки пространства Стоуна = ультрафильтры
+    { source: 'bpi', target: 'axiom_choice', type: LinkType.RELATED }, // BPI слабее AC
+    { source: 'bpi', target: 'thm_stone_rep', type: LinkType.EQUIVALENT }, // Эквивалентны в ZF
+    { source: 'bpi', target: 'ultrafilter', type: LinkType.CONTAINS }, // Lemma on Ultrafilter is BPI
+
+    // Парадокс Скулема (Теория моделей + Теория множеств)
+    { source: 'skolem_paradox', target: 'thm_los_vaught', type: LinkType.RELATED }, // Связан с теоремами Лёвенгейма-Сколема
+    { source: 'skolem_paradox', target: 'model_N', type: LinkType.RELATED }, // Оперирует понятием счетности (как N)
+    { source: 'skolem_paradox', target: 'zfc', type: LinkType.RELATED },
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

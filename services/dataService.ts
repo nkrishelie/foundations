@@ -754,7 +754,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
         details: ['$\\mathsf{ACF}_0$ vs $\\mathsf{ACF}_p$', 'Quantifier Elimination', 'Morley\'s Theorem Archetype', 'Nullstellensatz']
       },
       ru: {
-        label: 'АЦФ (ACF)',
+        label: 'ACF',
         description: 'Поля, где каждый многочлен имеет корень. Прототип СТАБИЛЬНЫХ теорий.',
         details: ['$\\mathsf{ACF}_0$ и $\\mathsf{ACF}_p$', 'Элиминация кванторов', 'Архетип теоремы Морли', 'Теорема о нулях']
       }

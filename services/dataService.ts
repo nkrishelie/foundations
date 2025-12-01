@@ -18,6 +18,145 @@ interface NodeDefinition {
 // const uni = (str: string) => str... 
 
 const RAW_NODES: Record<string, NodeDefinition> = {
+  // --- ALGEBRAIC STRUCTURES & THEOREMS ---
+  'theory_rings': {
+    group: Discipline.ALGEBRA,
+    val: 14,
+    synonyms: ['Теория колец', 'Rings'],
+    content: {
+      en: {
+        label: 'Ring Theory',
+        description: 'Study of structures with two operations: addition and multiplication. Basis for algebraic geometry.',
+        details: ['Ideals', 'Integral Domains', 'Noetherian Rings', 'Polynomial Rings']
+      },
+      ru: {
+        label: 'Теория колец',
+        description: 'Изучение структур с двумя операциями: сложением и умножением. Основа алгебраической геометрии.',
+        details: ['Идеалы', 'Области целостности', 'Нётеровы кольца', 'Кольца многочленов']
+      }
+    }
+  },
+  'theory_fields': {
+    group: Discipline.ALGEBRA,
+    val: 16,
+    synonyms: ['Теория полей', 'Fields'],
+    content: {
+      en: {
+        label: 'Field Theory',
+        description: 'Study of commutative rings where every non-zero element has an inverse.',
+        details: ['Galois Theory', 'Field Extensions', 'Characteristic', 'Algebraic Closure']
+      },
+      ru: {
+        label: 'Теория полей',
+        description: 'Изучение коммутативных колец, где каждый ненулевой элемент обратим.',
+        details: ['Теория Галуа', 'Расширения полей', 'Характеристика', 'Алгебраическое замыкание']
+      }
+    }
+  },
+  'ideal_concept': {
+    group: Discipline.ALGEBRA,
+    val: 12,
+    synonyms: ['Идеал'],
+    content: {
+      en: {
+        label: 'Ideal',
+        description: 'A subset of a ring closed under addition and multiplication by any element of the ring.',
+        details: ['Prime Ideal', 'Maximal Ideal', 'Quotient Ring', 'Filter (dual concept)']
+      },
+      ru: {
+        label: 'Идеал',
+        description: 'Подмножество кольца, замкнутое относительно сложения и умножения на любой элемент кольца.',
+        details: ['Простой идеал', 'Максимальный идеал', 'Фактор-кольцо', 'Фильтр (двойственное понятие)']
+      }
+    }
+  },
+  'homomorphism_thms': {
+    group: Discipline.ALGEBRA,
+    val: 14,
+    synonyms: ['Теоремы о гомоморфизмах', 'Isomorphism Theorems', 'Noether'],
+    content: {
+      en: {
+        label: 'Isomorphism Theorems',
+        description: 'Three fundamental theorems describing the relationship between quotients, homomorphisms, and subobjects.',
+        details: ['$G/\\text{Ker}(\\phi) \\cong \\text{Im}(\\phi)$', 'Noether Isomorphism Thms', 'Universal Property']
+      },
+      ru: {
+        label: 'Теоремы о гомоморфизмах',
+        description: 'Три фундаментальные теоремы, описывающие связь между факторами, гомоморфизмами и подобектами.',
+        details: ['$G/\\text{Ker}(\\phi) \\cong \\text{Im}(\\phi)$', 'Теоремы Нётер', 'Универсальное свойство']
+      }
+    }
+  },
+
+  // --- TOPOLOGICAL SEMANTICS & DUALITY ---
+  'esakia_space': {
+    group: Discipline.TOPOLOGY,
+    val: 14,
+    synonyms: ['Пространство Эсакиа', 'Esakia Duality'],
+    content: {
+      en: {
+        label: 'Esakia Space',
+        description: 'A Stone space with a partial order satisfying the Priestley separation axiom. Dual to Heyting Algebras.',
+        details: ['Esakia Duality', 'Topological semantics for Intuitionistic Logic', 'Clopen sets are lattice elements']
+      },
+      ru: {
+        label: 'Пространство Эсакиа',
+        description: 'Пространство Стоуна с частичным порядком, удовлетворяющее аксиоме Пристли. Двойственно алгебрам Гейтинга.',
+        details: ['Двойственность Эсакиа', 'Топологическая семантика интуиционизма', 'Clopen множества как элементы решетки']
+      }
+    }
+  },
+  'priestley_space': {
+    group: Discipline.TOPOLOGY,
+    val: 12,
+    synonyms: ['Пространство Пристли'],
+    content: {
+      en: {
+        label: 'Priestley Space',
+        description: 'Ordered compact totally disconnected space. Dual to Distributive Lattices.',
+        details: ['Priestley Duality', 'Generalization of Stone Spaces']
+      },
+      ru: {
+        label: 'Пространство Пристли',
+        description: 'Упорядоченное компактное вполне несвязное пространство. Двойственно дистрибутивным решеткам.',
+        details: ['Двойственность Пристли', 'Обобщение пространств Стоуна']
+      }
+    }
+  },
+  'alexandrov_topology': {
+    group: Discipline.TOPOLOGY,
+    val: 12,
+    synonyms: ['Топология Александрова'],
+    content: {
+      en: {
+        label: 'Alexandrov Topology',
+        description: 'Topology where arbitrary (not just finite) intersections of open sets are open.',
+        details: ['Topology on Posets', 'Connection to S4', 'Finite topological spaces']
+      },
+      ru: {
+        label: 'Топология Александрова',
+        description: 'Топология, в которой любые (не только конечные) пересечения открытых множеств открыты.',
+        details: ['Топология на ЧУМах', 'Связь с S4', 'Конечные топологические пространства']
+      }
+    }
+  },
+  'jsson_tarski_alg': {
+    group: Discipline.ORDER_THEORY,
+    val: 12,
+    synonyms: ['Алгебры Йонссона-Тарского', 'Модальные алгебры', 'MA'],
+    content: {
+      en: {
+        label: 'Modal Algebras',
+        description: 'Boolean algebras with an operator $\\square$ (or $\\diamond$). Algebraic semantics for Modal Logic.',
+        details: ['Jónsson-Tarski Duality', 'Representation Theory', 'Canonical Frames']
+      },
+      ru: {
+        label: 'Модальные алгебры',
+        description: 'Булевы алгебры с оператором $\\square$ (или $\\diamond$). Алгебраическая семантика модальной логики.',
+        details: ['Двойственность Йонссона-Тарского', 'Теория представлений', 'Канонические шкалы']
+      }
+    }
+  },
   'cylindric_alg': {
     group: Discipline.ORDER_THEORY, // Или ALGEBRA
     val: 14,
@@ -2117,6 +2256,38 @@ const RAW_LINKS = [
     // Лемма Цорна используется в теории колец (для поиска максимальных идеалов)
     { source: 'thm_zorn', target: 'model_R', type: LinkType.RELATED }, // (через базис Гамеля, например)
     { source: 'forcing_method', target: 'model_L', type: LinkType.RELATED }, // Форсинг расширяет L
+
+    // --- Algebra Hierarchy ---
+    { source: 'theory_groups', target: 'theory_rings', type: LinkType.EXTENDS }, // Кольцо - это абелева группа по сложению
+    { source: 'theory_rings', target: 'theory_fields', type: LinkType.EXTENDS }, // Поле - это кольцо с делением
+    { source: 'theory_rings', target: 'ideal_concept', type: LinkType.CONTAINS },
+    { source: 'ideal_concept', target: 'wkl0', type: LinkType.RELATED }, // Prime Ideal Thm ~ WKL0
+    
+    // Homomorphism Theorems
+    { source: 'theory_groups', target: 'homomorphism_thms', type: LinkType.RELATED },
+    { source: 'theory_rings', target: 'homomorphism_thms', type: LinkType.RELATED },
+    { source: 'model_Z', target: 'model_Q', type: LinkType.RELATED }, // Q - поле частных Z (алгебраическая конструкция)
+
+    // --- Topological Semantics & Duality ---
+    // Stone Duality chain:
+    { source: 'bool_alg', target: 'stone_space', type: LinkType.EQUIVALENT }, // Stone Duality
+    { source: 'dist_lattice', target: 'priestley_space', type: LinkType.EQUIVALENT }, // Priestley Duality
+    { source: 'heyting_alg', target: 'esakia_space', type: LinkType.EQUIVALENT }, // Esakia Duality
+    
+    // Modal Logic & Topology:
+    { source: 'modal_logic', target: 'jsson_tarski_alg', type: LinkType.EQUIVALENT }, // Logic <-> Algebra
+    { source: 'jsson_tarski_alg', target: 'stone_space', type: LinkType.EXTENDS }, // MA is BA + operator
+    [cite_start]{ source: 'modal_S4', target: 'alexandrov_topology', type: LinkType.MODELS }, // S4 is the logic of topological spaces [cite: 1269]
+    { source: 'alexandrov_topology', target: 'poset', type: LinkType.EQUIVALENT }, // 1-to-1 correspondence
+    
+    // Intuitionistic Logic connections:
+    { source: 'esakia_space', target: 'intuitionistic_logic', type: LinkType.MODELS }, // Esakia spaces are models for Int
+    { source: 'esakia_space', target: 'stone_space', type: LinkType.EXTENDS }, // Esakia is Stone + Order
+    [cite_start]{ source: 'heyting_alg', target: 'open_set_topology', type: LinkType.RELATED }, // Open sets form a Heyting algebra [cite: 666]
+    
+    // Specific Logic-Topology links from lectures
+    [cite_start]{ source: 'modal_GL', target: 'scattered_space', type: LinkType.MODELS }, // GL corresponds to scattered spaces [cite: 1286]
+    { source: 'scattered_space', target: 'topology', type: LinkType.EXTENDS },
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

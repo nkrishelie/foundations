@@ -1973,7 +1973,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: {
         label: 'Теорема о простом идеале (BPI)',
         description: 'В любой булевой алгебре есть простой идеал. Слабее AC, сильнее ZF.',
-        details: ['Эквивалентна теореме Стоуна', 'Лемма об ультрафильтре', 'Компактность логики']
+        details: ['Эквивалентна теореме Стоуна', 'Эквивалентна лемме об ультрафильтре', 'Компактность логики']
       }
     }
   },
@@ -2353,7 +2353,7 @@ const RAW_LINKS = [
     { source: 'ultrafilter', target: 'bool_alg', type: LinkType.RELATED }, // Определяется на булевой алгебре
     { source: 'ultraproduct', target: 'ultrafilter', type: LinkType.CONTAINS }, // Использует ультрафильтр для построения
     { source: 'stone_space', target: 'ultrafilter', type: LinkType.RELATED }, // Точки пространства Стоуна = ультрафильтры
-    { source: 'bpi', target: 'axiom_choice', type: LinkType.RELATED }, // BPI слабее AC
+    { source: 'axiom_choice', target: 'bpi', type: LinkType.PROVES }, // BPI слабее AC
     { source: 'bpi', target: 'thm_stone_rep', type: LinkType.EQUIVALENT }, // Эквивалентны в ZF
     { source: 'bpi', target: 'ultrafilter', type: LinkType.CONTAINS }, // Lemma on Ultrafilter is BPI
 

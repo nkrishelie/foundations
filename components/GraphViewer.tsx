@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
@@ -96,6 +96,40 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   const graphRef = useRef<any>(null);
   const isInited = useRef(false);
 
+  // === НОВЫЙ КОД: Состояния для подсветки ===
+  const [highlightNodes, setHighlightNodes] = useState(new Set());
+  const [highlightLinks, setHighlightLinks] = useState(new Set());
+  const [hoverNode, setHoverNode] = useState<any>(null);
+
+  // Обработчик наведения мыши
+  const handleNodeHover = (node: any) => {
+    // Оптимизация: не перерисовывать, если ничего не изменилось
+    if ((!node && !highlightNodes.size) || (node && hoverNode === node)) return;
+
+    const newHighlightNodes = new Set();
+    const newHighlightLinks = new Set();
+
+    if (node) {
+      newHighlightNodes.add(node.id);
+      // Проходим по всем связям и ищем соседей
+      data.links.forEach((link: any) => {
+        // Важно: d3 превращает source/target в объекты, поэтому проверяем .id
+        const sourceId = link.source.id || link.source;
+        const targetId = link.target.id || link.target;
+
+        if (sourceId === node.id || targetId === node.id) {
+          newHighlightLinks.add(link);
+          newHighlightNodes.add(sourceId);
+          newHighlightNodes.add(targetId);
+        }
+      });
+    }
+
+    setHoverNode(node || null);
+    setHighlightNodes(newHighlightNodes);
+    setHighlightLinks(newHighlightLinks);
+  };
+  
   useEffect(() => {
     isInited.current = false;
   }, [activeLanguage]);
@@ -226,7 +260,8 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       key={activeLanguage}
       ref={graphRef}
       graphData={data}
-
+      onNodeHover={handleNodeHover}
+      
       nodeLabel={(node: any) => {
         const labelText = cleanLabel(node.label);
         return `
@@ -242,18 +277,25 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         const color = DISCIPLINE_COLORS[node.group as any] || '#cccccc';
         const size = (node.val || 1);
         const isMain = size >= 20;
-        
+
+        // Проверяем, нужно ли "заглушить" этот узел (если наведены на другой)
+        const isDimmed = hoverNode && !highlightNodes.has(node.id);
+
         const group = new THREE.Group();
         
         // 1. Sphere
         const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
         const geometry = new THREE.SphereGeometry(radius, 32, 32);
+        
         const material = new THREE.MeshPhysicalMaterial({
           color: color,
           emissive: color,
-          emissiveIntensity: isMain ? 0.7 : 0.1,
+          // Если узел "заглушен", делаем его почти черным и прозрачным
+          emissiveIntensity: isDimmed ? 0.05 : (isMain ? 0.7 : 0.1),
           roughness: 0.4,
           metalness: 0.1,
+          transparent: true,         // Включаем прозрачность
+          opacity: isDimmed ? 0.2 : 1 // Полупрозрачность для неактивных
         });
         
         const sphere = new THREE.Mesh(geometry, material);
@@ -261,43 +303,50 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
 
         // 2. Text Label
         const SpriteTextClass = (SpriteText as any).default || SpriteText;
-        
         if (SpriteTextClass) {
-          // ВОТ ЗДЕСЬ ПРИМЕНЯЕМ ОЧИСТКУ ДЛЯ 3D
           const cleanText = cleanLabel(node.label);
-          
           const sprite = new SpriteTextClass(cleanText);
-          sprite.color = color;
+          
+          // Цвет текста тоже глушим, если не в фокусе
+          sprite.color = isDimmed ? 'rgba(255, 255, 255, 0.2)' : color;
+          
           sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
           sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
-          sprite.backgroundColor = '#00000080';
+          
+          // Фон текста
+          sprite.backgroundColor = isDimmed ? '#00000000' : '#00000080'; // Убираем фон у неактивных
+          
           sprite.padding = 1;
           sprite.borderRadius = 3;
-          sprite.material.depthTest = false;
+          sprite.material.depthTest = false; // Чтобы текст был всегда поверх (если активен)
           sprite.material.depthWrite = false;
-          sprite.renderOrder = 999;
+          // Если заглушен, меняем порядок отрисовки, чтобы не перекрывал активные
+          sprite.renderOrder = isDimmed ? 0 : 999; 
           
           group.add(sprite);
         }
 
         return group;
       }}
-
       // Links Settings
-      linkColor={getLinkColor}
+      linkColor={(link: any) => {
+        if (hoverNode && !highlightLinks.has(link)) return '#ffffff10'; // Почти невидимые
+        return LINK_COLORS[link.type] || '#ffffff';
+      }}
       
       // Толщина линий
-      linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
+      linkWidth={(link: any) => highlightLinks.has(link) ? 2 : (link.type === LinkType.RELATED ? 0.3 : 1)}
 
       // Частицы
-      linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
+      linkDirectionalParticles={(link: any) => highlightLinks.has(link) ? 4 : 0}
       linkDirectionalParticleSpeed={0.005}
-      linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}
+      linkDirectionalParticleWidth={2}
 
       // Стрелки
       linkDirectionalArrowLength={(link: any) => {
-        if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
-        return 4;
+         if (hoverNode && !highlightLinks.has(link)) return 0;
+         if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
+         return 4;
       }}
       linkDirectionalArrowRelPos={1}
       

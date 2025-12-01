@@ -9,10 +9,19 @@ interface Props {
   data: GraphData;
   onNodeClick: (node: GraphNode) => void;
   searchQuery: string;
+  activeLanguage: string;
 }
 
-export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery }) => {
+export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, activeLanguage }) => {
   const graphRef = useRef<any>(null);
+  
+  // Флаг: было ли выполнено начальное центрирование
+  const isInited = useRef(false);
+
+  // Сбрасываем флаг инициализации только если меняется язык (граф пересоздается)
+  useEffect(() => {
+    isInited.current = false;
+  }, [activeLanguage]);
 
   // Focus on search result
   useEffect(() => {
@@ -49,6 +58,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery })
 
   return (
     <ForceGraph3D
+      key={activeLanguage}
       ref={graphRef}
       graphData={data}
       
@@ -74,33 +84,20 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery })
         const sphere = new THREE.Mesh(geometry, material);
         group.add(sphere);
 
-        // 2. Text Label (using three-spritetext)
-        // Handle default export for production builds
+        // 2. Text Label
         const SpriteTextClass = (SpriteText as any).default || SpriteText;
         
         if (SpriteTextClass) {
           const sprite = new SpriteTextClass(node.label);
-          sprite.color = color; //isMain ? '#FFD700' : color;
+          sprite.color = color; // Цвет текста совпадает с цветом узла
           sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
-          //sprite.color = 'white'; 
-          //sprite.textHeight = 8; // Сделаем покрупнее для проверки
-          //sprite.position.y = 8; // Поднимем повыше
-          // Position
           sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
-          
-          // Styling
           sprite.backgroundColor = '#00000080';
           sprite.padding = 1;
           sprite.borderRadius = 3;
-          
-          // Ensure visibility
           sprite.material.depthTest = false;
           sprite.material.depthWrite = false;
           sprite.renderOrder = 999;
-
-          sprite.renderOrder = 999;
-          sprite.material.depthTest = false; 
-          sprite.material.depthWrite = false;
           
           group.add(sprite);
         }
@@ -127,15 +124,24 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery })
 
         graphRef.current.cameraPosition(
           { x: (node.x || 0) * distRatio, y: (node.y || 0) * distRatio, z: (node.z || 0) * distRatio },
-          node,
-          3000
+          node, // Look at node
+          2000  // Duration (ms)
         );
         onNodeClick(node);
       }}
       
       d3VelocityDecay={0.1}
       d3AlphaDecay={0.01}
-      onEngineStop={() => graphRef.current.zoomToFit(400)}
+      
+      // ИСПРАВЛЕНИЕ ЗДЕСЬ:
+      // Зумим только один раз при старте, а не при каждой остановке движка
+      onEngineStop={() => {
+        if (!isInited.current && graphRef.current) {
+          graphRef.current.zoomToFit(400);
+          isInited.current = true;
+        }
+      }}
+      
       controlType="orbit"
       enableNodeDrag={true}
       warmupTicks={100}

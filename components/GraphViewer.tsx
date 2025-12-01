@@ -101,9 +101,31 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   const [highlightLinks, setHighlightLinks] = useState(new Set());
   const [hoverNode, setHoverNode] = useState<any>(null);
 
+// === ОПТИМИЗАЦИЯ 1: Кэшируем соседей ===
+  // Строим карту смежности один раз при загрузке данных
+  const neighborMap = useMemo(() => {
+    const map = new Map<string, { links: any[], nodes: Set<string> }>();
+    
+    data.links.forEach((link: any) => {
+      const sourceId = link.source.id || link.source;
+      const targetId = link.target.id || link.target;
+
+      if (!map.has(sourceId)) map.set(sourceId, { links: [], nodes: new Set() });
+      if (!map.has(targetId)) map.set(targetId, { links: [], nodes: new Set() });
+
+      map.get(sourceId)?.links.push(link);
+      map.get(sourceId)?.nodes.add(targetId);
+      
+      map.get(targetId)?.links.push(link);
+      map.get(targetId)?.nodes.add(sourceId);
+    });
+    
+    return map;
+  }, [data]);
+  // =======================================
+  
   // Обработчик наведения мыши
   const handleNodeHover = (node: any) => {
-    // Оптимизация: не перерисовывать, если ничего не изменилось
     if ((!node && !highlightNodes.size) || (node && hoverNode === node)) return;
 
     const newHighlightNodes = new Set();
@@ -111,18 +133,12 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
 
     if (node) {
       newHighlightNodes.add(node.id);
-      // Проходим по всем связям и ищем соседей
-      data.links.forEach((link: any) => {
-        // Важно: d3 превращает source/target в объекты, поэтому проверяем .id
-        const sourceId = link.source.id || link.source;
-        const targetId = link.target.id || link.target;
-
-        if (sourceId === node.id || targetId === node.id) {
-          newHighlightLinks.add(link);
-          newHighlightNodes.add(sourceId);
-          newHighlightNodes.add(targetId);
-        }
-      });
+      // Берем готовых соседей из карты (мгновенно!)
+      const neighbors = neighborMap.get(node.id);
+      if (neighbors) {
+        neighbors.links.forEach(link => newHighlightLinks.add(link));
+        neighbors.nodes.forEach(neighborId => newHighlightNodes.add(neighborId));
+      }
     }
 
     setHoverNode(node || null);
@@ -261,6 +277,10 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       ref={graphRef}
       graphData={data}
       onNodeHover={handleNodeHover}
+
+      // Уменьшаем время "разогрева" и "остывания" физики
+      warmupTicks={50}     // Было 100. Меньше - быстрее старт
+      cooldownTicks={50}   // Было 100. Граф быстрее "застынет" и перестанет грузить CPU
       
       nodeLabel={(node: any) => {
         const labelText = cleanLabel(node.label);
@@ -285,7 +305,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         
         // 1. Sphere
         const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
-        const geometry = new THREE.SphereGeometry(radius, 32, 32);
+        const geometry = new THREE.SphereGeometry(radius, 16, 16);
         
         const material = new THREE.MeshPhysicalMaterial({
           color: color,

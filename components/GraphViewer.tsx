@@ -5,7 +5,6 @@ import * as THREE from 'three';
 import { GraphData, GraphNode, GraphLink, LinkType } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS } from '../constants';
 import { NavigationControls } from './NavigationControls';
-import { INITIAL_CAMERA_POSITION } from '../constants'; // Если у вас есть эта константа, или используйте {x:0, y:0, z:400}
 
 interface Props {
   data: GraphData;
@@ -14,22 +13,17 @@ interface Props {
   activeLanguage: string;
 }
 
-// Функция для очистки LaTeX из меток в 3D.
-// Превращаем команды LaTeX в красивые Unicode-символы
+// Функция очистки LaTeX
 const cleanLabel = (label: string): string => {
   if (!label) return '';
   return label
     .replace(/\$/g, '') 
-
-    // Множества
     .replace(/\\mathbb{N}/g, 'ℕ')
     .replace(/\\mathbb{Z}/g, 'ℤ')
     .replace(/\\mathbb{Q}/g, 'ℚ')
     .replace(/\\mathbb{R}/g, 'ℝ')
     .replace(/\\mathbb{C}/g, 'ℂ')
     .replace(/\\mathbb{A}/g, '𝔸')
-
-    // Греческие буквы
     .replace(/\\omega/g, 'ω')
     .replace(/\\aleph/g, 'ℵ')
     .replace(/\\varepsilon/g, 'ε')
@@ -39,9 +33,7 @@ const cleanLabel = (label: string): string => {
     .replace(/\\Pi/g, 'Π')
     .replace(/\\lambda/g, 'λ')
     .replace(/\\phi/g, 'φ')
-
-    // Логические операторы и кванторы
-    .replace(/\\vdash/g, '⊢')      // <--- ВОТ ТО, ЧТО ВЫ ИСКАЛИ
+    .replace(/\\vdash/g, '⊢')
     .replace(/\\forall/g, '∀')
     .replace(/\\exists/g, '∃')
     .replace(/\\to/g, '→')
@@ -52,12 +44,8 @@ const cleanLabel = (label: string): string => {
     .replace(/\\neg/g, '¬')
     .replace(/\\land/g, '∧')
     .replace(/\\lor/g, '∨')
-
-    // Модальности
     .replace(/\\square/g, '□')
     .replace(/\\diamond/g, '◇')
-
-    // Отношения и операции
     .replace(/\\le/g, '≤')
     .replace(/\\ge/g, '≥')
     .replace(/\\ne/g, '≠')
@@ -72,22 +60,16 @@ const cleanLabel = (label: string): string => {
     .replace(/\\setminus/g, '\\')
     .replace(/\\bot/g, '⊥')
     .replace(/\\top/g, '⊤')
-
-    // Шрифты и оформление
     .replace(/\\mathsf{([a-zA-Z0-9_]+)}/g, '$1')
     .replace(/\\mathbf{([a-zA-Z0-9_]+)}/g, '$1')
     .replace(/\\mathrm{([a-zA-Z0-9_]+)}/g, '$1')
     .replace(/\\text{([a-zA-Z0-9\s]+)}/g, '$1')
-
-    // Индексы и степени
-    .replace(/\^\{?([0-9a-z])\}?/g, '$1') // Простая имитация степени (удаляет ^)
+    .replace(/\^\{?([0-9a-z])\}?/g, '$1')
     .replace(/_0/g, '₀') 
     .replace(/_1/g, '₁')
     .replace(/_2/g, '₂')
     .replace(/_n/g, 'ₙ')
     .replace(/_k/g, 'ₖ')
-
-    // Финальная чистка
     .replace(/\\/g, '')
     .trim();
 };
@@ -96,117 +78,74 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   const graphRef = useRef<any>(null);
   const isInited = useRef(false);
 
+  // Сброс инициализации при смене языка
   useEffect(() => {
     isInited.current = false;
   }, [activeLanguage]);
 
-  // Focus on search result
+  // === ПОИСК И ФОКУСИРОВКА ===
   useEffect(() => {
     if (searchQuery && graphRef.current) {
-
-      // Функция, которая превращает "красивую" математику в простой текст для поиска
-      // Пример: "$\mathbb{Z} + \mathbb{Z}$" -> "z+z"
       const normalizeForSearch = (str: string) => {
         if (!str) return '';
         return str
           .toLowerCase()
-          // 1. Убираем LaTeX команды, оставляя содержимое
-          .replace(/\\mathbb{([a-z])}/g, '$1') // \mathbb{N} -> n
-          .replace(/\\mathsf{([a-z0-9]+)}/g, '$1') // \mathsf{PA} -> pa
+          .replace(/\\mathbb{([a-z])}/g, '$1')
+          .replace(/\\mathsf{([a-z0-9]+)}/g, '$1')
           .replace(/\\mathbf{([a-z0-9]+)}/g, '$1')
           .replace(/\\mathrm{([a-z0-9]+)}/g, '$1')
-          // 2. Превращаем Unicode-символы в обычные буквы
-          .replace(/ℕ/g, 'n')
-          .replace(/ℤ/g, 'z')
-          .replace(/ℚ/g, 'q')
-          .replace(/ℝ/g, 'r')
-          .replace(/ℂ/g, 'c')
-          .replace(/𝔸/g, 'a')
+          .replace(/ℕ/g, 'n').replace(/ℤ/g, 'z').replace(/ℚ/g, 'q')
+          .replace(/ℝ/g, 'r').replace(/ℂ/g, 'c').replace(/𝔸/g, 'a')
           .replace(/×/g, 'x')
-          // 3. Убираем мусор: $, \, {}, пробелы
           .replace(/[\$\\\{\}\s]/g, '')
           .replace(/\s/g, '');
       };
 
-      // Нормализуем запрос пользователя (убираем пробелы, приводим к нижнему регистру)
       const q = normalizeForSearch(searchQuery);
-
       const foundNode = data.nodes.find(n => {
-        // Проверяем ID
         if (normalizeForSearch(n.id).includes(q)) return true;
-
-        // Проверяем Label (самое важное для Z+Z)
         if (normalizeForSearch(n.label).includes(q)) return true;
-
-        // Проверяем синонимы
         if (n.synonyms?.some(s => normalizeForSearch(s).includes(q))) return true;
-
         return false;
       });
 
       if (foundNode) {
-        // Вычисляем дистанцию камеры в зависимости от размера узла
         const nodeSize = foundNode.val || 1;
         const distance = nodeSize > 20 ? 60 : 40; 
-
         const distRatio = 1 + distance/Math.hypot(foundNode.x || 1, foundNode.y || 1, foundNode.z || 1);
-
+        
         graphRef.current.cameraPosition(
           { 
             x: (foundNode.x || 0) * distRatio, 
             y: (foundNode.y || 0) * distRatio, 
             z: (foundNode.z || 0) * distRatio 
           },
-          foundNode, // Look at node
-          2000       // Время полета (мс)
+          foundNode,
+          2000
         );
       }
     }
   }, [searchQuery, data]);
 
-  const getLinkColor = (link: GraphLink) => LINK_COLORS[link.type];
-
-  if (!data || !data.nodes || data.nodes.length === 0) {
-    return <div className="w-full h-full flex items-center justify-center text-white">Loading Graph...</div>;
-  }
-
-  // --- ЛОГИКА НАВИГАЦИИ (РУЧНАЯ) ---
+  // --- НАВИГАЦИЯ ---
   const handleRotate = (h: number, v: number) => {
     const fg = graphRef.current;
     if (!fg) return;
-
-    // Получаем текущую позицию
     const currentPos = fg.cameraPosition();
-    // Используем встроенный класс Three.js для удобной работы с углами
     const spherical = new THREE.Spherical();
     spherical.setFromVector3(new THREE.Vector3(currentPos.x, currentPos.y, currentPos.z));
-
-    // Меняем углы (0.2 - это шаг поворота в радианах, примерно 11 градусов)
     spherical.theta += h * 0.2; 
     spherical.phi += v * 0.2;
-
-    // Ограничиваем вертикальный угол, чтобы не перевернуться (для trackball это не обязательно, но полезно)
     spherical.makeSafe();
-
-    // Превращаем обратно в XYZ
     const newPos = new THREE.Vector3().setFromSpherical(spherical);
-
-    // Плавно летим в новую точку
-    fg.cameraPosition(
-      { x: newPos.x, y: newPos.y, z: newPos.z },
-      currentPos.lookAt, // Смотрим туда же, куда смотрели
-      400 // мс
-    );
+    fg.cameraPosition({ x: newPos.x, y: newPos.y, z: newPos.z }, currentPos.lookAt, 400);
   };
 
   const handleZoom = (dir: number) => {
     const fg = graphRef.current;
     if (!fg) return;
-
     const currentPos = fg.cameraPosition();
-    // Умножаем текущие координаты на коэффициент (0.8 для приближения, 1.2 для отдаления)
     const factor = dir > 0 ? 1.4 : 0.7; 
-
     fg.cameraPosition(
       { x: currentPos.x * factor, y: currentPos.y * factor, z: currentPos.z * factor },
       currentPos.lookAt,
@@ -215,132 +154,124 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   };
 
   const handleReset = () => {
-    const fg = graphRef.current;
-    if (!fg) return;
-    fg.zoomToFit(1000); // 1 секунда на красивый возврат
+    graphRef.current?.zoomToFit(1000);
   };
+  
+  if (!data || !data.nodes || data.nodes.length === 0) {
+    return <div className="w-full h-full flex items-center justify-center text-white">Loading Graph...</div>;
+  }
 
   return (
-    <div className="relative w-full h-full"> {/* Обертка для позиционирования кнопок */}
-    <ForceGraph3D
-      key={activeLanguage}
-      ref={graphRef}
-      graphData={data}
+    <div className="relative w-full h-full">
+      <ForceGraph3D
+        key={activeLanguage}
+        ref={graphRef}
+        graphData={data}
+        
+        // Взаимодействие
+        onNodeClick={(node: any) => {
+          const distance = 40;
+          const distRatio = 1 + distance/Math.hypot(node.x || 1, node.y || 1, node.z || 1);
+          graphRef.current.cameraPosition(
+            { x: (node.x || 0) * distRatio, y: (node.y || 0) * distRatio, z: (node.z || 0) * distRatio },
+            node,
+            2000
+          );
+          onNodeClick(node);
+        }}
 
-      nodeLabel={(node: any) => {
-        // Очищаем текст от LaTeX символов для читаемости
-        const labelText = cleanLabel(node.label);
-    
-        // Возвращаем HTML-строку. Можно добавить немного стилей Tailwind, 
-        // чтобы соответствовать темной теме приложения.
-        return `
-          <div class="px-3 py-1.5 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
-          <div class="px-3 py-1 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
-            <div class="text-slate-100 font-medium text-sm whitespace-nowrap">
-              ${labelText}
+        // Оптимизация физики
+        warmupTicks={50}
+        cooldownTicks={50}
+        d3VelocityDecay={0.1}
+        d3AlphaDecay={0.05}
+        
+        // Всплывашка (только название)
+        nodeLabel={(node: any) => {
+          const labelText = cleanLabel(node.label);
+          return `
+            <div class="px-3 py-1 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
+              <div class="text-slate-100 font-medium text-sm whitespace-nowrap">
+                ${labelText}
+              </div>
             </div>
-            ${node.synonyms && node.synonyms.length > 0 ? 
-              `<div class="text-slate-400 text-xs mt-0.5">${node.synonyms[0]}</div>` : ''}
-          </div>
-        `;
-      }}
+          `;
+        }}
+
+        // Отрисовка узлов
+        nodeThreeObject={(node: any) => {
+          const color = DISCIPLINE_COLORS[node.group as any] || '#cccccc';
+          const size = (node.val || 1);
+          const isMain = size >= 20;
+          
+          const group = new THREE.Group();
+          
+          // Сфера (оптимизация: меньше полигонов - 16)
+          const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
+          const geometry = new THREE.SphereGeometry(radius, 16, 16); 
+          
+          const material = new THREE.MeshPhysicalMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: isMain ? 0.7 : 0.1,
+            roughness: 0.4,
+            metalness: 0.1,
+          });
+          
+          const sphere = new THREE.Mesh(geometry, material);
+          group.add(sphere);
+
+          // Текст
+          const SpriteTextClass = (SpriteText as any).default || SpriteText;
+          if (SpriteTextClass) {
+            const cleanText = cleanLabel(node.label);
+            const sprite = new SpriteTextClass(cleanText);
+            
+            sprite.color = color;
+            sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
+            sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
+            
+            sprite.backgroundColor = '#00000080';
+            sprite.padding = 1;
+            sprite.borderRadius = 3;
+            sprite.material.depthTest = false;
+            sprite.material.depthWrite = false;
+            sprite.renderOrder = 999;
+            
+            group.add(sprite);
+          }
+          return group;
+        }}
+
+        // Настройки связей
+        linkColor={(link: any) => LINK_COLORS[link.type as LinkType] || '#ffffff'}
+        linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
+        
+        // Частицы
+        linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
+        linkDirectionalParticleSpeed={0.005}
+        linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}
+
+        // Стрелки
+        linkDirectionalArrowLength={(link: any) => {
+          if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
+          return 4;
+        }}
+        linkDirectionalArrowRelPos={1}
+        
+        backgroundColor="#000005"
+        showNavInfo={false}
+        controlType="trackball"
+        enableNodeDrag={true}
+        
+        onEngineStop={() => {
+          if (!isInited.current && graphRef.current) {
+            graphRef.current.zoomToFit(400);
+            isInited.current = true;
+          }
+        }}
+      />
       
-      }}      
-      // Node Rendering
-      nodeThreeObject={(node: any) => {
-        const color = DISCIPLINE_COLORS[node.group as any] || '#cccccc';
-        const size = (node.val || 1);
-        const isMain = size >= 20;
-
-        const group = new THREE.Group();
-
-        // 1. Sphere
-        const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
-        const geometry = new THREE.SphereGeometry(radius, 16, 16);
-        const material = new THREE.MeshPhysicalMaterial({
-          color: color,
-          emissive: color,
-          emissiveIntensity: isMain ? 0.7 : 0.1,
-          roughness: 0.4,
-          metalness: 0.1,
-        });
-
-        const sphere = new THREE.Mesh(geometry, material);
-        group.add(sphere);
-
-        // 2. Text Label
-        const SpriteTextClass = (SpriteText as any).default || SpriteText;
-
-        if (SpriteTextClass) {
-          // ВОТ ЗДЕСЬ ПРИМЕНЯЕМ ОЧИСТКУ ДЛЯ 3D
-          const cleanText = cleanLabel(node.label);
-
-          const sprite = new SpriteTextClass(cleanText);
-          sprite.color = color;
-          sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
-          sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
-          sprite.backgroundColor = '#00000080';
-          sprite.padding = 1;
-          sprite.borderRadius = 3;
-          sprite.material.depthTest = false;
-          sprite.material.depthWrite = false;
-          sprite.renderOrder = 999;
-
-          group.add(sprite);
-        }
-
-        return group;
-      }}
-
-      // Links Settings
-      linkColor={getLinkColor}
-
-      // Толщина линий
-      linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
-
-      // Частицы
-      linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
-      linkDirectionalParticleSpeed={0.005}
-      linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}
-
-      // Стрелки
-      linkDirectionalArrowLength={(link: any) => {
-        if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
-        return 4;
-      }}
-      linkDirectionalArrowRelPos={1}
-
-      // World
-      backgroundColor="#000005"
-      showNavInfo={false}
-
-      // Interactions
-      onNodeClick={(node: any) => {
-        const distance = 40;
-        const distRatio = 1 + distance/Math.hypot(node.x || 1, node.y || 1, node.z || 1);
-
-        graphRef.current.cameraPosition(
-          { x: (node.x || 0) * distRatio, y: (node.y || 0) * distRatio, z: (node.z || 0) * distRatio },
-          node,
-          2000
-        );
-        onNodeClick(node);
-      }}
-
-      d3VelocityDecay={0.1}
-      d3AlphaDecay={0.05}
-      onEngineStop={() => {
-        if (!isInited.current && graphRef.current) {
-          graphRef.current.zoomToFit(400);
-          isInited.current = true;
-        }
-      }}
-      controlType="trackball"
-      enableNodeDrag={true}
-      warmupTicks={100}
-      cooldownTicks={100}
-    />
-    {/* Вставляем панель управления поверх графа */}
       <NavigationControls 
         onRotate={handleRotate}
         onZoom={handleZoom}

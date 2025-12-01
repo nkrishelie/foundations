@@ -58,15 +58,35 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   // Focus on search result
   useEffect(() => {
     if (searchQuery && graphRef.current) {
-      const lowerQuery = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase().trim();
+      
+      // Умная функция проверки совпадения
+      const match = (str?: string) => {
+        if (!str) return false;
+        // 1. Прямое совпадение
+        if (str.toLowerCase().includes(q)) return true;
+        // 2. Совпадение с очищенным от LaTeX текстом (чтобы "N + Z" нашло "$\mathbb{N} + \mathbb{Z}$")
+        if (cleanLabel(str).toLowerCase().includes(q)) return true;
+        return false;
+      };
+
       const foundNode = data.nodes.find(n => 
-        n.label.toLowerCase().includes(lowerQuery) ||
-        n.details?.some(d => d.toLowerCase().includes(lowerQuery)) ||
-        n.synonyms?.some(s => s.toLowerCase().includes(lowerQuery))
+        // Приоритет 1: Ищем в ID (техническое имя)
+        n.id.toLowerCase().includes(q) ||
+        // Приоритет 2: Ищем в видимом названии (с учетом очистки от LaTeX)
+        match(n.label) ||
+        // Приоритет 3: Синонимы
+        n.synonyms?.some(match) ||
+        // Приоритет 4: Описание и детали
+        match(n.description) ||
+        n.details?.some(match)
       );
 
       if (foundNode) {
-        const distance = 40;
+        // Вычисляем дистанцию камеры в зависимости от размера узла, чтобы не врезаться в него
+        const nodeSize = foundNode.val || 1;
+        const distance = nodeSize > 20 ? 60 : 40; 
+        
         const distRatio = 1 + distance/Math.hypot(foundNode.x || 1, foundNode.y || 1, foundNode.z || 1);
         
         graphRef.current.cameraPosition(
@@ -75,13 +95,13 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
             y: (foundNode.y || 0) * distRatio, 
             z: (foundNode.z || 0) * distRatio 
           },
-          foundNode,
-          3000
+          foundNode, // Look at node
+          2000       // Время полета (мс)
         );
       }
     }
   }, [searchQuery, data]);
-
+  
   const getLinkColor = (link: GraphLink) => LINK_COLORS[link.type];
 
   if (!data || !data.nodes || data.nodes.length === 0) {

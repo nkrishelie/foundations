@@ -98,6 +98,28 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
     isInited.current = false;
   }, [activeLanguage]);
 
+  // --- НАСТРОЙКА ФИЗИКИ (LAYOUT) ---
+  useEffect(() => {
+    const fg = graphRef.current;
+    if (fg) {
+      // 1. Сила отталкивания (Charge). 
+      // Значение по умолчанию около -50. Мы ставим -800, чтобы узлы сильно отлетали друг от друга.
+      // Это дает пространство для чтения текста.
+      fg.d3Force('charge').strength(-800);
+
+      // 2. Длина связей (Link Distance).
+      // Увеличиваем длину пружин, чтобы связи не стягивали граф в точку.
+      fg.d3Force('link').distance(70);
+
+      // 3. (Опционально) Центрирование
+      // Небольшая сила, тянущая все к центру (0,0,0), чтобы граф не улетел в бесконечность
+      // fg.d3Force('center').strength(0.05);
+      
+      // Перезапускаем разогрев движка, чтобы применить новые силы
+      fg.d3ReheatSimulation();
+    }
+  }, []);
+  
   // Focus on search result
   useEffect(() => {
     if (searchQuery && graphRef.current) {

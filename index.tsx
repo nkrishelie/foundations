@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import './index.css'; // <-- ДОБАВИТЬ ЭТУ СТРОКУ (если файл index.css лежит рядом)
+import './index.css'; 
 // Если index.css лежит в корне проекта, то путь может быть '../index.css'
+import 'katex/dist/katex.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';

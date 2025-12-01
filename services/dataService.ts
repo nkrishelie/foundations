@@ -2277,16 +2277,16 @@ const RAW_LINKS = [
     // Modal Logic & Topology:
     { source: 'modal_logic', target: 'jsson_tarski_alg', type: LinkType.EQUIVALENT }, // Logic <-> Algebra
     { source: 'jsson_tarski_alg', target: 'stone_space', type: LinkType.EXTENDS }, // MA is BA + operator
-    [cite_start]{ source: 'modal_S4', target: 'alexandrov_topology', type: LinkType.MODELS }, // S4 is the logic of topological spaces [cite: 1269]
+    { source: 'modal_S4', target: 'alexandrov_topology', type: LinkType.MODELS }, // S4 is the logic of topological spaces [cite: 1269]
     { source: 'alexandrov_topology', target: 'poset', type: LinkType.EQUIVALENT }, // 1-to-1 correspondence
     
     // Intuitionistic Logic connections:
     { source: 'esakia_space', target: 'intuitionistic_logic', type: LinkType.MODELS }, // Esakia spaces are models for Int
     { source: 'esakia_space', target: 'stone_space', type: LinkType.EXTENDS }, // Esakia is Stone + Order
-    [cite_start]{ source: 'heyting_alg', target: 'open_set_topology', type: LinkType.RELATED }, // Open sets form a Heyting algebra [cite: 666]
+    { source: 'heyting_alg', target: 'open_set_topology', type: LinkType.RELATED }, // Open sets form a Heyting algebra [cite: 666]
     
     // Specific Logic-Topology links from lectures
-    [cite_start]{ source: 'modal_GL', target: 'scattered_space', type: LinkType.MODELS }, // GL corresponds to scattered spaces [cite: 1286]
+    { source: 'modal_GL', target: 'scattered_space', type: LinkType.MODELS }, // GL corresponds to scattered spaces [cite: 1286]
     { source: 'scattered_space', target: 'topology', type: LinkType.EXTENDS },
 ];
 

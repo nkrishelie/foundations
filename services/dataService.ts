@@ -18,6 +18,183 @@ interface NodeDefinition {
 // const uni = (str: string) => str... 
 
 const RAW_NODES: Record<string, NodeDefinition> = {
+  // --- AXIOM OF CHOICE & EQUIVALENTS ---
+  'axiom_choice': {
+    group: Discipline.SET_THEORY,
+    val: 20,
+    synonyms: ['Аксиома Выбора', 'AC', 'Choice'],
+    content: {
+      en: {
+        label: 'Axiom of Choice ($\\mathsf{AC}$)',
+        description: 'For every family of non-empty sets, there exists a choice function. Independent of ZF.',
+        details: ['Product of non-empty sets is non-empty', 'Vitali Set', 'Banach-Tarski Paradox']
+      },
+      ru: {
+        label: 'Аксиома Выбора ($\\mathsf{AC}$)',
+        description: 'Для любого семейства непустых множеств существует функция выбора. Независима от ZF.',
+        details: ['Произведение непустых множеств непусто', 'Множество Витали', 'Парадокс Банаха-Тарского']
+      }
+    }
+  },
+  'thm_zorn': {
+    group: Discipline.ORDER_THEORY,
+    val: 16,
+    synonyms: ['Лемма Цорна'],
+    content: {
+      en: {
+        label: 'Zorn\'s Lemma',
+        description: 'If every chain in a poset has an upper bound, the poset has a maximal element.',
+        details: ['Equivalent to AC', 'Used in Algebra (Basis, Max Ideal)']
+      },
+      ru: {
+        label: 'Лемма Цорна',
+        description: 'Если каждая цепь в частичном порядке имеет верхнюю грань, то есть максимальный элемент.',
+        details: ['Эквивалентна AC', 'Используется в алгебре (Базис, Макс. идеал)']
+      }
+    }
+  },
+  'thm_zermelo_wo': {
+    group: Discipline.SET_THEORY,
+    val: 16,
+    synonyms: ['Теорема Цермело', 'Вполне упорядочение'],
+    content: {
+      en: {
+        label: 'Well-Ordering Theorem',
+        description: 'Every set can be well-ordered. Proved by Zermelo using AC.',
+        details: ['Equivalent to AC', 'Every set is bijective to an ordinal']
+      },
+      ru: {
+        label: 'Теорема Цермело',
+        description: 'Любое множество может быть вполне упорядочено.',
+        details: ['Эквивалентна AC', 'Любое множество равномощно ординалу']
+      }
+    }
+  },
+  'ac_omega': {
+    group: Discipline.SET_THEORY,
+    val: 12,
+    synonyms: ['Счетный выбор', 'AC_omega'],
+    content: {
+      en: {
+        label: 'Countable Choice ($\\mathsf{AC}_\\omega$)',
+        description: 'Choice function exists for countable families. Weaker than AC, sufficient for most Analysis.',
+        details: ['Union of countable sets', 'Lebesgue measure is additive', 'No Banach-Tarski']
+      },
+      ru: {
+        label: 'Счетный выбор ($\\mathsf{AC}_\\omega$)',
+        description: 'Выбор существует для счетных семейств. Слабее AC, достаточна для анализа.',
+        details: ['Объединение счетных множеств', 'Мера Лебега аддитивна', 'Нет парадокса Банаха-Тарского']
+      }
+    }
+  },
+
+  // --- ORDINALS & TRANSFINITE ---
+  'transfinite_induction': {
+    group: Discipline.SET_THEORY,
+    val: 18,
+    synonyms: ['Трансфинитная индукция', 'Recursion'],
+    content: {
+      en: {
+        label: 'Transfinite Induction',
+        description: 'Extension of induction to well-ordered sets (ordinals).',
+        details: ['Base case (0)', 'Successor case ($\\alpha+1$)', 'Limit case ($\\lambda$)']
+      },
+      ru: {
+        label: 'Трансфинитная индукция',
+        description: 'Обобщение индукции на вполне упорядоченные множества (ординалы).',
+        details: ['База (0)', 'Шаг ($\\alpha+1$)', 'Предел ($\\lambda$)']
+      }
+    }
+  },
+  'hartogs_number': {
+    group: Discipline.SET_THEORY,
+    val: 10,
+    synonyms: ['Число Хартогса', 'Aleph function'],
+    content: {
+      en: {
+        label: 'Hartogs Number ($\\aleph(A)$)',
+        description: 'The least ordinal that cannot be injected into set $A$. Exists even without AC.',
+        details: ['Cardinality assignment without AC', 'Collapse of cardinals']
+      },
+      ru: {
+        label: 'Число Хартогса ($\\aleph(A)$)',
+        description: 'Наименьший ординал, который не вкладывается в $A$. Существует даже без AC.',
+        details: ['Приписывание мощности без AC', 'Коллапс кардиналов']
+      }
+    }
+  },
+  'continuum_hypothesis': {
+    group: Discipline.SET_THEORY,
+    val: 14,
+    synonyms: ['CH', 'Континуум-гипотеза'],
+    content: {
+      en: {
+        label: 'Continuum Hypothesis ($\\mathsf{CH}$)',
+        description: 'There is no cardinality strictly between $\\aleph_0$ and $2^{\\aleph_0}$.',
+        details: ['Independent of ZFC', 'True in $L$', 'Forcing']
+      },
+      ru: {
+        label: 'Континуум-гипотеза ($\\mathsf{CH}$)',
+        description: 'Нет мощности строго между $\\aleph_0$ и $2^{\\aleph_0}$.',
+        details: ['Независима от ZFC', 'Верна в $L$', 'Форсинг']
+      }
+    }
+  },
+  'forcing_method': {
+    group: Discipline.SET_THEORY,
+    val: 14,
+    synonyms: ['Форсинг', 'Forcing'],
+    content: {
+      en: {
+        label: 'Forcing',
+        description: 'Technique by Paul Cohen to prove independence results (e.g., $\\neg\\mathsf{CH}$).',
+        details: ['Generic Model', 'Extension of Ground Model', 'Independence of AC']
+      },
+      ru: {
+        label: 'Метод Форсинга',
+        description: 'Техника Пола Коэна для доказательства независимости (например, $\\neg\\mathsf{CH}$).',
+        details: ['Генерическая модель', 'Расширение модели', 'Независимость AC']
+      }
+    }
+  },
+
+  // --- FINITE & INFINITE ---
+  'dedekind_finite': {
+    group: Discipline.SET_THEORY,
+    val: 12,
+    synonyms: ['Конечность по Дедекинду'],
+    content: {
+      en: {
+        label: 'Dedekind Infinite',
+        description: 'A set is infinite if it is bijective to a proper subset of itself.',
+        details: ['Differs from finite without AC', '$\\omega$ is Dedekind infinite']
+      },
+      ru: {
+        label: 'Бесконечность по Дедекинду',
+        description: 'Множество бесконечно, если оно равномощно своему собственному подмножеству.',
+        details: ['Отличается от обычного без AC', '$\\omega$ бесконечно по Дедекинду']
+      }
+    }
+  },
+  
+  // --- RANK & HIERARCHY ---
+  'rank_concept': {
+    group: Discipline.SET_THEORY,
+    val: 12,
+    synonyms: ['Ранг множества'],
+    content: {
+      en: {
+        label: 'Rank of a Set',
+        description: 'The least ordinal $\\alpha$ such that set $x \\subseteq V_\\alpha$. Measure of complexity.',
+        details: ['Well-foundedness', 'Foundation Axiom', 'Rank($\\omega$) = $\\omega$']
+      },
+      ru: {
+        label: 'Ранг множества',
+        description: 'Наименьший ординал $\\alpha$, такой что $x \\subseteq V_\\alpha$. Мера сложности.',
+        details: ['Фундированность', 'Аксиома основания', 'Ранг($\\omega$) = $\\omega$']
+      }
+    }
+  },
   // --- FOUNDATIONS ---
   'math_lang': {
     group: Discipline.FOUNDATIONS,
@@ -1549,6 +1726,37 @@ const RAW_NODES: Record<string, NodeDefinition> = {
 };
 
 const RAW_LINKS = [
+    // Axiom of Choice & Equivalents
+    { source: 'zfc', target: 'axiom_choice', type: LinkType.CONTAINS },
+    { source: 'axiom_choice', target: 'thm_zorn', type: LinkType.EQUIVALENT },
+    { source: 'axiom_choice', target: 'thm_zermelo_wo', type: LinkType.EQUIVALENT },
+    { source: 'axiom_choice', target: 'ac_omega', type: LinkType.EXTENDS }, // AC implies AC_omega
+    { source: 'axiom_choice', target: 'axiom_determinacy', type: LinkType.RELATED }, // Conflict
+    { source: 'thm_zorn', target: 'order_theory', type: LinkType.RELATED },
+    
+    // Transfinite & Ordinals
+    { source: 'ordinal_arithmetic', target: 'transfinite_induction', type: LinkType.CONTAINS },
+    { source: 'transfinite_induction', target: 'ordinal_omega', type: LinkType.RELATED },
+    { source: 'transfinite_induction', target: 'cumulative_hierarchy', type: LinkType.RELATED }, // Hierarchy defined by recursion
+    { source: 'cumulative_hierarchy', target: 'rank_concept', type: LinkType.CONTAINS },
+    { source: 'rank_concept', target: 'model_V_omega', type: LinkType.RELATED },
+    
+    // Cardinals & Independence
+    { source: 'cardinal_arithmetic', target: 'hartogs_number', type: LinkType.RELATED },
+    { source: 'cardinal_aleph1', target: 'continuum_hypothesis', type: LinkType.RELATED },
+    { source: 'zfc', target: 'continuum_hypothesis', type: LinkType.RELATED }, // Independent
+    { source: 'forcing_method', target: 'continuum_hypothesis', type: LinkType.PROVES }, // Independence proof
+    { source: 'forcing_method', target: 'zfc', type: LinkType.RELATED },
+    { source: 'model_L', target: 'continuum_hypothesis', type: LinkType.MODELS }, // GCH is true in L
+    { source: 'dedekind_finite', target: 'ac_omega', type: LinkType.RELATED }, // Relation requires AC_omega
+    
+    // Construction of Numbers (Models)
+    { source: 'cumulative_hierarchy', target: 'model_R', type: LinkType.CONTAINS }, // R appears at specific rank
+    { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS },
+    { source: 'model_Q', target: 'model_R', type: LinkType.EXTENDS }, // R construced from Q (Cauchy seq)
+    { source: 'model_Z', target: 'model_Q', type: LinkType.EXTENDS },
+    { source: 'model_N', target: 'model_Z', type: LinkType.EXTENDS },
+  
     // Constructive Math & Intuitionism
     { source: 'intuitionistic_logic', target: 'bhk_interpretation', type: LinkType.RELATED },
     { source: 'bhk_interpretation', target: 'math_lang', type: LinkType.RELATED }, // Semantics of proofs

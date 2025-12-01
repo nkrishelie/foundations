@@ -362,10 +362,11 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       }
     }
   },
-  'rca0': {
+'rca0': {
     group: Discipline.PROOF_THEORY,
     val: 15,
-    synonyms: ['RCA0', 'Recursive Comprehension'],
+    // Добавили теги Big Five
+    synonyms: ['RCA0', 'Recursive Comprehension', 'Big Five', 'Большая пятерка'],
     content: {
       en: {
         label: '$\\mathsf{RCA}_0$',
@@ -382,7 +383,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   'wkl0': {
     group: Discipline.PROOF_THEORY,
     val: 15,
-    synonyms: ['WKL0', 'Weak Konig Lemma'],
+    // Добавили теги Big Five
+    synonyms: ['WKL0', 'Weak Konig Lemma', 'Big Five', 'Большая пятерка'],
     content: {
       en: {
         label: '$\\mathsf{WKL}_0$',
@@ -399,7 +401,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   'aca0': {
     group: Discipline.PROOF_THEORY,
     val: 15,
-    synonyms: ['ACA0', 'Arithmetic Comprehension'],
+    // Добавили теги Big Five
+    synonyms: ['ACA0', 'Arithmetic Comprehension', 'Big Five', 'Большая пятерка'],
     content: {
       en: {
         label: '$\\mathsf{ACA}_0$',
@@ -416,7 +419,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   'atr0': {
     group: Discipline.PROOF_THEORY,
     val: 12,
-    synonyms: ['ATR0'],
+    // Добавили теги Big Five
+    synonyms: ['ATR0', 'Big Five', 'Большая пятерка'],
     content: {
       en: { label: '$\\mathsf{ATR}_0$', description: 'Arithmetical Transfinite Recursion. Allows iterating arithmetic operations along well-orderings.', details: ['Clopen Determinacy', 'Perfect Set Theorem', 'Ulm\'s Theorem'] },
       ru: { label: '$\\mathsf{ATR}_0$', description: 'Арифметическая трансфинитная рекурсия. Позволяет итерировать операции вдоль вполне упорядочений.', details: ['Детерминированность', 'Теорема о совершенном множестве'] }
@@ -425,6 +429,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   'pi11_ca0': {
     group: Discipline.PROOF_THEORY,
     val: 12,
+    // Добавили теги Big Five (ранее синонимов тут не было)
+    synonyms: ['Big Five', 'Большая пятерка'], 
     content: {
       en: { label: '$\\Pi^1_1$-$\\mathsf{CA}_0$', description: '$\\Pi^1_1$ Comprehension. The strongest of the "Big Five".', details: ['Cantor-Bendixson', 'Kruskal\'s Theorem'] },
       ru: { label: '$\\Pi^1_1$-$\\mathsf{CA}_0$', description: '$\\Pi^1_1$ свертывание. Сильнейшая из "Большой пятерки".', details: ['Кантор-Бендикссон', 'Теорема Крускала'] }

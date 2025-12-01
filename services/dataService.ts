@@ -72,6 +72,58 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       }
     }
   },
+  'inference_concept': {
+    group: Discipline.LOGIC,
+    val: 22,
+    // Эти синонимы обеспечат работу поиска по словам "вывод", "inference", "доказательство"
+    synonyms: ['Вывод', 'Inference', 'Derivation', 'Deduction', 'Доказательство', 'Syntactic consequence', 'Синтаксическое следование', 'Штопор'],
+    content: {
+      en: {
+        label: 'Derivability ($\\vdash$)',
+        description: 'Syntactic relation asserting that a formula can be derived from axioms using inference rules within a formal system.',
+        details: ['Finite sequence of formulas', 'Modus Ponens', 'Deduction Theorem', '$\\Gamma \\vdash \\phi$']
+      },
+      ru: {
+        label: 'Выводимость ($\\vdash$)',
+        description: 'Синтаксическое отношение, означающее, что формулу можно получить из аксиом с помощью правил вывода.',
+        details: ['Конечная последовательность формул', 'Modus Ponens', 'Теорема о дедукции', '$\\Gamma \\vdash \\phi$']
+      }
+    }
+  },
+  'inference_rules': {
+    group: Discipline.LOGIC,
+    val: 16,
+    synonyms: ['Правила вывода', 'Inference Rules', 'Admissible rules', 'Допустимые правила'],
+    content: {
+      en: {
+        label: 'Inference Rules',
+        description: 'Transformation rules defining the logic. Distinction between derivable and admissible rules.',
+        details: ['Bernays\' Rules', 'Generalization', 'Substitution', 'Cut Rule']
+      },
+      ru: {
+        label: 'Правила вывода',
+        description: 'Правила преобразования, задающие логику. Различие между выводимыми и допустимыми правилами.',
+        details: ['Правила Бернайса', 'Обобщение', 'Подстановка', 'Правило сечения']
+      }
+    }
+  },
+  'soundness_completeness': {
+    group: Discipline.LOGIC,
+    val: 20,
+    synonyms: ['Корректность и Полнота', 'Soundness', 'Completeness', 'Meta-theory'],
+    content: {
+      en: {
+        label: 'Soundness & Completeness',
+        description: 'The fundamental bridge between Syntax ($\\vdash$) and Semantics ($\\models$).',
+        details: ['$\\Gamma \\vdash \\phi \\iff \\Gamma \\models \\phi$', 'Gödel\'s Completeness Thm', 'Henkin Construction']
+      },
+      ru: {
+        label: 'Корректность и Полнота',
+        description: 'Фундаментальный мост между Синтаксисом ($\\vdash$) и Семантикой ($\\models$).',
+        details: ['$\\Gamma \\vdash \\phi \\iff \\Gamma \\models \\phi$', 'Теорема Гёделя о полноте', 'Конструкция Хенкина']
+      }
+    }
+  },
   'intuitionistic_logic': {
     group: Discipline.LOGIC,
     val: 15,
@@ -1514,6 +1566,26 @@ const RAW_LINKS = [
     // Теоремы
     { source: 'omitting_types', target: 'isolated_type', type: LinkType.RELATED }, // Опускать можно только неизолированные
     { source: 'thm_ryll', target: 'type_theory_model', type: LinkType.RELATED }, // Категоричность <=> конечное число типов
+
+    // Inference & Derivability
+    { source: 'math_lang', target: 'inference_concept', type: LinkType.CONTAINS },
+    { source: 'inference_concept', target: 'inference_rules', type: LinkType.CONTAINS },
+    
+    // Связь с логиками
+    { source: 'pred_logic', target: 'inference_concept', type: LinkType.CONTAINS },
+    { source: 'prop_logic', target: 'inference_concept', type: LinkType.CONTAINS },
+    { source: 'sequent_calculus', target: 'inference_concept', type: LinkType.RELATED }, // Секвенции — это формализация вывода
+    
+    // Мост Синтаксис <-> Семантика
+    { source: 'soundness_completeness', target: 'inference_concept', type: LinkType.RELATED }, // Syntax
+    { source: 'soundness_completeness', target: 'mt_concepts', type: LinkType.RELATED }, // Semantics (Model Theory)
+    
+    // Примеры
+    { source: 'theory_PA', target: 'inference_concept', type: LinkType.RELATED }, // PA использует спец. правила индукции
+    { source: 'modal_K', target: 'inference_rules', type: LinkType.CONTAINS }, // Правило усиления (Nec)
+    
+    // Теорема о дедукции связывает импликацию и вывод
+    { source: 'inference_concept', target: 'heyting_alg', type: LinkType.RELATED }, // Алгебраическая интерпретация выводимости
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

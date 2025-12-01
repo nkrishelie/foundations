@@ -10,7 +10,8 @@ export const NavigationControls: React.FC<Props> = ({ onRotate, onZoom, onReset 
   const btnClass = "w-10 h-10 flex items-center justify-center bg-slate-800/80 hover:bg-blue-600 border border-slate-600 rounded text-white transition-colors backdrop-blur-md active:scale-95 select-none";
 
   return (
-    <div className="absolute bottom-6 left-6 z-20 flex flex-col gap-4 pointer-events-auto">
+    //<div className="absolute bottom-6 left-6 z-20 flex flex-col gap-4 pointer-events-auto">
+    <div className="absolute bottom-6 left-6 z-20 hidden md:flex flex-col gap-4 pointer-events-auto">      
       
       {/* Блок вращения (Джойстик) */}
       <div className="relative w-32 h-32">

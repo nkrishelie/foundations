@@ -12,13 +12,40 @@ interface Props {
   activeLanguage: string;
 }
 
+// Функция для очистки LaTeX из меток в 3D.
+// SpriteText не понимает формулы, поэтому мы превращаем их в Unicode/Текст
+const cleanLabel = (label: string): string => {
+  if (!label) return '';
+  return label
+    // Удаляем знаки доллара
+    .replace(/\$/g, '') 
+    // Заменяем популярные символы на Юникод
+    .replace(/\\mathbb{N}/g, 'ℕ')
+    .replace(/\\mathbb{Z}/g, 'ℤ')
+    .replace(/\\mathbb{Q}/g, 'ℚ')
+    .replace(/\\mathbb{R}/g, 'ℝ')
+    .replace(/\\mathbb{C}/g, 'ℂ')
+    .replace(/\\mathbb{A}/g, '𝔸')
+    .replace(/\\omega/g, 'ω')
+    .replace(/\\aleph_1/g, 'ℵ₁')
+    .replace(/\\varepsilon_0/g, 'ε₀')
+    .replace(/\\Gamma_0/g, 'Γ₀')
+    .replace(/\\lambda/g, 'λ')
+    // Убираем обертки шрифтов: \mathsf{PA} -> PA, \mathsf{RCA}_0 -> RCA_0
+    .replace(/\\mathsf{([a-zA-Z0-9]+)}/g, '$1')
+    .replace(/\\mathbf{([a-zA-Z0-9]+)}/g, '$1')
+    .replace(/\\mathrm{([a-zA-Z0-9]+)}/g, '$1')
+    // Очищаем нижние индексы для простоты: RCA_0 -> RCA0 (опционально, можно оставить _)
+    .replace(/_0/g, '₀') 
+    .replace(/_1/g, '₁')
+    // Убираем оставшиеся слеши
+    .replace(/\\/g, '');
+};
+
 export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, activeLanguage }) => {
   const graphRef = useRef<any>(null);
-  
-  // Флаг: было ли выполнено начальное центрирование
   const isInited = useRef(false);
 
-  // Сбрасываем флаг инициализации только если меняется язык (граф пересоздается)
   useEffect(() => {
     isInited.current = false;
   }, [activeLanguage]);
@@ -88,8 +115,11 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         const SpriteTextClass = (SpriteText as any).default || SpriteText;
         
         if (SpriteTextClass) {
-          const sprite = new SpriteTextClass(node.label);
-          sprite.color = color; // Цвет текста совпадает с цветом узла
+          // ВОТ ЗДЕСЬ ПРИМЕНЯЕМ ОЧИСТКУ ДЛЯ 3D
+          const cleanText = cleanLabel(node.label);
+          
+          const sprite = new SpriteTextClass(cleanText);
+          sprite.color = color;
           sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
           sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
           sprite.backgroundColor = '#00000080';
@@ -105,23 +135,22 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         return group;
       }}
 
-      // Links
+      // Links Settings
       linkColor={getLinkColor}
-
-      // Настройка толщины: тонкая для "Связано", обычная для остальных
+      
+      // Толщина линий
       linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
 
-      // Настройка частиц: убираем их для "Связано", чтобы не шумели
+      // Частицы
       linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
       linkDirectionalParticleSpeed={0.005}
       linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}
 
-      // Настройка стрелок: убираем для Эквивалентности и Связано
+      // Стрелки
       linkDirectionalArrowLength={(link: any) => {
         if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
-        return 4; // Размер стрелки для направленных связей
+        return 4;
       }}
-      
       linkDirectionalArrowRelPos={1}
       
       // World
@@ -135,24 +164,20 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
 
         graphRef.current.cameraPosition(
           { x: (node.x || 0) * distRatio, y: (node.y || 0) * distRatio, z: (node.z || 0) * distRatio },
-          node, // Look at node
-          2000  // Duration (ms)
+          node,
+          2000
         );
         onNodeClick(node);
       }}
       
       d3VelocityDecay={0.1}
       d3AlphaDecay={0.01}
-      
-      // ИСПРАВЛЕНИЕ ЗДЕСЬ:
-      // Зумим только один раз при старте, а не при каждой остановке движка
       onEngineStop={() => {
         if (!isInited.current && graphRef.current) {
           graphRef.current.zoomToFit(400);
           isInited.current = true;
         }
       }}
-      
       controlType="orbit"
       enableNodeDrag={true}
       warmupTicks={100}

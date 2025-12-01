@@ -18,6 +18,40 @@ interface NodeDefinition {
 // const uni = (str: string) => str... 
 
 const RAW_NODES: Record<string, NodeDefinition> = {
+  'cylindric_alg': {
+    group: Discipline.ORDER_THEORY, // Или ALGEBRA
+    val: 14,
+    synonyms: ['Цилиндрические алгебры', 'CA', 'Алгебраическая логика'],
+    content: {
+      en: {
+        label: 'Cylindric Algebras ($\\mathbf{CA}_\\alpha$)',
+        description: 'Algebraic structures introduced by Tarski and Henkin to correspond to First-Order Logic with identity.',
+        details: ['Cylindrification $c_i$ ($\\exists x_i$)', 'Diagonal elements $d_{ij}$ ($x_i=x_j$)', 'Dimension $\\alpha$']
+      },
+      ru: {
+        label: 'Цилиндрические алгебры ($\\mathbf{CA}_\\alpha$)',
+        description: 'Алгебраические структуры, введенные Тарским и Хенкиным как аналог логики первого порядка с равенством.',
+        details: ['Цилиндрификация $c_i$ ($\\exists x_i$)', 'Диагональные элементы $d_{ij}$ ($x_i=x_j$)', 'Размерность $\\alpha$']
+      }
+    }
+  },
+  'polyadic_alg': {
+    group: Discipline.ORDER_THEORY,
+    val: 12,
+    synonyms: ['Полиадические алгебры', 'Алгебры Халмоша'],
+    content: {
+      en: {
+        label: 'Polyadic Algebras',
+        description: 'Algebraic approach to First-Order Logic by Paul Halmos. Focuses on substitution operators.',
+        details: ['Transformation systems', 'Locally finite algebras', 'Halmos Duality']
+      },
+      ru: {
+        label: 'Полиадические алгебры',
+        description: 'Алгебраический подход к логике первого порядка Пола Халмоша. Акцент на операторах подстановки.',
+        details: ['Системы преобразований', 'Локально конечные алгебры', 'Двойственность Халмоша']
+      }
+    }
+  },
   'thm_cbs': {
     group: Discipline.SET_THEORY,
     val: 18,
@@ -1743,6 +1777,17 @@ const RAW_NODES: Record<string, NodeDefinition> = {
 };
 
 const RAW_LINKS = [
+    // Algebraic Logic (Tarski, Halmos)
+    { source: 'bool_alg', target: 'cylindric_alg', type: LinkType.EXTENDS }, // CA is Boolean Algebra + operators
+    { source: 'bool_alg', target: 'polyadic_alg', type: LinkType.EXTENDS },
+    { source: 'cylindric_alg', target: 'pred_logic', type: LinkType.EQUIVALENT }, // Algebraization of FOL
+    { source: 'polyadic_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },
+    
+    // Connections to authors/theorems
+    { source: 'thm_tarski_truth', target: 'cylindric_alg', type: LinkType.RELATED }, // Tarski created both
+    { source: 'stone_space', target: 'cylindric_alg', type: LinkType.RELATED }, // Stone representation extends to CAs
+    { source: 'cylindric_alg', target: 'polyadic_alg', type: LinkType.RELATED }, // Similar goals, different signatures
+  
     // Cantor-Bernstein
     { source: 'thm_knaster', target: 'thm_cbs', type: LinkType.PROVES }, // Кнастер доказывает CBS (через неподвижную точку)
     { source: 'zfc', target: 'thm_cbs', type: LinkType.CONTAINS },

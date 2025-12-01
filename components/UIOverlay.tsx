@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GraphNode, Discipline, LinkType, Language } from '../types';
+import { GraphNode, GraphLink, Discipline, LinkType, Language } from '../types'; // Добавили GraphLink
 import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS } from '../constants';
 import Latex from 'react-latex-next';
 
@@ -16,10 +16,21 @@ const cleanForSearch = (str: string) => {
     .trim();
 };
 
+// Функция экранирования для CSV (обрабатывает запятые и кавычки внутри текста)
+const escapeCsv = (str: string) => {
+  if (!str) return '';
+  const result = str.replace(/"/g, '""'); // Удваиваем кавычки
+  if (result.search(/("|,|\n)/g) >= 0) {
+    return `"${result}"`; // Оборачиваем в кавычки, если есть спецсимволы
+  }
+  return result;
+};
+
 const normalize = (str: string) => str.toLowerCase().replace(/\s/g, '');
 
 interface Props {
   nodes: GraphNode[];
+  links: GraphLink[]; // <--- Новый проп
   selectedNode: GraphNode | null;
   onSearch: (query: string) => void;
   onCloseSidebar: () => void;
@@ -29,6 +40,7 @@ interface Props {
 
 export const UIOverlay: React.FC<Props> = ({ 
   nodes,
+  links, // <--- Получаем связи
   selectedNode, 
   onSearch, 
   onCloseSidebar,
@@ -40,6 +52,55 @@ export const UIOverlay: React.FC<Props> = ({
   const [filteredNodes, setFilteredNodes] = useState<GraphNode[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  // --- ЛОГИКА ЭКСПОРТА ---
+  const handleExport = () => {
+    // 1. Формируем CSV для Узлов
+    const nodesHeader = ['ID', 'Label', 'Group', 'Description', 'Details'];
+    const nodesRows = nodes.map(n => [
+      n.id,
+      cleanForSearch(n.label), // Можно использовать сырой label, если нужно с формулами
+      DISCIPLINE_LABELS[n.group][currentLang],
+      cleanForSearch(n.description),
+      n.details ? n.details.map(cleanForSearch).join('; ') : ''
+    ]);
+    
+    const nodesCsvContent = [
+      nodesHeader.join(','),
+      ...nodesRows.map(row => row.map(escapeCsv).join(','))
+    ].join('\n');
+
+    // 2. Формируем CSV для Связей
+    const linksHeader = ['Source ID', 'Target ID', 'Relation Type'];
+    const linksRows = links.map((l: any) => [
+      // d3-force превращает source/target в объекты, нам нужны ID
+      typeof l.source === 'object' ? l.source.id : l.source,
+      typeof l.target === 'object' ? l.target.id : l.target,
+      LINK_LABELS[l.type as LinkType][currentLang]
+    ]);
+
+    const linksCsvContent = [
+      linksHeader.join(','),
+      ...linksRows.map(row => row.map(escapeCsv).join(','))
+    ].join('\n');
+
+    // 3. Скачиваем файлы
+    downloadFile(nodesCsvContent, `math_nexus_nodes_${currentLang}.csv`);
+    downloadFile(linksCsvContent, `math_nexus_links_${currentLang}.csv`);
+  };
+
+  const downloadFile = (content: string, fileName: string) => {
+    // Добавляем BOM (\uFEFF) чтобы Excel правильно читал кириллицу
+    const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  // -----------------------
+
   // Логика фильтрации
   useEffect(() => {
     if (!inputValue || inputValue.length < 2) {
@@ -50,34 +111,20 @@ export const UIOverlay: React.FC<Props> = ({
 
     const q = normalize(inputValue);
     
-    // Ищем совпадения
     const results = nodes.filter(n => {
-      // Данные уже локализованы в App.tsx -> dataService.ts,
-      // поэтому используем свойства напрямую (n.label, n.description), а не n.content
-
-      // 1. По ID
       if (normalize(n.id).includes(q)) return true;
-      
-      // 2. По метке (Label)
       const labelClean = normalize(cleanForSearch(n.label));
       if (labelClean.includes(q)) return true;
-      
-      // 3. По синонимам
       if (n.synonyms?.some(s => normalize(s).includes(q))) return true;
-
-      // 4. По описанию и деталям
       if (normalize(cleanForSearch(n.description)).includes(q)) return true;
       if (n.details?.some(d => normalize(cleanForSearch(d)).includes(q))) return true;
-
       return false;
     });
 
-    // Берем топ-50 результатов
     setFilteredNodes(results.slice(0, 50));
     setShowDropdown(true);
-  }, [inputValue, nodes]); // currentLang здесь не нужен, так как nodes обновляются снаружи
+  }, [inputValue, nodes]);
 
-  // Выбор узла из списка
   const handleSelectNode = (node: GraphNode) => {
     setInputValue(cleanForSearch(node.label)); 
     setShowDropdown(false);
@@ -148,10 +195,22 @@ export const UIOverlay: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Language Toggles */}
-        <div className="flex space-x-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 backdrop-blur-md">
-          <button onClick={() => onToggleLang('ru')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'ru' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇷🇺</button>
-          <button onClick={() => onToggleLang('en')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'en' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇺🇸</button>
+        {/* Buttons: Language + Export */}
+        <div className="flex gap-2">
+          {/* Кнопка Экспорта */}
+          <button
+            onClick={handleExport}
+            className="flex items-center justify-center px-3 py-1.5 bg-slate-800/80 border border-slate-600 rounded-lg hover:bg-blue-600 hover:border-blue-500 text-slate-300 hover:text-white transition-all backdrop-blur-md"
+            title={currentLang === 'en' ? "Export Data to CSV" : "Экспорт данных в CSV"}
+          >
+            <span className="text-lg">💾</span>
+          </button>
+
+          {/* Языки */}
+          <div className="flex space-x-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 backdrop-blur-md">
+            <button onClick={() => onToggleLang('ru')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'ru' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇷🇺</button>
+            <button onClick={() => onToggleLang('en')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'en' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇺🇸</button>
+          </div>
         </div>
       </div>
 

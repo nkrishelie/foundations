@@ -256,7 +256,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       }}
       
       d3VelocityDecay={0.1}
-      d3AlphaDecay={0.03}
+      d3AlphaDecay={0.05}
       onEngineStop={() => {
         if (!isInited.current && graphRef.current) {
           graphRef.current.zoomToFit(400);

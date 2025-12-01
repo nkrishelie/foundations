@@ -194,7 +194,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
 
   return (
     <ForceGraph3D
-      key={activeLanguage}
+      //key={activeLanguage}
       ref={graphRef}
       graphData={data}
       

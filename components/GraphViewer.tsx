@@ -13,38 +13,81 @@ interface Props {
 }
 
 // Функция для очистки LaTeX из меток в 3D.
-// SpriteText не понимает формулы, поэтому мы превращаем их в Unicode/Текст
+// Превращаем команды LaTeX в красивые Unicode-символы
 const cleanLabel = (label: string): string => {
   if (!label) return '';
   return label
-    // Удаляем знаки доллара
     .replace(/\$/g, '') 
-    // Заменяем популярные символы на Юникод
+    
+    // Множества
     .replace(/\\mathbb{N}/g, 'ℕ')
     .replace(/\\mathbb{Z}/g, 'ℤ')
     .replace(/\\mathbb{Q}/g, 'ℚ')
     .replace(/\\mathbb{R}/g, 'ℝ')
     .replace(/\\mathbb{C}/g, 'ℂ')
     .replace(/\\mathbb{A}/g, '𝔸')
+    
+    // Греческие буквы
     .replace(/\\omega/g, 'ω')
-    .replace(/\\aleph_1/g, 'ℵ₁')
-    .replace(/\\varepsilon_0/g, 'ε₀')
-    .replace(/\\Gamma_0/g, 'Γ₀')
+    .replace(/\\aleph/g, 'ℵ')
+    .replace(/\\varepsilon/g, 'ε')
+    .replace(/\\Gamma/g, 'Γ')
+    .replace(/\\Delta/g, 'Δ')
+    .replace(/\\Sigma/g, 'Σ')
+    .replace(/\\Pi/g, 'Π')
     .replace(/\\lambda/g, 'λ')
-    // Убираем обертки шрифтов: \mathsf{PA} -> PA, \mathsf{RCA}_0 -> RCA_0
-    .replace(/\\mathsf{([a-zA-Z0-9]+)}/g, '$1')
-    .replace(/\\mathbf{([a-zA-Z0-9]+)}/g, '$1')
-    .replace(/\\mathrm{([a-zA-Z0-9]+)}/g, '$1')
-    // Очищаем нижние индексы для простоты: RCA_0 -> RCA0 (опционально, можно оставить _)
-    .replace(/_0/g, '₀') 
-    .replace(/_1/g, '₁')
-    // Добавляем обработку знака умножения и других операторов
-    .replace(/\\times/g, '×') 
-    .replace(/\\cdot/g, '·')
+    .replace(/\\phi/g, 'φ')
+    
+    // Логические операторы и кванторы
+    .replace(/\\vdash/g, '⊢')      // <--- ВОТ ТО, ЧТО ВЫ ИСКАЛИ
+    .replace(/\\forall/g, '∀')
+    .replace(/\\exists/g, '∃')
+    .replace(/\\to/g, '→')
+    .replace(/\\leftrightarrow/g, '↔')
+    .replace(/\\Rightarrow/g, '⇒')
+    .replace(/\\Leftrightarrow/g, '⇔')
+    .replace(/\\models/g, '⊨')
+    .replace(/\\neg/g, '¬')
+    .replace(/\\land/g, '∧')
+    .replace(/\\lor/g, '∨')
+    
+    // Модальности
+    .replace(/\\square/g, '□')
+    .replace(/\\diamond/g, '◇')
+    
+    // Отношения и операции
     .replace(/\\le/g, '≤')
     .replace(/\\ge/g, '≥')
-    // Убираем оставшиеся слеши
-    .replace(/\\/g, '');
+    .replace(/\\ne/g, '≠')
+    .replace(/\\neq/g, '≠')
+    .replace(/\\times/g, '×')
+    .replace(/\\cdot/g, '·')
+    .replace(/\\in/g, '∈')
+    .replace(/\\subset/g, '⊂')
+    .replace(/\\subseteq/g, '⊆')
+    .replace(/\\cup/g, '∪')
+    .replace(/\\cap/g, '∩')
+    .replace(/\\setminus/g, '\\')
+    .replace(/\\bot/g, '⊥')
+    .replace(/\\top/g, '⊤')
+
+    // Шрифты и оформление
+    .replace(/\\mathsf{([a-zA-Z0-9_]+)}/g, '$1')
+    .replace(/\\mathbf{([a-zA-Z0-9_]+)}/g, '$1')
+    .replace(/\\mathrm{([a-zA-Z0-9_]+)}/g, '$1')
+    .replace(/\\text{([a-zA-Z0-9\s]+)}/g, '$1')
+    
+    // Индексы и степени
+    .replace(/\^\{?([0-9a-z])\}?/g, '$1') // Простая имитация степени (удаляет ^)
+    .replace(/_0/g, '₀') 
+    .replace(/_1/g, '₁')
+    .replace(/_2/g, '₂')
+    .replace(/_n/g, 'ₙ')
+    .replace(/_k/g, 'ₖ')
+    
+    // Финальная чистка
+    .replace(/\\/g, '')
+    .trim();
 };
 
 export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, activeLanguage }) => {

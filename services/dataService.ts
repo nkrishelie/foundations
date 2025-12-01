@@ -617,7 +617,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   // --- SET THEORY ---
   'zfc': {
     group: Discipline.SET_THEORY,
-    val: 35,
+    val: 50,
     synonyms: ['Теория множеств', 'ЗФЦ', 'ZFC'],
     content: {
       en: {
@@ -957,7 +957,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   },
   'mt_concepts': {
     group: Discipline.MODEL_THEORY,
-    val: 35,
+    val: 50,
     synonyms: ['Теория моделей'],
     content: {
       en: {

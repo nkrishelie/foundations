@@ -228,22 +228,15 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       graphData={data}
 
       nodeLabel={(node: any) => {
-        // Очищаем текст от LaTeX символов для читаемости
         const labelText = cleanLabel(node.label);
-    
-        // Возвращаем HTML-строку. Можно добавить немного стилей Tailwind, 
-        // чтобы соответствовать темной теме приложения.
         return `
-          <div class="px-3 py-1.5 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
+          <div class="px-3 py-1 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
             <div class="text-slate-100 font-medium text-sm whitespace-nowrap">
               ${labelText}
             </div>
-            ${node.synonyms && node.synonyms.length > 0 ? 
-              `<div class="text-slate-400 text-xs mt-0.5">${node.synonyms[0]}</div>` : ''}
           </div>
         `;
-      }}
-      
+      }}      
       // Node Rendering
       nodeThreeObject={(node: any) => {
         const color = DISCIPLINE_COLORS[node.group as any] || '#cccccc';

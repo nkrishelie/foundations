@@ -14,12 +14,12 @@ export const DISCIPLINE_COLORS: Record<Discipline, string> = {
 };
 
 export const LINK_COLORS: Record<LinkType, string> = {
-  [LinkType.EXTENDS]: '#94a3b8',
-  [LinkType.PROVES]: '#22d3ee',
-  [LinkType.MODELS]: '#4ade80',
-  [LinkType.EQUIVALENT]: '#f472b6',
-  [LinkType.CONTAINS]: '#475569',
-  [LinkType.RELATED]: '#64748b'
+  [LinkType.EXTENDS]: '#f59e0b',   // Amber (Янтарный) — для иерархии "наследует/расширяет"
+  [LinkType.PROVES]: '#22d3ee',    // Cyan (Голубой) — для логического вывода
+  [LinkType.MODELS]: '#4ade80',    // Green (Зеленый) — для семантики/моделей
+  [LinkType.EQUIVALENT]: '#f472b6',// Pink (Розовый) — для тождеств
+  [LinkType.CONTAINS]: '#a78bfa',  // Purple (Фиолетовый) — для "включает в себя"
+  [LinkType.RELATED]: '#475569'    // Slate-600 (Темно-серый) — чтобы не отвлекало внимание
 };
 
 export const INITIAL_CAMERA_POSITION = { x: 0, y: 0, z: 400 };

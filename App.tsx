@@ -36,8 +36,14 @@ const App: React.FC = () => {
       {/* UI Layer */}
       <div className="absolute inset-0 z-10 pointer-events-none">
         <UIOverlay 
+          nodes={data.nodes} // <--- ДОБАВИТЬ ЭТУ СТРОКУ
           selectedNode={selectedNode} 
-          onSearch={setSearchQuery}
+          onSearch={(query) => {
+            setSearchQuery(query);
+            // Если выбран конкретный узел через поиск, можно сразу его выделить
+            const foundNode = data.nodes.find(n => n.id === query);
+            if (foundNode) setSelectedNode(foundNode);
+          }}
           onCloseSidebar={() => setSelectedNode(null)}
           currentLang={language}
           onToggleLang={(lang) => setLanguage(lang)}

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
@@ -20,7 +20,7 @@ const cleanLabel = (label: string): string => {
   if (!label) return '';
   return label
     .replace(/\$/g, '') 
-    
+
     // Множества
     .replace(/\\mathbb{N}/g, 'ℕ')
     .replace(/\\mathbb{Z}/g, 'ℤ')
@@ -28,7 +28,7 @@ const cleanLabel = (label: string): string => {
     .replace(/\\mathbb{R}/g, 'ℝ')
     .replace(/\\mathbb{C}/g, 'ℂ')
     .replace(/\\mathbb{A}/g, '𝔸')
-    
+
     // Греческие буквы
     .replace(/\\omega/g, 'ω')
     .replace(/\\aleph/g, 'ℵ')
@@ -39,7 +39,7 @@ const cleanLabel = (label: string): string => {
     .replace(/\\Pi/g, 'Π')
     .replace(/\\lambda/g, 'λ')
     .replace(/\\phi/g, 'φ')
-    
+
     // Логические операторы и кванторы
     .replace(/\\vdash/g, '⊢')      // <--- ВОТ ТО, ЧТО ВЫ ИСКАЛИ
     .replace(/\\forall/g, '∀')
@@ -52,11 +52,11 @@ const cleanLabel = (label: string): string => {
     .replace(/\\neg/g, '¬')
     .replace(/\\land/g, '∧')
     .replace(/\\lor/g, '∨')
-    
+
     // Модальности
     .replace(/\\square/g, '□')
     .replace(/\\diamond/g, '◇')
-    
+
     // Отношения и операции
     .replace(/\\le/g, '≤')
     .replace(/\\ge/g, '≥')
@@ -78,7 +78,7 @@ const cleanLabel = (label: string): string => {
     .replace(/\\mathbf{([a-zA-Z0-9_]+)}/g, '$1')
     .replace(/\\mathrm{([a-zA-Z0-9_]+)}/g, '$1')
     .replace(/\\text{([a-zA-Z0-9\s]+)}/g, '$1')
-    
+
     // Индексы и степени
     .replace(/\^\{?([0-9a-z])\}?/g, '$1') // Простая имитация степени (удаляет ^)
     .replace(/_0/g, '₀') 
@@ -86,7 +86,7 @@ const cleanLabel = (label: string): string => {
     .replace(/_2/g, '₂')
     .replace(/_n/g, 'ₙ')
     .replace(/_k/g, 'ₖ')
-    
+
     // Финальная чистка
     .replace(/\\/g, '')
     .trim();
@@ -96,56 +96,6 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   const graphRef = useRef<any>(null);
   const isInited = useRef(false);
 
-  // === НОВЫЙ КОД: Состояния для подсветки ===
-  const [highlightNodes, setHighlightNodes] = useState(new Set());
-  const [highlightLinks, setHighlightLinks] = useState(new Set());
-  const [hoverNode, setHoverNode] = useState<any>(null);
-
-// === ОПТИМИЗАЦИЯ 1: Кэшируем соседей ===
-  // Строим карту смежности один раз при загрузке данных
-  const neighborMap = useMemo(() => {
-    const map = new Map<string, { links: any[], nodes: Set<string> }>();
-    
-    data.links.forEach((link: any) => {
-      const sourceId = link.source.id || link.source;
-      const targetId = link.target.id || link.target;
-
-      if (!map.has(sourceId)) map.set(sourceId, { links: [], nodes: new Set() });
-      if (!map.has(targetId)) map.set(targetId, { links: [], nodes: new Set() });
-
-      map.get(sourceId)?.links.push(link);
-      map.get(sourceId)?.nodes.add(targetId);
-      
-      map.get(targetId)?.links.push(link);
-      map.get(targetId)?.nodes.add(sourceId);
-    });
-    
-    return map;
-  }, [data]);
-  // =======================================
-  
-  // Обработчик наведения мыши
-  const handleNodeHover = (node: any) => {
-    if ((!node && !highlightNodes.size) || (node && hoverNode === node)) return;
-
-    const newHighlightNodes = new Set();
-    const newHighlightLinks = new Set();
-
-    if (node) {
-      newHighlightNodes.add(node.id);
-      // Берем готовых соседей из карты (мгновенно!)
-      const neighbors = neighborMap.get(node.id);
-      if (neighbors) {
-        neighbors.links.forEach(link => newHighlightLinks.add(link));
-        neighbors.nodes.forEach(neighborId => newHighlightNodes.add(neighborId));
-      }
-    }
-
-    setHoverNode(node || null);
-    setHighlightNodes(newHighlightNodes);
-    setHighlightLinks(newHighlightLinks);
-  };
-  
   useEffect(() => {
     isInited.current = false;
   }, [activeLanguage]);
@@ -153,7 +103,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   // Focus on search result
   useEffect(() => {
     if (searchQuery && graphRef.current) {
-      
+
       // Функция, которая превращает "красивую" математику в простой текст для поиска
       // Пример: "$\mathbb{Z} + \mathbb{Z}$" -> "z+z"
       const normalizeForSearch = (str: string) => {
@@ -184,7 +134,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       const foundNode = data.nodes.find(n => {
         // Проверяем ID
         if (normalizeForSearch(n.id).includes(q)) return true;
-        
+
         // Проверяем Label (самое важное для Z+Z)
         if (normalizeForSearch(n.label).includes(q)) return true;
 
@@ -198,9 +148,9 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         // Вычисляем дистанцию камеры в зависимости от размера узла
         const nodeSize = foundNode.val || 1;
         const distance = nodeSize > 20 ? 60 : 40; 
-        
+
         const distRatio = 1 + distance/Math.hypot(foundNode.x || 1, foundNode.y || 1, foundNode.z || 1);
-        
+
         graphRef.current.cameraPosition(
           { 
             x: (foundNode.x || 0) * distRatio, 
@@ -213,7 +163,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       }
     }
   }, [searchQuery, data]);
-  
+
   const getLinkColor = (link: GraphLink) => LINK_COLORS[link.type];
 
   if (!data || !data.nodes || data.nodes.length === 0) {
@@ -252,11 +202,11 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   const handleZoom = (dir: number) => {
     const fg = graphRef.current;
     if (!fg) return;
-    
+
     const currentPos = fg.cameraPosition();
     // Умножаем текущие координаты на коэффициент (0.8 для приближения, 1.2 для отдаления)
     const factor = dir > 0 ? 1.4 : 0.7; 
-    
+
     fg.cameraPosition(
       { x: currentPos.x * factor, y: currentPos.y * factor, z: currentPos.z * factor },
       currentPos.lookAt,
@@ -269,28 +219,32 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
     if (!fg) return;
     fg.zoomToFit(1000); // 1 секунда на красивый возврат
   };
-  
+
   return (
     <div className="relative w-full h-full"> {/* Обертка для позиционирования кнопок */}
     <ForceGraph3D
       key={activeLanguage}
       ref={graphRef}
       graphData={data}
-      onNodeHover={handleNodeHover}
 
-      // Уменьшаем время "разогрева" и "остывания" физики
-      warmupTicks={50}     // Было 100. Меньше - быстрее старт
-      cooldownTicks={50}   // Было 100. Граф быстрее "застынет" и перестанет грузить CPU
-      
       nodeLabel={(node: any) => {
+        // Очищаем текст от LaTeX символов для читаемости
         const labelText = cleanLabel(node.label);
+    
+        // Возвращаем HTML-строку. Можно добавить немного стилей Tailwind, 
+        // чтобы соответствовать темной теме приложения.
         return `
+          <div class="px-3 py-1.5 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
           <div class="px-3 py-1 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
             <div class="text-slate-100 font-medium text-sm whitespace-nowrap">
               ${labelText}
             </div>
+            ${node.synonyms && node.synonyms.length > 0 ? 
+              `<div class="text-slate-400 text-xs mt-0.5">${node.synonyms[0]}</div>` : ''}
           </div>
         `;
+      }}
+      
       }}      
       // Node Rendering
       nodeThreeObject={(node: any) => {
@@ -298,82 +252,68 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         const size = (node.val || 1);
         const isMain = size >= 20;
 
-        // Проверяем, нужно ли "заглушить" этот узел (если наведены на другой)
-        const isDimmed = hoverNode && !highlightNodes.has(node.id);
-
         const group = new THREE.Group();
-        
+
         // 1. Sphere
         const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
         const geometry = new THREE.SphereGeometry(radius, 16, 16);
-        
         const material = new THREE.MeshPhysicalMaterial({
           color: color,
           emissive: color,
-          // Если узел "заглушен", делаем его почти черным и прозрачным
-          emissiveIntensity: isDimmed ? 0.05 : (isMain ? 0.7 : 0.1),
+          emissiveIntensity: isMain ? 0.7 : 0.1,
           roughness: 0.4,
           metalness: 0.1,
-          transparent: true,         // Включаем прозрачность
-          opacity: isDimmed ? 0.2 : 1 // Полупрозрачность для неактивных
         });
-        
+
         const sphere = new THREE.Mesh(geometry, material);
         group.add(sphere);
 
         // 2. Text Label
         const SpriteTextClass = (SpriteText as any).default || SpriteText;
+
         if (SpriteTextClass) {
+          // ВОТ ЗДЕСЬ ПРИМЕНЯЕМ ОЧИСТКУ ДЛЯ 3D
           const cleanText = cleanLabel(node.label);
+
           const sprite = new SpriteTextClass(cleanText);
-          
-          // Цвет текста тоже глушим, если не в фокусе
-          sprite.color = isDimmed ? 'rgba(255, 255, 255, 0.2)' : color;
-          
+          sprite.color = color;
           sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
           sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
-          
-          // Фон текста
-          sprite.backgroundColor = isDimmed ? '#00000000' : '#00000080'; // Убираем фон у неактивных
-          
+          sprite.backgroundColor = '#00000080';
           sprite.padding = 1;
           sprite.borderRadius = 3;
-          sprite.material.depthTest = false; // Чтобы текст был всегда поверх (если активен)
+          sprite.material.depthTest = false;
           sprite.material.depthWrite = false;
-          // Если заглушен, меняем порядок отрисовки, чтобы не перекрывал активные
-          sprite.renderOrder = isDimmed ? 0 : 999; 
-          
+          sprite.renderOrder = 999;
+
           group.add(sprite);
         }
 
         return group;
       }}
+
       // Links Settings
-      linkColor={(link: any) => {
-        if (hoverNode && !highlightLinks.has(link)) return '#ffffff10'; // Почти невидимые
-        return LINK_COLORS[link.type] || '#ffffff';
-      }}
-      
+      linkColor={getLinkColor}
+
       // Толщина линий
-      linkWidth={(link: any) => highlightLinks.has(link) ? 2 : (link.type === LinkType.RELATED ? 0.3 : 1)}
+      linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
 
       // Частицы
-      linkDirectionalParticles={(link: any) => highlightLinks.has(link) ? 4 : 0}
+      linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
       linkDirectionalParticleSpeed={0.005}
-      linkDirectionalParticleWidth={2}
+      linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}
 
       // Стрелки
       linkDirectionalArrowLength={(link: any) => {
-         if (hoverNode && !highlightLinks.has(link)) return 0;
-         if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
-         return 4;
+        if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
+        return 4;
       }}
       linkDirectionalArrowRelPos={1}
-      
+
       // World
       backgroundColor="#000005"
       showNavInfo={false}
-      
+
       // Interactions
       onNodeClick={(node: any) => {
         const distance = 40;
@@ -386,7 +326,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         );
         onNodeClick(node);
       }}
-      
+
       d3VelocityDecay={0.1}
       d3AlphaDecay={0.05}
       onEngineStop={() => {

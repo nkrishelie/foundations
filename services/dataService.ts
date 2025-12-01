@@ -600,19 +600,20 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       }
     }
   },
-  'theory_order': {
+'theory_order': {
     group: Discipline.ORDER_THEORY,
     val: 15,
+    synonyms: ['аксиомы порядка','axioms of order'],
     content: {
       en: { 
-        label: 'Theory of Order', 
-        description: 'Axiomatic theory defining general properties of order relations (partial, linear, well-orders).', 
-        details: ['Reflexivity', 'Transitivity', 'Antisymmetry'] 
+        label: 'Axiomatic Order Theory', // Было: Theory of Order
+        description: 'Formal first-order theory defining general properties of relations (reflexivity, transitivity, antisymmetry).', 
+        details: ['Partial Order Axioms', 'Linear Order Axioms', 'Strict/Non-strict'] 
       },
       ru: { 
-        label: 'Теория порядка', 
-        description: 'Аксиоматическая теория, определяющая общие свойства отношений порядка.', 
-        details: ['Рефлексивность', 'Транзитивность', 'Антисимметричность'] 
+        label: 'Аксиоматика порядка', // Было: Теория порядка
+        description: 'Формальная теория первого порядка, определяющая общие свойства отношений (рефлексивность, транзитивность).', 
+        details: ['Аксиомы частичного порядка', 'Аксиомы линейного порядка', 'Строгий/Нестрогий'] 
       }
     }
   },

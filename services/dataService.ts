@@ -981,6 +981,291 @@ const RAW_NODES: Record<string, NodeDefinition> = {
         details: ['WQO', 'TREE(3)', 'Быстрорастущая иерархия', 'Недоказуемо в PA']
       }
     }
+  },
+  
+  // --- REVERSE MATHEMATICS (ОБРАТНАЯ МАТЕМАТИКА) ---
+  'reverse_math': {
+    group: Discipline.FOUNDATIONS,
+    val: 22,
+    synonyms: ['Обратная математика', 'Reverse Math'],
+    content: {
+      en: {
+        label: 'Reverse Mathematics',
+        description: 'A program to determine which axioms are necessary to prove a specific theorem.',
+        details: ['Big Five Subsystems', 'Subsystems of Second Order Arithmetic', 'Harvey Friedman', 'Simpson']
+      },
+      ru: {
+        label: 'Обратная математика',
+        description: 'Программа по определению того, какие аксиомы необходимы для доказательства конкретной теоремы.',
+        details: ['Большая пятерка', 'Арифметика второго порядка', 'Харви Фридман', 'Симпсон']
+      }
+    }
+  },
+  'rca0': {
+    group: Discipline.PROOF_THEORY,
+    val: 15,
+    synonyms: ['RCA0', 'Recursive Comprehension'],
+    content: {
+      en: {
+        label: 'RCA₀',
+        description: 'Recursive Comprehension Axiom. The base system for Reverse Math. Corresponds to "Computable Mathematics".',
+        details: ['Δ⁰₁ comprehension', 'Σ⁰₁ induction', 'Intermediate Value Thm', 'Algebraic Closure exists']
+      },
+      ru: {
+        label: 'RCA₀',
+        description: 'Аксиома рекурсивного свертывания. Базовая система обратной математики. Соответствует "Вычислимой математике".',
+        details: ['Δ⁰₁ свертывание', 'Σ⁰₁ индукция', 'Теорема о промежуточном значении', 'Существование алг. замыкания']
+      }
+    }
+  },
+  'wkl0': {
+    group: Discipline.PROOF_THEORY,
+    val: 15,
+    synonyms: ['WKL0', 'Weak Konig Lemma'],
+    content: {
+      en: {
+        label: 'WKL₀',
+        description: 'Weak König\'s Lemma. Adds compactness arguments to RCA₀.',
+        details: ['Compactness of [0,1]', 'Heine-Borel', 'Maximum Principle', 'Prime Ideal Theorem']
+      },
+      ru: {
+        label: 'WKL₀',
+        description: 'Слабая лемма Кёнига. Добавляет аргументы компактности к RCA₀.',
+        details: ['Компактность [0,1]', 'Гейне-Борель', 'Принцип максимума', 'Теорема о простом идеале']
+      }
+    }
+  },
+  'aca0': {
+    group: Discipline.PROOF_THEORY,
+    val: 15,
+    synonyms: ['ACA0', 'Arithmetic Comprehension'],
+    content: {
+      en: {
+        label: 'ACA₀',
+        description: 'Arithmetical Comprehension. Equivalent to PA but conservative over PA for arithmetic sentences.',
+        details: ['Bolzano-Weierstrass', 'Cauchy Convergence', 'Strong König\'s Lemma']
+      },
+      ru: {
+        label: 'ACA₀',
+        description: 'Арифметическое свертывание. Эквивалентна PA, но консервативна над ней для арифметических утверждений.',
+        details: ['Больцано-Вейерштрасс', 'Сходимость Коши', 'Сильная лемма Кёнига']
+      }
+    }
+  },
+  'atr0': {
+    group: Discipline.PROOF_THEORY,
+    val: 12,
+    synonyms: ['ATR0'],
+    content: {
+      en: { label: 'ATR₀', description: 'Arithmetical Transfinite Recursion. Allows iterating arithmetic operations along well-orderings.', details: ['Clopen Determinacy', 'Perfect Set Theorem', 'Ulm\'s Theorem'] },
+      ru: { label: 'ATR₀', description: 'Арифметическая трансфинитная рекурсия. Позволяет итерировать операции вдоль вполне упорядочений.', details: ['Детерминированность', 'Теорема о совершенном множестве'] }
+    }
+  },
+  'pi11_ca0': {
+    group: Discipline.PROOF_THEORY,
+    val: 12,
+    content: {
+      en: { label: 'Π¹₁-CA₀', description: 'Π¹₁ Comprehension. The strongest of the "Big Five".', details: ['Cantor-Bendixson', 'Kruskal\'s Theorem'] },
+      ru: { label: 'Π¹₁-CA₀', description: 'Π¹₁ свертывание. Сильнейшая из "Большой пятерки".', details: ['Кантор-Бендикссон', 'Теорема Крускала'] }
+    }
+  },
+
+  // --- ADVANCED MODEL THEORY (ПРОДВИНУТАЯ ТЕОРИЯ МОДЕЛЕЙ) ---
+  'stone_space_types': {
+    group: Discipline.TOPOLOGY, 
+    val: 18,
+    synonyms: ['Пространство Стоуна', 'S(T)'],
+    content: {
+      en: {
+        label: 'Stone Space of Types Sₙ(T)',
+        description: 'The set of all complete n-types forms a compact, Hausdorff, totally disconnected topological space.',
+        details: ['Clopen sets = Formulas', 'Points = Ultrafilters', 'Isolated points = Principal types', 'Cantor Space']
+      },
+      ru: {
+        label: 'Пространство типов Sₙ(T)',
+        description: 'Множество всех полных n-типов образует компактное, хаусдорфово, вполне несвязное пространство.',
+        details: ['Clopen = Формулы', 'Точки = Ультрафильтры', 'Изолированные точки = Изолированные типы', 'Канторово множество']
+      }
+    }
+  },
+  'ultraproduct': {
+    group: Discipline.MODEL_THEORY,
+    val: 16,
+    synonyms: ['Ультрапроизведение', 'Ультрастепень'],
+    content: {
+      en: {
+        label: 'Ultraproduct',
+        description: 'A method of constructing new structures from a family of structures using an ultrafilter.',
+        details: ['Łoś\'s Theorem', 'Non-standard Analysis', 'Compactness Proof', 'Hyperreals']
+      },
+      ru: {
+        label: 'Ультрапроизведение',
+        description: 'Метод построения новых структур из семейства структур с использованием ультрафильтра.',
+        details: ['Теорема Лося', 'Нестандартный анализ', 'Доказательство компактности', 'Гипервещественные числа']
+      }
+    }
+  },
+  'saturated_model': {
+    group: Discipline.MODEL_THEORY,
+    val: 14,
+    synonyms: ['Насыщенная модель'],
+    content: {
+      en: { label: 'Saturated Model', description: 'A model that realizes all types over small sets of parameters.', details: ['Universal', 'Homogeneous', 'Monster Model'] },
+      ru: { label: 'Насыщенная модель', description: 'Модель, реализующая все типы над малыми множествами параметров.', details: ['Универсальность', 'Однородность', 'Monster Model'] }
+    }
+  },
+  'indiscernibles': {
+    group: Discipline.MODEL_THEORY,
+    val: 12,
+    synonyms: ['Неразличимые', 'Indiscernibles'],
+    content: {
+      en: { label: 'Indiscernibles', description: 'A sequence of elements where the truth of a formula depends only on the order of indices.', details: ['Ramsey Theory', 'Ehrenfeucht-Mostowski', 'Stretching models'] },
+      ru: { label: 'Неразличимые', description: 'Последовательность элементов, где истинность формулы зависит только от порядка индексов.', details: ['Теория Рамсея', 'Эренфойхт-Мостовский', 'Растягивание моделей'] }
+    }
+  },
+  'prime_model': {
+    group: Discipline.MODEL_THEORY,
+    val: 12,
+    synonyms: ['Простая модель', 'Atomic model'],
+    content: {
+      en: { label: 'Prime Model', description: 'A model that can be elementarily embedded into any other model of the theory.', details: ['Omitting Types', 'Atomic Model', 'Isolated Types'] },
+      ru: { label: 'Простая модель', description: 'Модель, которая может быть элементарно вложена в любую другую модель теории.', details: ['Опускание типов', 'Атомная модель', 'Изолированные типы'] }
+    }
+  },
+  'qe': {
+    group: Discipline.MODEL_THEORY,
+    val: 16,
+    synonyms: ['Элиминация кванторов', 'QE'],
+    content: {
+      en: { label: 'Quantifier Elimination', description: 'Every formula is equivalent to a quantifier-free formula.', details: ['Tarski-Seidenberg (RCF)', 'Presburger', 'ACF', 'Model Completeness'] },
+      ru: { label: 'Элиминация кванторов', description: 'Каждая формула эквивалентна бескванторной формуле.', details: ['Тарский-Зайденберг (RCF)', 'Пресбургер', 'ACF', 'Модельная полнота'] }
+    }
+  },
+
+  // --- PROOF THEORY & LOGIC (ТЕОРИЯ ДОКАЗАТЕЛЬСТВ) ---
+  'sequent_calculus': {
+    group: Discipline.LOGIC,
+    val: 18,
+    synonyms: ['Секвенциальное исчисление', 'Gentzen', 'LK', 'LJ'],
+    content: {
+      en: {
+        label: 'Sequent Calculus',
+        description: 'A logical system using sequents Γ ⇒ Δ. Introduced by Gentzen to analyze deduction.',
+        details: ['Cut Elimination', 'Subformula Property', 'LK (Classical)', 'LJ (Intuitionistic)']
+      },
+      ru: {
+        label: 'Секвенциальное исчисление',
+        description: 'Логическая система, использующая секвенции Γ ⇒ Δ. Введена Генценом для анализа вывода.',
+        details: ['Устранение сечения', 'Подформульность', 'LK (Классическое)', 'LJ (Интуиционистское)']
+      }
+    }
+  },
+  'cut_elimination': {
+    group: Discipline.PROOF_THEORY,
+    val: 16,
+    synonyms: ['Устранение сечения', 'Hauptsatz'],
+    content: {
+      en: { label: 'Cut Elimination', description: 'Gentzen\'s Hauptsatz: The Cut rule is admissible. Proofs can be normalized.', details: ['Consistency Proofs', 'Normalization', 'Analytic Proofs'] },
+      ru: { label: 'Устранение сечения', description: 'Hauptsatz Генцена: Правило сечения допустимо. Доказательства можно нормализовать.', details: ['Доказательства непротиворечивости', 'Нормализация', 'Аналитические доказательства'] }
+    }
+  },
+  'epsilon_0': {
+    group: Discipline.PROOF_THEORY,
+    val: 14,
+    synonyms: ['ε₀', 'Epsilon Nought'],
+    content: {
+      en: { label: 'ε₀ (Epsilon Nought)', description: 'The proof-theoretic ordinal of Peano Arithmetic.', details: ['Gentzen\'s Consistency Proof', 'Limit of ω^ω...', 'Goodstein Sequences', 'Hydra Game'] },
+      ru: { label: 'ε₀ (Эпсилон-нулевое)', description: 'Доказательно-теоретический ординал арифметики Пеано.', details: ['Доказательство Генцена', 'Предел ω^ω...', 'Последовательности Гудстейна', 'Игра Гидра'] }
+    }
+  },
+  'gamma_0': {
+    group: Discipline.PROOF_THEORY,
+    val: 10,
+    synonyms: ['Γ₀', 'Gamma Nought'],
+    content: {
+      en: { label: 'Γ₀ (Feferman-Schütte)', description: 'The proof-theoretic ordinal of Predicative Analysis.', details: ['Veblen Hierarchy', 'ATR₀ ordinal'] },
+      ru: { label: 'Γ₀ (Фефермана-Шютте)', description: 'Доказательно-теоретический ординал предикативного анализа.', details: ['Иерархия Веблена', 'Ординал ATR₀'] }
+    }
+  },
+  'modal_S5': {
+    group: Discipline.LOGIC,
+    val: 10,
+    content: {
+      en: { label: 'System S5', description: 'Logic of metaphysical necessity. Relation is an equivalence.', details: ['Euclidean axiom: ◇p → □◇p', 'Partition of worlds'] },
+      ru: { label: 'Система S5', description: 'Логика метафизической необходимости. Отношение эквивалентности.', details: ['Аксиома Евклида: ◇p → □◇p', 'Разбиение миров'] }
+    }
+  },
+
+  // --- SET THEORY (ТЕОРИЯ МНОЖЕСТВ) ---
+  'cumulative_hierarchy': {
+    group: Discipline.SET_THEORY,
+    val: 16,
+    synonyms: ['Иерархия фон Неймана', 'V_alpha'],
+    content: {
+      en: {
+        label: 'Cumulative Hierarchy',
+        description: 'The definition of the universe V as the union of levels V_α.',
+        details: ['V = L (in Constructible)', 'Rank of a set', 'Well-foundedness']
+      },
+      ru: {
+        label: 'Иерархия фон Неймана',
+        description: 'Определение универсума V как объединения уровней V_α.',
+        details: ['V = L (в конструктивном)', 'Ранг множества', 'Фундированность']
+      }
+    }
+  },
+  'cardinal_arithmetic': {
+    group: Discipline.SET_THEORY,
+    val: 14,
+    content: {
+      en: { label: 'Cardinal Arithmetic', description: 'Arithmetic of alephs.', details: ['Hessenberg Thm: κ² = κ', 'König\'s Theorem', 'cf(κ) (Cofinality)'] },
+      ru: { label: 'Кардинальная арифметика', description: 'Арифметика алефов.', details: ['Теорема Гессенберга: κ² = κ', 'Теорема Кёнига', 'cf(κ) (Конфинальность)'] }
+    }
+  },
+  'ordinal_arithmetic': {
+    group: Discipline.SET_THEORY,
+    val: 14,
+    content: {
+      en: { label: 'Ordinal Arithmetic', description: 'Non-commutative arithmetic of order types.', details: ['Cantor Normal Form', 'ω^ω', 'Non-commutative addition/multiplication'] },
+      ru: { label: 'Ординальная арифметика', description: 'Некоммутативная арифметика порядковых типов.', details: ['Нормальная форма Кантора', 'ω^ω', 'Некоммутативное сложение/умножение'] }
+    }
+  },
+  'large_cardinals': {
+    group: Discipline.SET_THEORY,
+    val: 12,
+    synonyms: ['Большие кардиналы'],
+    content: {
+      en: { label: 'Large Cardinals', description: 'Cardinals whose existence cannot be proved in ZFC.', details: ['Inaccessible', 'Measurable', 'Woodin', 'Consistency Strength'] },
+      ru: { label: 'Большие кардиналы', description: 'Кардиналы, существование которых недоказуемо в ZFC.', details: ['Недостижимые', 'Измеримые', 'Вудина', 'Сила непротиворечивости'] }
+    }
+  },
+  'axiom_determinacy': {
+    group: Discipline.SET_THEORY,
+    val: 10,
+    synonyms: ['AD', 'Детерминированность'],
+    content: {
+      en: { label: 'Axiom of Determinacy (AD)', description: 'Every infinite game is determined. Contradicts AC.', details: ['Infinite Games', 'Lebesgue measurability of ALL sets'] },
+      ru: { label: 'Аксиома детерминированности (AD)', description: 'Любая бесконечная игра детерминирована. Противоречит AC.', details: ['Бесконечные игры', 'Измеримость ВСЕХ множеств по Лебегу'] }
+    }
+  },
+
+  // --- ALGEBRA & NUMBER THEORY ---
+  'crt': {
+    group: Discipline.ALGEBRA,
+    val: 12,
+    synonyms: ['КТО', 'Китайская теорема об остатках'],
+    content: {
+      en: { label: 'Chinese Remainder Thm', description: 'Solving systems of congruences with coprime moduli.', details: ['Gödel Beta Function', 'Sequence Coding in PA'] },
+      ru: { label: 'Китайская теорема об остатках', description: 'Решение систем сравнений с взаимно простыми модулями.', details: ['Бета-функция Гёделя', 'Кодирование последовательностей в PA'] }
+    }
+  },
+  'diophantine_set': {
+    group: Discipline.ALGEBRA,
+    val: 14,
+    content: {
+      en: { label: 'Diophantine Sets', description: 'Sets defined by polynomial equations.', details: ['Matiyasevich Theorem', 'MRDP', 'Hilbert\'s 10th Problem'] },
+      ru: { label: 'Диофантовы множества', description: 'Множества, задаваемые полиномиальными уравнениями.', details: ['Теорема Матиясевича', 'MRDP', '10-я проблема Гильберта'] }
+    }
   }
 };
 
@@ -1096,7 +1381,76 @@ const RAW_LINKS = [
     { source: 'theory_PA', target: 'thm_tarski_truth', type: LinkType.RELATED },
     { source: 'thm_kruskal', target: 'poset', type: LinkType.RELATED },
     { source: 'thm_kruskal', target: 'theory_PA', type: LinkType.RELATED },
-    { source: 'theory_PA2', target: 'model_N', type: LinkType.RELATED }
+    { source: 'theory_PA2', target: 'model_N', type: LinkType.RELATED },
+  
+    // Reverse Mathematics
+    { source: 'reverse_math', target: 'rca0', type: LinkType.CONTAINS },
+    { source: 'reverse_math', target: 'theory_PA2', type: LinkType.RELATED },
+    { source: 'rca0', target: 'theory_PA', type: LinkType.EXTENDS },
+    { source: 'wkl0', target: 'rca0', type: LinkType.EXTENDS },
+    { source: 'wkl0', target: 'thm_kruskal', type: LinkType.RELATED },
+    { source: 'aca0', target: 'wkl0', type: LinkType.EXTENDS },
+    { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT },
+    { source: 'atr0', target: 'aca0', type: LinkType.EXTENDS },
+    { source: 'pi11_ca0', target: 'atr0', type: LinkType.EXTENDS },
+    { source: 'pi11_ca0', target: 'thm_kruskal', type: LinkType.PROVES },
+
+    // Model Theory Extensions
+    { source: 'mt_concepts', target: 'ultraproduct', type: LinkType.CONTAINS },
+    { source: 'mt_concepts', target: 'saturated_model', type: LinkType.CONTAINS },
+    { source: 'mt_concepts', target: 'indiscernibles', type: LinkType.CONTAINS },
+    { source: 'mt_concepts', target: 'qe', type: LinkType.CONTAINS },
+    { source: 'mt_concepts', target: 'prime_model', type: LinkType.CONTAINS },
+    { source: 'stone_space_types', target: 'mt_concepts', type: LinkType.RELATED },
+    
+    // Connections for Stone Space
+    { source: 'stone_space_types', target: 'stone_space', type: LinkType.EXTENDS },
+    { source: 'stone_space_types', target: 'bool_alg', type: LinkType.RELATED },
+    { source: 'stone_space_types', target: 'topology', type: LinkType.RELATED },
+    { source: 'stone_space_types', target: 'thm_ryll', type: LinkType.RELATED },
+
+    // Ultraproducts
+    { source: 'ultraproduct', target: 'model_nonstd', type: LinkType.RELATED },
+    { source: 'ultraproduct', target: 'thm_los_vaught', type: LinkType.RELATED },
+    { source: 'ultraproduct', target: 'model_R', type: LinkType.RELATED },
+
+    // Quantifier Elimination
+    { source: 'qe', target: 'theory_RCF', type: LinkType.RELATED },
+    { source: 'qe', target: 'theory_ACF', type: LinkType.RELATED },
+    { source: 'qe', target: 'theory_Presburger', type: LinkType.RELATED },
+    { source: 'qe', target: 'theory_DLO', type: LinkType.RELATED },
+    { source: 'qe', target: 'thm_tarski_seidenberg', type: LinkType.EQUIVALENT },
+
+    // Proof Theory & Ordinals
+    { source: 'epsilon_0', target: 'theory_PA', type: LinkType.RELATED },
+    { source: 'gamma_0', target: 'atr0', type: LinkType.RELATED },
+    { source: 'epsilon_0', target: 'ordinal_arithmetic', type: LinkType.RELATED },
+    { source: 'ordinal_arithmetic', target: 'zfc', type: LinkType.CONTAINS },
+    { source: 'cardinal_arithmetic', target: 'zfc', type: LinkType.CONTAINS },
+    { source: 'cardinal_arithmetic', target: 'cardinal_aleph1', type: LinkType.RELATED },
+    { source: 'ordinal_arithmetic', target: 'ordinal_omega', type: LinkType.RELATED },
+    
+    // Sequent Calculus
+    { source: 'sequent_calculus', target: 'pred_logic', type: LinkType.RELATED },
+    { source: 'sequent_calculus', target: 'cut_elimination', type: LinkType.CONTAINS },
+    { source: 'cut_elimination', target: 'incompleteness', type: LinkType.RELATED },
+
+    // Set Theory Hierarchy
+    { source: 'cumulative_hierarchy', target: 'zfc', type: LinkType.CONTAINS },
+    { source: 'cumulative_hierarchy', target: 'model_V_omega', type: LinkType.CONTAINS },
+    { source: 'cumulative_hierarchy', target: 'model_L', type: LinkType.RELATED },
+    { source: 'large_cardinals', target: 'zfc', type: LinkType.EXTENDS },
+    { source: 'axiom_determinacy', target: 'zfc', type: LinkType.RELATED },
+    { source: 'axiom_determinacy', target: 'large_cardinals', type: LinkType.RELATED },
+
+    // Algebra / Arithmetic
+    { source: 'crt', target: 'theory_PA', type: LinkType.RELATED },
+    { source: 'crt', target: 'incompleteness', type: LinkType.RELATED },
+    { source: 'diophantine_set', target: 'incompleteness', type: LinkType.RELATED },
+    { source: 'diophantine_set', target: 'theory_PA', type: LinkType.RELATED },
+
+    // Modals
+    { source: 'modal_S5', target: 'modal_S4', type: LinkType.EXTENDS }
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

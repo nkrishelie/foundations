@@ -24,9 +24,13 @@ const App: React.FC = () => {
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
-      {/* МОДАЛЬНОЕ ОКНО (Показываем, если showWelcome === true) */}
+      {/* МОДАЛЬНОЕ ОКНО */}
       {showWelcome && (
-        <WelcomeModal onStart={() => setShowWelcome(false)} />
+        <WelcomeModal 
+          onStart={() => setShowWelcome(false)}
+          currentLang={language} // <--- Передаем текущий язык
+          onToggleLang={setLanguage} // <--- Передаем функцию переключения
+        />
       )}
       
       {/* 3D Scene */}

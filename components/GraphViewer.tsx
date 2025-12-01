@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
-import { GraphData, GraphNode, GraphLink } from '../types';
+import { GraphData, GraphNode, GraphLink, LinkType } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS } from '../constants';
 
 interface Props {
@@ -107,10 +107,21 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
 
       // Links
       linkColor={getLinkColor}
-      linkWidth={0.5}
-      linkDirectionalParticles={2}
+
+      // Настройка толщины: тонкая для "Связано", обычная для остальных
+      linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
+
+      // Настройка частиц: убираем их для "Связано", чтобы не шумели
+      linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
       linkDirectionalParticleSpeed={0.005}
-      linkDirectionalArrowLength={3}
+      linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}
+
+      // Настройка стрелок: убираем для Эквивалентности и Связано
+      linkDirectionalArrowLength={(link: any) => {
+        if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
+        return 4; // Размер стрелки для направленных связей
+      }}
+      
       linkDirectionalArrowRelPos={1}
       
       // World

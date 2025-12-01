@@ -263,7 +263,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
           isInited.current = true;
         }
       }}
-      controlType="orbit"
+      controlType="trackball"
       enableNodeDrag={true}
       warmupTicks={100}
       cooldownTicks={100}

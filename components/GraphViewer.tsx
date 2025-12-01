@@ -58,32 +58,48 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   // Focus on search result
   useEffect(() => {
     if (searchQuery && graphRef.current) {
-      const q = searchQuery.toLowerCase().trim();
       
-      // Умная функция проверки совпадения
-      const match = (str?: string) => {
-        if (!str) return false;
-        // 1. Прямое совпадение
-        if (str.toLowerCase().includes(q)) return true;
-        // 2. Совпадение с очищенным от LaTeX текстом (чтобы "N + Z" нашло "$\mathbb{N} + \mathbb{Z}$")
-        if (cleanLabel(str).toLowerCase().includes(q)) return true;
-        return false;
+      // Функция, которая превращает "красивую" математику в простой текст для поиска
+      // Пример: "$\mathbb{Z} + \mathbb{Z}$" -> "z+z"
+      const normalizeForSearch = (str: string) => {
+        if (!str) return '';
+        return str
+          .toLowerCase()
+          // 1. Убираем LaTeX команды, оставляя содержимое
+          .replace(/\\mathbb{([a-z])}/g, '$1') // \mathbb{N} -> n
+          .replace(/\\mathsf{([a-z0-9]+)}/g, '$1') // \mathsf{PA} -> pa
+          .replace(/\\mathbf{([a-z0-9]+)}/g, '$1')
+          .replace(/\\mathrm{([a-z0-9]+)}/g, '$1')
+          // 2. Превращаем Unicode-символы в обычные буквы
+          .replace(/ℕ/g, 'n')
+          .replace(/ℤ/g, 'z')
+          .replace(/ℚ/g, 'q')
+          .replace(/ℝ/g, 'r')
+          .replace(/ℂ/g, 'c')
+          .replace(/𝔸/g, 'a')
+          .replace(/×/g, 'x')
+          // 3. Убираем мусор: $, \, {}, пробелы
+          .replace(/[\$\\\{\}\s]/g, '');
       };
 
-      const foundNode = data.nodes.find(n => 
-        // Приоритет 1: Ищем в ID (техническое имя)
-        n.id.toLowerCase().includes(q) ||
-        // Приоритет 2: Ищем в видимом названии (с учетом очистки от LaTeX)
-        match(n.label) ||
-        // Приоритет 3: Синонимы
-        n.synonyms?.some(match) ||
-        // Приоритет 4: Описание и детали
-        match(n.description) ||
-        n.details?.some(match)
-      );
+      // Нормализуем запрос пользователя (убираем пробелы, приводим к нижнему регистру)
+      const q = normalizeForSearch(searchQuery);
+
+      const foundNode = data.nodes.find(n => {
+        // Проверяем ID
+        if (normalizeForSearch(n.id).includes(q)) return true;
+        
+        // Проверяем Label (самое важное для Z+Z)
+        if (normalizeForSearch(n.label).includes(q)) return true;
+
+        // Проверяем синонимы
+        if (n.synonyms?.some(s => normalizeForSearch(s).includes(q))) return true;
+
+        return false;
+      });
 
       if (foundNode) {
-        // Вычисляем дистанцию камеры в зависимости от размера узла, чтобы не врезаться в него
+        // Вычисляем дистанцию камеры в зависимости от размера узла
         const nodeSize = foundNode.val || 1;
         const distance = nodeSize > 20 ? 60 : 40; 
         

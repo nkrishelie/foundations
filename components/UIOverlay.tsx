@@ -40,7 +40,7 @@ export const UIOverlay: React.FC<Props> = ({
   const [filteredNodes, setFilteredNodes] = useState<GraphNode[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Логика фильтрации
+// Логика фильтрации
   useEffect(() => {
     if (!inputValue || inputValue.length < 2) {
       setFilteredNodes([]);
@@ -52,20 +52,31 @@ export const UIOverlay: React.FC<Props> = ({
     
     // Ищем совпадения
     const results = nodes.filter(n => {
+      // 0. Получаем контент на текущем языке (для поиска по описанию)
+      // Если перевод не найден, берем английский (fallback)
+      const content = n.content[currentLang as Language] || n.content['en'];
+
       // 1. По ID
       if (normalize(n.id).includes(q)) return true;
+      
       // 2. По метке (Label)
-      const labelClean = normalize(cleanForSearch(n.label));
+      const labelClean = normalize(cleanForSearch(content.label)); // Используем локализованную метку
       if (labelClean.includes(q)) return true;
+      
       // 3. По синонимам
       if (n.synonyms?.some(s => normalize(s).includes(q))) return true;
+
+      // 4. По описанию и деталям (РАСШИРЕНИЕ ПОИСКА)
+      if (normalize(cleanForSearch(content.description)).includes(q)) return true;
+      if (content.details.some(d => normalize(cleanForSearch(d)).includes(q))) return true;
+
       return false;
     });
 
-    // Берем топ-7 результатов
-    setFilteredNodes(results.slice(0, 7));
+    // УВЕЛИЧИВАЕМ ЛИМИТ до 50 результатов
+    setFilteredNodes(results.slice(0, 50));
     setShowDropdown(true);
-  }, [inputValue, nodes]);
+  }, [inputValue, nodes, currentLang]); // Добавили currentLang в зависимости
 
   // Выбор узла из списка
   const handleSelectNode = (node: GraphNode) => {
@@ -112,30 +123,34 @@ export const UIOverlay: React.FC<Props> = ({
 
             {/* Dropdown Results */}
             {showDropdown && filteredNodes.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl overflow-hidden z-50">
-                {filteredNodes.map((node) => (
-                  <div
-                    key={node.id}
-                    onClick={() => handleSelectNode(node)}
-                    className="px-4 py-2 hover:bg-slate-700 cursor-pointer border-b border-slate-800 last:border-0 flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <span 
-                        className="w-2 h-2 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
-                      />
-                      <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
-                        {/* Используем Latex для рендеринга формул в списке */}
-                        <Latex>{node.label}</Latex>
-                      </span>
+              <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                {filteredNodes.map((node) => {
+                  // Получаем правильную метку для отображения в списке
+                  const content = node.content[currentLang as Language] || node.content['en'];
+                  
+                  return (
+                    <div
+                      key={node.id}
+                      onClick={() => handleSelectNode(node)}
+                      className="px-4 py-2 hover:bg-slate-700 cursor-pointer border-b border-slate-800 last:border-0 flex items-center justify-between group"
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <span 
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
+                        />
+                        <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
+                          <Latex>{content.label}</Latex>
+                        </span>
+                      </div>
+                      {node.synonyms && (
+                        <span className="text-xs text-slate-500 ml-2 hidden sm:block truncate max-w-[100px]">
+                          {node.synonyms[0]}
+                        </span>
+                      )}
                     </div>
-                    {node.synonyms && (
-                      <span className="text-xs text-slate-500 ml-2 hidden sm:block">
-                        {node.synonyms[0]}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

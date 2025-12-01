@@ -2068,6 +2068,55 @@ const RAW_LINKS = [
     
     // Теорема о дедукции связывает импликацию и вывод
     { source: 'inference_concept', target: 'heyting_alg', type: LinkType.RELATED }, // Алгебраическая интерпретация выводимости
+
+    // --- ДОПОЛНИТЕЛЬНЫЕ СВЯЗИ (УЛУЧШЕНИЕ СТРУКТУРЫ) ---
+
+    // 1. Связь Логики и Алгебры (через Алгебраическую Логику)
+    // Tarski's Lindenbaum algebra is effectively a Boolean Algebra
+    { source: 'lindenbaum_alg', target: 'bool_alg', type: LinkType.EQUIVALENT }, 
+    { source: 'lindenbaum_alg', target: 'stone_space', type: LinkType.RELATED }, // Stone dual to Lindenbaum alg
+    { source: 'heyting_alg', target: 'lattice', type: LinkType.EXTENDS }, // Гейтингова алгебра — это решетка
+    { source: 'heyting_alg', target: 'topology', type: LinkType.RELATED }, // Связь с топологией открытых множеств
+
+    // 2. Уточнение по Теории Моделей (из model_theory.tex)
+    // Теорема компактности связывает логику и ультрапроизведения
+    { source: 'pred_logic', target: 'ultraproduct', type: LinkType.RELATED }, 
+    { source: 'ultraproduct', target: 'thm_los_vaught', type: LinkType.RELATED }, // Теорема Лося — основа ультрапроизведений
+    // Насыщенные модели реализуют типы
+    { source: 'saturated_model', target: 'type_theory_model', type: LinkType.RELATED },
+    // Изолированные типы реализуются в простых моделях
+    { source: 'prime_model', target: 'isolated_type', type: LinkType.RELATED }, 
+    
+    // 3. Теория Множеств и Ординалы (из D4.tex)
+    // Иерархия фон Неймана строится по трансфинитной рекурсии
+    { source: 'cumulative_hierarchy', target: 'transfinite_induction', type: LinkType.CONTAINS },
+    { source: 'cumulative_hierarchy', target: 'ordinal_arithmetic', type: LinkType.RELATED },
+    // Аксиома выбора эквивалентна теореме Цермело
+    { source: 'axiom_choice', target: 'thm_zermelo_wo', type: LinkType.EQUIVALENT },
+    // Число Хартогса связано с ординалами
+    { source: 'hartogs_number', target: 'ordinal_arithmetic', type: LinkType.RELATED },
+
+    // 4. Арифметика и Теория Доказательств (из logic_main.tex)
+    // Генцен использовал эпсилон-0 для доказательства непротиворечивости PA
+    { source: 'epsilon_0', target: 'theory_PA', type: LinkType.RELATED },
+    { source: 'epsilon_0', target: 'cut_elimination', type: LinkType.RELATED },
+    // ATR0 использует более сильные ординалы (Гамма-0)
+    { source: 'gamma_0', target: 'atr0', type: LinkType.RELATED },
+    
+    // 5. Числовые системы (Иерархия вложения)
+    // N -> Z -> Q -> R -> C
+    { source: 'model_Z', target: 'model_N', type: LinkType.EXTENDS },
+    { source: 'model_Q', target: 'model_Z', type: LinkType.EXTENDS },
+    { source: 'model_R', target: 'model_Q', type: LinkType.EXTENDS },
+    { source: 'model_C', target: 'model_R', type: LinkType.EXTENDS },
+    { source: 'model_A', target: 'model_Q', type: LinkType.EXTENDS }, // Алгебраические расширяют Рациональные
+
+    // 6. Специальные связи
+    // Теорема Тарского о невыразимости истины применима к PA
+    { source: 'thm_tarski_truth', target: 'theory_PA', type: LinkType.RELATED },
+    // Лемма Цорна используется в теории колец (для поиска максимальных идеалов)
+    { source: 'thm_zorn', target: 'model_R', type: LinkType.RELATED }, // (через базис Гамеля, например)
+    { source: 'forcing_method', target: 'model_L', type: LinkType.RELATED }, // Форсинг расширяет L
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

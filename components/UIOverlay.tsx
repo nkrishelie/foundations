@@ -144,11 +144,13 @@ export const UIOverlay: React.FC<Props> = ({
   return (
     <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4">
       
-      {/* Top Bar */}
-      <div className="pointer-events-auto w-full flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative">
+    {/* Top Bar */}
+      {/* ИЗМЕНЕНИЕ 1: У контейнера ставим pointer-events-none вместо auto */}
+      <div className="pointer-events-none w-full flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative">
         
         {/* Search Block */}
-        <div className="w-full max-w-md relative">
+        {/* ИЗМЕНЕНИЕ 2: Самому блоку поиска возвращаем кликабельность (pointer-events-auto) */}
+        <div className="w-full max-w-md relative pointer-events-auto">
           <h1 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight mb-2">
             MathLogic <span className="text-blue-400">Nexus</span>
           </h1>
@@ -196,7 +198,8 @@ export const UIOverlay: React.FC<Props> = ({
         </div>
 
         {/* Buttons: Language + Export */}
-        <div className="flex gap-2">
+        {/* ИЗМЕНЕНИЕ 3: Блоку с кнопками тоже возвращаем кликабельность */}
+        <div className="flex gap-2 pointer-events-auto">
           {/* Кнопка Экспорта */}
           <button
             onClick={handleExport}
@@ -213,7 +216,7 @@ export const UIOverlay: React.FC<Props> = ({
           </div>
         </div>
       </div>
-
+      
       {/* Legend */}
       <div className="pointer-events-auto absolute top-24 right-4 max-h-[70vh] overflow-y-auto custom-scrollbar z-10">
         <div className={`bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-lg transition-all duration-300 ${isLegendOpen ? 'p-4' : 'p-2'}`}>

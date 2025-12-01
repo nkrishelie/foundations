@@ -18,145 +18,6 @@ interface NodeDefinition {
 // const uni = (str: string) => str... 
 
 const RAW_NODES: Record<string, NodeDefinition> = {
-  // --- ALGEBRAIC STRUCTURES & THEOREMS ---
-  'theory_rings': {
-    group: Discipline.ALGEBRA,
-    val: 14,
-    synonyms: ['Теория колец', 'Rings'],
-    content: {
-      en: {
-        label: 'Ring Theory',
-        description: 'Study of structures with two operations: addition and multiplication. Basis for algebraic geometry.',
-        details: ['Ideals', 'Integral Domains', 'Noetherian Rings', 'Polynomial Rings']
-      },
-      ru: {
-        label: 'Теория колец',
-        description: 'Изучение структур с двумя операциями: сложением и умножением. Основа алгебраической геометрии.',
-        details: ['Идеалы', 'Области целостности', 'Нётеровы кольца', 'Кольца многочленов']
-      }
-    }
-  },
-  'theory_fields': {
-    group: Discipline.ALGEBRA,
-    val: 16,
-    synonyms: ['Теория полей', 'Fields'],
-    content: {
-      en: {
-        label: 'Field Theory',
-        description: 'Study of commutative rings where every non-zero element has an inverse.',
-        details: ['Galois Theory', 'Field Extensions', 'Characteristic', 'Algebraic Closure']
-      },
-      ru: {
-        label: 'Теория полей',
-        description: 'Изучение коммутативных колец, где каждый ненулевой элемент обратим.',
-        details: ['Теория Галуа', 'Расширения полей', 'Характеристика', 'Алгебраическое замыкание']
-      }
-    }
-  },
-  'ideal_concept': {
-    group: Discipline.ALGEBRA,
-    val: 12,
-    synonyms: ['Идеал'],
-    content: {
-      en: {
-        label: 'Ideal',
-        description: 'A subset of a ring closed under addition and multiplication by any element of the ring.',
-        details: ['Prime Ideal', 'Maximal Ideal', 'Quotient Ring', 'Filter (dual concept)']
-      },
-      ru: {
-        label: 'Идеал',
-        description: 'Подмножество кольца, замкнутое относительно сложения и умножения на любой элемент кольца.',
-        details: ['Простой идеал', 'Максимальный идеал', 'Фактор-кольцо', 'Фильтр (двойственное понятие)']
-      }
-    }
-  },
-  'homomorphism_thms': {
-    group: Discipline.ALGEBRA,
-    val: 14,
-    synonyms: ['Теоремы о гомоморфизмах', 'Isomorphism Theorems', 'Noether'],
-    content: {
-      en: {
-        label: 'Isomorphism Theorems',
-        description: 'Three fundamental theorems describing the relationship between quotients, homomorphisms, and subobjects.',
-        details: ['$G/\\text{Ker}(\\phi) \\cong \\text{Im}(\\phi)$', 'Noether Isomorphism Thms', 'Universal Property']
-      },
-      ru: {
-        label: 'Теоремы о гомоморфизмах',
-        description: 'Три фундаментальные теоремы, описывающие связь между факторами, гомоморфизмами и подобектами.',
-        details: ['$G/\\text{Ker}(\\phi) \\cong \\text{Im}(\\phi)$', 'Теоремы Нётер', 'Универсальное свойство']
-      }
-    }
-  },
-
-  // --- TOPOLOGICAL SEMANTICS & DUALITY ---
-  'esakia_space': {
-    group: Discipline.TOPOLOGY,
-    val: 14,
-    synonyms: ['Пространство Эсакиа', 'Esakia Duality'],
-    content: {
-      en: {
-        label: 'Esakia Space',
-        description: 'A Stone space with a partial order satisfying the Priestley separation axiom. Dual to Heyting Algebras.',
-        details: ['Esakia Duality', 'Topological semantics for Intuitionistic Logic', 'Clopen sets are lattice elements']
-      },
-      ru: {
-        label: 'Пространство Эсакиа',
-        description: 'Пространство Стоуна с частичным порядком, удовлетворяющее аксиоме Пристли. Двойственно алгебрам Гейтинга.',
-        details: ['Двойственность Эсакиа', 'Топологическая семантика интуиционизма', 'Clopen множества как элементы решетки']
-      }
-    }
-  },
-  'priestley_space': {
-    group: Discipline.TOPOLOGY,
-    val: 12,
-    synonyms: ['Пространство Пристли'],
-    content: {
-      en: {
-        label: 'Priestley Space',
-        description: 'Ordered compact totally disconnected space. Dual to Distributive Lattices.',
-        details: ['Priestley Duality', 'Generalization of Stone Spaces']
-      },
-      ru: {
-        label: 'Пространство Пристли',
-        description: 'Упорядоченное компактное вполне несвязное пространство. Двойственно дистрибутивным решеткам.',
-        details: ['Двойственность Пристли', 'Обобщение пространств Стоуна']
-      }
-    }
-  },
-  'alexandrov_topology': {
-    group: Discipline.TOPOLOGY,
-    val: 12,
-    synonyms: ['Топология Александрова'],
-    content: {
-      en: {
-        label: 'Alexandrov Topology',
-        description: 'Topology where arbitrary (not just finite) intersections of open sets are open.',
-        details: ['Topology on Posets', 'Connection to S4', 'Finite topological spaces']
-      },
-      ru: {
-        label: 'Топология Александрова',
-        description: 'Топология, в которой любые (не только конечные) пересечения открытых множеств открыты.',
-        details: ['Топология на ЧУМах', 'Связь с S4', 'Конечные топологические пространства']
-      }
-    }
-  },
-  'jsson_tarski_alg': {
-    group: Discipline.ORDER_THEORY,
-    val: 12,
-    synonyms: ['Алгебры Йонссона-Тарского', 'Модальные алгебры', 'MA'],
-    content: {
-      en: {
-        label: 'Modal Algebras',
-        description: 'Boolean algebras with an operator $\\square$ (or $\\diamond$). Algebraic semantics for Modal Logic.',
-        details: ['Jónsson-Tarski Duality', 'Representation Theory', 'Canonical Frames']
-      },
-      ru: {
-        label: 'Модальные алгебры',
-        description: 'Булевы алгебры с оператором $\\square$ (или $\\diamond$). Алгебраическая семантика модальной логики.',
-        details: ['Двойственность Йонссона-Тарского', 'Теория представлений', 'Канонические шкалы']
-      }
-    }
-  },
   'cylindric_alg': {
     group: Discipline.ORDER_THEORY, // Или ALGEBRA
     val: 14,
@@ -366,7 +227,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       }
     }
   },
-  
+
   // --- RANK & HIERARCHY ---
   'rank_concept': {
     group: Discipline.SET_THEORY,
@@ -948,7 +809,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: '$\\aleph_1$ (Алеф-один)', description: 'Первый несчетный кардинал.', details: ['Континуум-гипотеза', 'Вполне упорядочение $\\mathbb{R}$'] }
     }
   },
-  
+
   // --- ORDER THEORY ---
   'order_theory': {
     group: Discipline.ORDER_THEORY,
@@ -1921,12 +1782,12 @@ const RAW_LINKS = [
     { source: 'bool_alg', target: 'polyadic_alg', type: LinkType.EXTENDS },
     { source: 'cylindric_alg', target: 'pred_logic', type: LinkType.EQUIVALENT }, // Algebraization of FOL
     { source: 'polyadic_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },
-    
+
     // Connections to authors/theorems
     { source: 'thm_tarski_truth', target: 'cylindric_alg', type: LinkType.RELATED }, // Tarski created both
     { source: 'stone_space', target: 'cylindric_alg', type: LinkType.RELATED }, // Stone representation extends to CAs
     { source: 'cylindric_alg', target: 'polyadic_alg', type: LinkType.RELATED }, // Similar goals, different signatures
-  
+
     // Cantor-Bernstein
     { source: 'thm_knaster', target: 'thm_cbs', type: LinkType.PROVES }, // Кнастер доказывает CBS (через неподвижную точку)
     { source: 'zfc', target: 'thm_cbs', type: LinkType.CONTAINS },
@@ -1939,14 +1800,14 @@ const RAW_LINKS = [
     { source: 'axiom_choice', target: 'ac_omega', type: LinkType.EXTENDS }, // AC implies AC_omega
     { source: 'axiom_choice', target: 'axiom_determinacy', type: LinkType.RELATED }, // Conflict
     { source: 'thm_zorn', target: 'order_theory', type: LinkType.RELATED },
-    
+
     // Transfinite & Ordinals
     { source: 'ordinal_arithmetic', target: 'transfinite_induction', type: LinkType.CONTAINS },
     { source: 'transfinite_induction', target: 'ordinal_omega', type: LinkType.RELATED },
     { source: 'transfinite_induction', target: 'cumulative_hierarchy', type: LinkType.RELATED }, // Hierarchy defined by recursion
     { source: 'cumulative_hierarchy', target: 'rank_concept', type: LinkType.CONTAINS },
     { source: 'rank_concept', target: 'model_V_omega', type: LinkType.RELATED },
-    
+
     // Cardinals & Independence
     { source: 'cardinal_arithmetic', target: 'hartogs_number', type: LinkType.RELATED },
     { source: 'cardinal_aleph1', target: 'continuum_hypothesis', type: LinkType.RELATED },
@@ -1955,14 +1816,14 @@ const RAW_LINKS = [
     { source: 'forcing_method', target: 'zfc', type: LinkType.RELATED },
     { source: 'model_L', target: 'continuum_hypothesis', type: LinkType.MODELS }, // GCH is true in L
     { source: 'dedekind_finite', target: 'ac_omega', type: LinkType.RELATED }, // Relation requires AC_omega
-    
+
     // Construction of Numbers (Models)
     { source: 'cumulative_hierarchy', target: 'model_R', type: LinkType.CONTAINS }, // R appears at specific rank
     { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS },
     { source: 'model_Q', target: 'model_R', type: LinkType.EXTENDS }, // R construced from Q (Cauchy seq)
     { source: 'model_Z', target: 'model_Q', type: LinkType.EXTENDS },
     { source: 'model_N', target: 'model_Z', type: LinkType.EXTENDS },
-  
+
     // Constructive Math & Intuitionism
     { source: 'intuitionistic_logic', target: 'bhk_interpretation', type: LinkType.RELATED },
     { source: 'bhk_interpretation', target: 'math_lang', type: LinkType.RELATED }, // Semantics of proofs
@@ -1987,7 +1848,7 @@ const RAW_LINKS = [
     { source: 'comp_theory', target: 'recursion_theorem', type: LinkType.PROVES },
     { source: 'rice_theorem', target: 'incompleteness', type: LinkType.RELATED }, // Undecidability connection
     { source: 'recursion_theorem', target: 'incompleteness', type: LinkType.RELATED }, // Used in Gödel's proof (diagonalization)
-  
+
     // Language & Logic
     { source: 'math_lang', target: 'pred_logic', type: LinkType.CONTAINS },
     { source: 'pred_logic', target: 'prop_logic', type: LinkType.CONTAINS },
@@ -2001,7 +1862,7 @@ const RAW_LINKS = [
     { source: 'intuitionistic_logic', target: 'prop_logic', type: LinkType.RELATED },
     { source: 'intuitionistic_logic', target: 'modal_S4', type: LinkType.EQUIVALENT },
     { source: 'modal_GL', target: 'theory_PA', type: LinkType.MODELS },
-    
+
     // Computability
     { source: 'comp_theory', target: 'lambda_calc', type: LinkType.CONTAINS },
     { source: 'lambda_calc', target: 'lambda_reductions', type: LinkType.CONTAINS },
@@ -2011,7 +1872,7 @@ const RAW_LINKS = [
     { source: 'comp_theory', target: 'pred_logic', type: LinkType.RELATED },
     { source: 'comp_theory', target: 'incompleteness', type: LinkType.PROVES },
     { source: 'theory_PA', target: 'comp_theory', type: LinkType.RELATED },
-    
+
     { source: 'typed_lambda', target: 'curry_howard', type: LinkType.RELATED },
     { source: 'curry_howard', target: 'prop_logic', type: LinkType.RELATED },
     { source: 'system_f', target: 'theory_PA2', type: LinkType.RELATED },
@@ -2024,7 +1885,7 @@ const RAW_LINKS = [
     { source: 'theory_PA', target: 'theory_Presburger', type: LinkType.EXTENDS },
     { source: 'theory_PA2', target: 'theory_PA', type: LinkType.EXTENDS },
     { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT },
-    
+
     // Set Theory
     { source: 'zfc', target: 'theory_HF', type: LinkType.CONTAINS },
     { source: 'zfc', target: 'model_quine', type: LinkType.RELATED },
@@ -2036,7 +1897,7 @@ const RAW_LINKS = [
     { source: 'ordinal_omega', target: 'model_N', type: LinkType.EQUIVALENT },
     { source: 'model_L', target: 'incompleteness', type: LinkType.RELATED },
     { source: 'model_L', target: 'cardinal_aleph1', type: LinkType.CONTAINS },
-    
+
     // Order & Lattices
     { source: 'order_theory', target: 'poset', type: LinkType.CONTAINS },
     { source: 'order_theory', target: 'theory_order', type: LinkType.CONTAINS },
@@ -2073,7 +1934,7 @@ const RAW_LINKS = [
     { source: 'theory_tf_groups', target: 'theory_groups', type: LinkType.EXTENDS },
     { source: 'theory_tf_groups', target: 'model_Q', type: LinkType.RELATED },
     { source: 'model_C', target: 'model_R', type: LinkType.EXTENDS },
-    
+
     // Topology
     { source: 'topology', target: 'stone_space', type: LinkType.CONTAINS },
     { source: 'stone_space', target: 'bool_alg', type: LinkType.EQUIVALENT },
@@ -2083,7 +1944,7 @@ const RAW_LINKS = [
     { source: 'thm_stone_rep', target: 'stone_space', type: LinkType.RELATED },
     { source: 'modal_S4', target: 'topology', type: LinkType.RELATED },
     { source: 'modal_GL', target: 'scattered_space', type: LinkType.RELATED },
-    
+
     // Meta
     { source: 'mt_concepts', target: 'model_N', type: LinkType.RELATED },
     { source: 'mt_concepts', target: 'auto_group', type: LinkType.RELATED },
@@ -2100,7 +1961,7 @@ const RAW_LINKS = [
     { source: 'thm_kruskal', target: 'poset', type: LinkType.RELATED },
     { source: 'thm_kruskal', target: 'theory_PA', type: LinkType.RELATED },
     { source: 'theory_PA2', target: 'model_N', type: LinkType.RELATED },
-  
+
     // Reverse Mathematics
     { source: 'reverse_math', target: 'rca0', type: LinkType.CONTAINS },
     { source: 'reverse_math', target: 'theory_PA2', type: LinkType.RELATED },
@@ -2120,7 +1981,7 @@ const RAW_LINKS = [
     { source: 'mt_concepts', target: 'qe', type: LinkType.CONTAINS },
     { source: 'mt_concepts', target: 'prime_model', type: LinkType.CONTAINS },
     { source: 'stone_space_types', target: 'mt_concepts', type: LinkType.RELATED },
-    
+
     // Connections for Stone Space
     { source: 'stone_space_types', target: 'stone_space', type: LinkType.EXTENDS },
     { source: 'stone_space_types', target: 'bool_alg', type: LinkType.RELATED },
@@ -2147,7 +2008,7 @@ const RAW_LINKS = [
     { source: 'cardinal_arithmetic', target: 'zfc', type: LinkType.CONTAINS },
     { source: 'cardinal_arithmetic', target: 'cardinal_aleph1', type: LinkType.RELATED },
     { source: 'ordinal_arithmetic', target: 'ordinal_omega', type: LinkType.RELATED },
-    
+
     // Sequent Calculus
     { source: 'sequent_calculus', target: 'pred_logic', type: LinkType.RELATED },
     { source: 'sequent_calculus', target: 'cut_elimination', type: LinkType.CONTAINS },
@@ -2174,16 +2035,16 @@ const RAW_LINKS = [
     { source: 'mt_concepts', target: 'type_theory_model', type: LinkType.CONTAINS },
     { source: 'type_theory_model', target: 'complete_type', type: LinkType.EXTENDS },
     { source: 'type_theory_model', target: 'isolated_type', type: LinkType.EXTENDS },
-    
+
     // Связь с пространством Стоуна (типы - это точки в пространстве)
     { source: 'stone_space_types', target: 'complete_type', type: LinkType.CONTAINS },
     { source: 'stone_space_types', target: 'isolated_type', type: LinkType.RELATED }, // Изолированные точки пространства
-    
+
     // Связь с моделями
     { source: 'saturated_model', target: 'type_theory_model', type: LinkType.RELATED }, // Насыщенная реализует ВСЕ типы
     { source: 'prime_model', target: 'isolated_type', type: LinkType.RELATED }, // Простая реализует ТОЛЬКО изолированные типы
     { source: 'prime_model', target: 'omitting_types', type: LinkType.RELATED },
-    
+
     // Теоремы
     { source: 'omitting_types', target: 'isolated_type', type: LinkType.RELATED }, // Опускать можно только неизолированные
     { source: 'thm_ryll', target: 'type_theory_model', type: LinkType.RELATED }, // Категоричность <=> конечное число типов
@@ -2191,20 +2052,20 @@ const RAW_LINKS = [
     // Inference & Derivability
     { source: 'math_lang', target: 'inference_concept', type: LinkType.CONTAINS },
     { source: 'inference_concept', target: 'inference_rules', type: LinkType.CONTAINS },
-    
+
     // Связь с логиками
     { source: 'pred_logic', target: 'inference_concept', type: LinkType.CONTAINS },
     { source: 'prop_logic', target: 'inference_concept', type: LinkType.CONTAINS },
     { source: 'sequent_calculus', target: 'inference_concept', type: LinkType.RELATED }, // Секвенции — это формализация вывода
-    
+
     // Мост Синтаксис <-> Семантика
     { source: 'soundness_completeness', target: 'inference_concept', type: LinkType.RELATED }, // Syntax
     { source: 'soundness_completeness', target: 'mt_concepts', type: LinkType.RELATED }, // Semantics (Model Theory)
-    
+
     // Примеры
     { source: 'theory_PA', target: 'inference_concept', type: LinkType.RELATED }, // PA использует спец. правила индукции
     { source: 'modal_K', target: 'inference_rules', type: LinkType.CONTAINS }, // Правило усиления (Nec)
-    
+
     // Теорема о дедукции связывает импликацию и вывод
     { source: 'inference_concept', target: 'heyting_alg', type: LinkType.RELATED }, // Алгебраическая интерпретация выводимости
 
@@ -2256,38 +2117,6 @@ const RAW_LINKS = [
     // Лемма Цорна используется в теории колец (для поиска максимальных идеалов)
     { source: 'thm_zorn', target: 'model_R', type: LinkType.RELATED }, // (через базис Гамеля, например)
     { source: 'forcing_method', target: 'model_L', type: LinkType.RELATED }, // Форсинг расширяет L
-
-    // --- Algebra Hierarchy ---
-    { source: 'theory_groups', target: 'theory_rings', type: LinkType.EXTENDS }, // Кольцо - это абелева группа по сложению
-    { source: 'theory_rings', target: 'theory_fields', type: LinkType.EXTENDS }, // Поле - это кольцо с делением
-    { source: 'theory_rings', target: 'ideal_concept', type: LinkType.CONTAINS },
-    { source: 'ideal_concept', target: 'wkl0', type: LinkType.RELATED }, // Prime Ideal Thm ~ WKL0
-    
-    // Homomorphism Theorems
-    { source: 'theory_groups', target: 'homomorphism_thms', type: LinkType.RELATED },
-    { source: 'theory_rings', target: 'homomorphism_thms', type: LinkType.RELATED },
-    { source: 'model_Z', target: 'model_Q', type: LinkType.RELATED }, // Q - поле частных Z (алгебраическая конструкция)
-
-    // --- Topological Semantics & Duality ---
-    // Stone Duality chain:
-    { source: 'bool_alg', target: 'stone_space', type: LinkType.EQUIVALENT }, // Stone Duality
-    { source: 'dist_lattice', target: 'priestley_space', type: LinkType.EQUIVALENT }, // Priestley Duality
-    { source: 'heyting_alg', target: 'esakia_space', type: LinkType.EQUIVALENT }, // Esakia Duality
-    
-    // Modal Logic & Topology:
-    { source: 'modal_logic', target: 'jsson_tarski_alg', type: LinkType.EQUIVALENT }, // Logic <-> Algebra
-    { source: 'jsson_tarski_alg', target: 'stone_space', type: LinkType.EXTENDS }, // MA is BA + operator
-    { source: 'modal_S4', target: 'alexandrov_topology', type: LinkType.MODELS }, // S4 is the logic of topological spaces [cite: 1269]
-    { source: 'alexandrov_topology', target: 'poset', type: LinkType.EQUIVALENT }, // 1-to-1 correspondence
-    
-    // Intuitionistic Logic connections:
-    { source: 'esakia_space', target: 'intuitionistic_logic', type: LinkType.MODELS }, // Esakia spaces are models for Int
-    { source: 'esakia_space', target: 'stone_space', type: LinkType.EXTENDS }, // Esakia is Stone + Order
-    { source: 'heyting_alg', target: 'open_set_topology', type: LinkType.RELATED }, // Open sets form a Heyting algebra [cite: 666]
-    
-    // Specific Logic-Topology links from lectures
-    { source: 'modal_GL', target: 'scattered_space', type: LinkType.MODELS }, // GL corresponds to scattered spaces [cite: 1286]
-    { source: 'scattered_space', target: 'topology', type: LinkType.EXTENDS },
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

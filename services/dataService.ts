@@ -18,6 +18,23 @@ interface NodeDefinition {
 // const uni = (str: string) => str... 
 
 const RAW_NODES: Record<string, NodeDefinition> = {
+  'thm_cbs': {
+    group: Discipline.SET_THEORY,
+    val: 18,
+    synonyms: ['Теорема Кантора-Бернштейна', 'CBS Theorem', 'Schroeder-Bernstein'],
+    content: {
+      en: {
+        label: 'Cantor-Bernstein-Schroeder',
+        description: 'If there exist injections $f: A \\to B$ and $g: B \\to A$, then there exists a bijection $h: A \\to B$.',
+        details: ['Cardinality equality', '$|A|\\le|B| \\land |B|\\le|A| \\Rightarrow |A|=|B|$', 'Proof via Knaster-Tarski']
+      },
+      ru: {
+        label: 'Теорема Кантора-Бернштейна',
+        description: 'Если существуют инъекции $f: A \\to B$ и $g: B \\to A$, то существует биекция $h: A \\to B$.',
+        details: ['Равенство мощностей', '$|A|\\le|B| \\land |B|\\le|A| \\Rightarrow |A|=|B|$', 'Доказательство через Кнастера-Тарского']
+      }
+    }
+  },
   // --- AXIOM OF CHOICE & EQUIVALENTS ---
   'axiom_choice': {
     group: Discipline.SET_THEORY,
@@ -1726,6 +1743,11 @@ const RAW_NODES: Record<string, NodeDefinition> = {
 };
 
 const RAW_LINKS = [
+    // Cantor-Bernstein
+    { source: 'thm_knaster', target: 'thm_cbs', type: LinkType.PROVES }, // Кнастер доказывает CBS (через неподвижную точку)
+    { source: 'zfc', target: 'thm_cbs', type: LinkType.CONTAINS },
+    { source: 'thm_cbs', target: 'cardinal_arithmetic', type: LinkType.RELATED }, // Основа сравнения кардиналов
+    { source: 'thm_cbs', target: 'dedekind_finite', type: LinkType.RELATED }, // Используется при анализе конечности
     // Axiom of Choice & Equivalents
     { source: 'zfc', target: 'axiom_choice', type: LinkType.CONTAINS },
     { source: 'axiom_choice', target: 'thm_zorn', type: LinkType.EQUIVALENT },

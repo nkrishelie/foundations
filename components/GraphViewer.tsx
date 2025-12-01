@@ -4,6 +4,8 @@ import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
 import { GraphData, GraphNode, GraphLink, LinkType } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS } from '../constants';
+import { NavigationControls } from './NavigationControls';
+import { INITIAL_CAMERA_POSITION } from '../constants'; // Если у вас есть эта константа, или используйте {x:0, y:0, z:400}
 
 interface Props {
   data: GraphData;
@@ -168,7 +170,58 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
     return <div className="w-full h-full flex items-center justify-center text-white">Loading Graph...</div>;
   }
 
+  // --- ЛОГИКА НАВИГАЦИИ (РУЧНАЯ) ---
+  const handleRotate = (h: number, v: number) => {
+    const fg = graphRef.current;
+    if (!fg) return;
+
+    // Получаем текущую позицию
+    const currentPos = fg.cameraPosition();
+    // Используем встроенный класс Three.js для удобной работы с углами
+    const spherical = new THREE.Spherical();
+    spherical.setFromVector3(new THREE.Vector3(currentPos.x, currentPos.y, currentPos.z));
+
+    // Меняем углы (0.2 - это шаг поворота в радианах, примерно 11 градусов)
+    spherical.theta += h * 0.2; 
+    spherical.phi += v * 0.2;
+
+    // Ограничиваем вертикальный угол, чтобы не перевернуться (для trackball это не обязательно, но полезно)
+    spherical.makeSafe();
+
+    // Превращаем обратно в XYZ
+    const newPos = new THREE.Vector3().setFromSpherical(spherical);
+
+    // Плавно летим в новую точку
+    fg.cameraPosition(
+      { x: newPos.x, y: newPos.y, z: newPos.z },
+      currentPos.lookAt, // Смотрим туда же, куда смотрели
+      400 // мс
+    );
+  };
+
+  const handleZoom = (dir: number) => {
+    const fg = graphRef.current;
+    if (!fg) return;
+    
+    const currentPos = fg.cameraPosition();
+    // Умножаем текущие координаты на коэффициент (0.8 для приближения, 1.2 для отдаления)
+    const factor = dir > 0 ? 1.4 : 0.7; 
+    
+    fg.cameraPosition(
+      { x: currentPos.x * factor, y: currentPos.y * factor, z: currentPos.z * factor },
+      currentPos.lookAt,
+      400
+    );
+  };
+
+  const handleReset = () => {
+    const fg = graphRef.current;
+    if (!fg) return;
+    fg.zoomToFit(1000); // 1 секунда на красивый возврат
+  };
+  
   return (
+    <div className="relative w-full h-full"> {/* Обертка для позиционирования кнопок */}
     <ForceGraph3D
       key={activeLanguage}
       ref={graphRef}
@@ -268,5 +321,12 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
       warmupTicks={100}
       cooldownTicks={100}
     />
+    {/* Вставляем панель управления поверх графа */}
+      <NavigationControls 
+        onRotate={handleRotate}
+        onZoom={handleZoom}
+        onReset={handleReset}
+      />
+    </div>
   );
 };

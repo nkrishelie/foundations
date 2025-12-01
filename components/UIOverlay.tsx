@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GraphNode, GraphLink, Discipline, LinkType, Language } from '../types'; // Добавили GraphLink
+import { GraphNode, GraphLink, Discipline, LinkType, Language } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS } from '../constants';
 import Latex from 'react-latex-next';
 
@@ -16,12 +16,12 @@ const cleanForSearch = (str: string) => {
     .trim();
 };
 
-// Функция экранирования для CSV (обрабатывает запятые и кавычки внутри текста)
+// Функция экранирования для CSV
 const escapeCsv = (str: string) => {
   if (!str) return '';
-  const result = str.replace(/"/g, '""'); // Удваиваем кавычки
+  const result = str.replace(/"/g, '""');
   if (result.search(/("|,|\n)/g) >= 0) {
-    return `"${result}"`; // Оборачиваем в кавычки, если есть спецсимволы
+    return `"${result}"`;
   }
   return result;
 };
@@ -30,7 +30,7 @@ const normalize = (str: string) => str.toLowerCase().replace(/\s/g, '');
 
 interface Props {
   nodes: GraphNode[];
-  links: GraphLink[]; // <--- Новый проп
+  links: GraphLink[];
   selectedNode: GraphNode | null;
   onSearch: (query: string) => void;
   onCloseSidebar: () => void;
@@ -40,7 +40,7 @@ interface Props {
 
 export const UIOverlay: React.FC<Props> = ({ 
   nodes,
-  links, // <--- Получаем связи
+  links,
   selectedNode, 
   onSearch, 
   onCloseSidebar,
@@ -54,11 +54,10 @@ export const UIOverlay: React.FC<Props> = ({
 
   // --- ЛОГИКА ЭКСПОРТА ---
   const handleExport = () => {
-    // 1. Формируем CSV для Узлов
     const nodesHeader = ['ID', 'Label', 'Group', 'Description', 'Details'];
     const nodesRows = nodes.map(n => [
       n.id,
-      cleanForSearch(n.label), // Можно использовать сырой label, если нужно с формулами
+      cleanForSearch(n.label),
       DISCIPLINE_LABELS[n.group][currentLang],
       cleanForSearch(n.description),
       n.details ? n.details.map(cleanForSearch).join('; ') : ''
@@ -69,10 +68,8 @@ export const UIOverlay: React.FC<Props> = ({
       ...nodesRows.map(row => row.map(escapeCsv).join(','))
     ].join('\n');
 
-    // 2. Формируем CSV для Связей
     const linksHeader = ['Source ID', 'Target ID', 'Relation Type'];
     const linksRows = links.map((l: any) => [
-      // d3-force превращает source/target в объекты, нам нужны ID
       typeof l.source === 'object' ? l.source.id : l.source,
       typeof l.target === 'object' ? l.target.id : l.target,
       LINK_LABELS[l.type as LinkType][currentLang]
@@ -83,13 +80,11 @@ export const UIOverlay: React.FC<Props> = ({
       ...linksRows.map(row => row.map(escapeCsv).join(','))
     ].join('\n');
 
-    // 3. Скачиваем файлы
     downloadFile(nodesCsvContent, `math_nexus_nodes_${currentLang}.csv`);
     downloadFile(linksCsvContent, `math_nexus_links_${currentLang}.csv`);
   };
 
   const downloadFile = (content: string, fileName: string) => {
-    // Добавляем BOM (\uFEFF) чтобы Excel правильно читал кириллицу
     const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -99,7 +94,6 @@ export const UIOverlay: React.FC<Props> = ({
     link.click();
     document.body.removeChild(link);
   };
-  // -----------------------
 
   // Логика фильтрации
   useEffect(() => {
@@ -144,12 +138,10 @@ export const UIOverlay: React.FC<Props> = ({
   return (
     <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4">
       
-    {/* Top Bar */}
-      {/* ИЗМЕНЕНИЕ 1: У контейнера ставим pointer-events-none вместо auto */}
+      {/* Top Bar */}
       <div className="pointer-events-none w-full flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative">
         
         {/* Search Block */}
-        {/* ИЗМЕНЕНИЕ 2: Самому блоку поиска возвращаем кликабельность (pointer-events-auto) */}
         <div className="w-full max-w-md relative pointer-events-auto">
           <h1 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight mb-2">
             MathLogic <span className="text-blue-400">Nexus</span>
@@ -170,37 +162,46 @@ export const UIOverlay: React.FC<Props> = ({
             {/* Dropdown Results */}
             {showDropdown && filteredNodes.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                {filteredNodes.map((node) => (
-                  <div
-                    key={node.id}
-                    onClick={() => handleSelectNode(node)}
-                    className="px-4 py-2 hover:bg-slate-700 cursor-pointer border-b border-slate-800 last:border-0 flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <span 
-                        className="w-2 h-2 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
-                      />
-                      <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
-                        <Latex>{node.label}</Latex>
-                      </span>
+                {filteredNodes.map((node) => {
+                  
+                  // --- ИСПРАВЛЕНИЕ: Умный выбор синонима ---
+                  const displaySynonym = node.synonyms?.find(s => {
+                    const isCyrillic = /[а-яА-ЯёЁ]/.test(s);
+                    // Если язык RU - ищем кириллицу, если EN - ищем то, что НЕ кириллица
+                    return currentLang === 'ru' ? isCyrillic : !isCyrillic;
+                  }) || node.synonyms?.[0];
+                  // -----------------------------------------
+
+                  return (
+                    <div
+                      key={node.id}
+                      onClick={() => handleSelectNode(node)}
+                      className="px-4 py-2 hover:bg-slate-700 cursor-pointer border-b border-slate-800 last:border-0 flex items-center justify-between group"
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <span 
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
+                        />
+                        <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
+                          <Latex>{node.label}</Latex>
+                        </span>
+                      </div>
+                      {displaySynonym && (
+                        <span className="text-xs text-slate-500 ml-2 hidden sm:block truncate max-w-[100px] text-right">
+                          {displaySynonym}
+                        </span>
+                      )}
                     </div>
-                    {node.synonyms && (
-                      <span className="text-xs text-slate-500 ml-2 hidden sm:block truncate max-w-[100px]">
-                        {node.synonyms[0]}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
 
         {/* Buttons: Language + Export */}
-        {/* ИЗМЕНЕНИЕ 3: Блоку с кнопками тоже возвращаем кликабельность */}
         <div className="flex gap-2 pointer-events-auto">
-          {/* Кнопка Экспорта */}
           <button
             onClick={handleExport}
             className="flex items-center justify-center px-3 py-1.5 bg-slate-800/80 border border-slate-600 rounded-lg hover:bg-blue-600 hover:border-blue-500 text-slate-300 hover:text-white transition-all backdrop-blur-md"
@@ -209,7 +210,6 @@ export const UIOverlay: React.FC<Props> = ({
             <span className="text-lg">💾</span>
           </button>
 
-          {/* Языки */}
           <div className="flex space-x-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 backdrop-blur-md">
             <button onClick={() => onToggleLang('ru')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'ru' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇷🇺</button>
             <button onClick={() => onToggleLang('en')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'en' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇺🇸</button>

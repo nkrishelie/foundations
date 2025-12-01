@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { GraphNode, Discipline, LinkType, Language } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS } from '../constants';
-import Latex from 'react-latex-next'; // <--- Импорт компонента для формул
+import Latex from 'react-latex-next';
+
+// Функция очистки для поиска (дублируем логику, чтобы список был читаемым)
+const cleanForSearch = (str: string) => {
+  if (!str) return '';
+  return str
+    .replace(/\$/g, '')
+    .replace(/\\mathbb{([a-z])}/gi, '$1')
+    .replace(/\\mathsf{([a-z0-9]+)}/gi, '$1')
+    .replace(/\\mathbf{([a-z0-9]+)}/gi, '$1')
+    .replace(/\\mathrm{([a-z0-9]+)}/gi, '$1')
+    .replace(/\\/g, '')
+    .trim();
+};
+
+const normalize = (str: string) => str.toLowerCase().replace(/\s/g, '');
 
 interface Props {
+  nodes: GraphNode[]; // <--- Новый проп
   selectedNode: GraphNode | null;
   onSearch: (query: string) => void;
   onCloseSidebar: () => void;
@@ -12,39 +28,120 @@ interface Props {
 }
 
 export const UIOverlay: React.FC<Props> = ({ 
+  nodes,
   selectedNode, 
   onSearch, 
   onCloseSidebar,
   currentLang,
   onToggleLang
 }) => {
-  const [query, setQuery] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const [isLegendOpen, setIsLegendOpen] = useState(true);
+  const [filteredNodes, setFilteredNodes] = useState<GraphNode[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setQuery(val);
-    onSearch(val);
+  // Логика фильтрации
+  useEffect(() => {
+    if (!inputValue || inputValue.length < 2) {
+      setFilteredNodes([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const q = normalize(inputValue);
+    
+    // Ищем совпадения
+    const results = nodes.filter(n => {
+      // 1. По ID
+      if (normalize(n.id).includes(q)) return true;
+      // 2. По метке (Label)
+      const labelClean = normalize(cleanForSearch(n.label));
+      if (labelClean.includes(q)) return true;
+      // 3. По синонимам
+      if (n.synonyms?.some(s => normalize(s).includes(q))) return true;
+      return false;
+    });
+
+    // Берем топ-7 результатов
+    setFilteredNodes(results.slice(0, 7));
+    setShowDropdown(true);
+  }, [inputValue, nodes]);
+
+  // Выбор узла из списка
+  const handleSelectNode = (node: GraphNode) => {
+    setInputValue(cleanForSearch(node.label)); // Ставим красивое имя в инпут
+    setShowDropdown(false);
+    onSearch(node.id); // Отправляем ID в GraphViewer для полета камеры
+  };
+
+  // Обработка Enter
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      if (filteredNodes.length > 0) {
+        handleSelectNode(filteredNodes[0]);
+      } else {
+        // Если списка нет, ищем "в лоб"
+        onSearch(inputValue);
+      }
+    }
   };
 
   return (
     <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4">
       
       {/* Top Bar */}
-      <div className="pointer-events-auto w-full flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        <div className="w-full max-w-md space-y-2">
-          <h1 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight">
+      <div className="pointer-events-auto w-full flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative">
+        
+        {/* Search Block */}
+        <div className="w-full max-w-md relative">
+          <h1 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight mb-2">
             MathLogic <span className="text-blue-400">Nexus</span>
           </h1>
-          <input
-            type="text"
-            value={query}
-            onChange={handleSearch}
-            placeholder={currentLang === 'en' ? "Search theorems..." : "Поиск теорем..."}
-            className="w-full px-4 py-2 bg-slate-800/90 text-white border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400 backdrop-blur-md shadow-xl"
-          />
+          
+          <div className="relative">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => inputValue.length >= 2 && setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 200)} // Задержка для клика
+              placeholder={currentLang === 'en' ? "Search..." : "Поиск..."}
+              className="w-full px-4 py-2 bg-slate-800/90 text-white border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400 backdrop-blur-md shadow-xl"
+            />
+
+            {/* Dropdown Results */}
+            {showDropdown && filteredNodes.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl overflow-hidden z-50">
+                {filteredNodes.map((node) => (
+                  <div
+                    key={node.id}
+                    onClick={() => handleSelectNode(node)}
+                    className="px-4 py-2 hover:bg-slate-700 cursor-pointer border-b border-slate-800 last:border-0 flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <span 
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
+                      />
+                      <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
+                        {/* Используем Latex для рендеринга формул в списке */}
+                        <Latex>{node.label}</Latex>
+                      </span>
+                    </div>
+                    {node.synonyms && (
+                      <span className="text-xs text-slate-500 ml-2 hidden sm:block">
+                        {node.synonyms[0]}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
+        {/* Language Toggles */}
         <div className="flex space-x-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 backdrop-blur-md">
           <button onClick={() => onToggleLang('ru')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'ru' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇷🇺</button>
           <button onClick={() => onToggleLang('en')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'en' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇺🇸</button>
@@ -79,7 +176,6 @@ export const UIOverlay: React.FC<Props> = ({
                     <div key={type} className="flex items-center space-x-2">
                       <div className="flex items-center w-8 flex-shrink-0">
                         <div className="h-[2px] w-full" style={{ backgroundColor: LINK_COLORS[type] }}></div>
-                        {/* Стрелка рисуется только если это не симметричная связь, но в легенде можно оставить как есть для простоты */}
                       </div>
                       <span className="text-xs text-slate-300 leading-tight">{LINK_LABELS[type][currentLang]}</span>
                     </div>
@@ -91,7 +187,7 @@ export const UIOverlay: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Detail Sidebar - ЗДЕСЬ ГЛАВНЫЕ ИЗМЕНЕНИЯ */}
+      {/* Detail Sidebar */}
       {selectedNode && (
         <div className="pointer-events-auto absolute right-4 bottom-4 top-1/4 w-96 bg-slate-900/95 backdrop-blur-xl border-l border-t border-slate-700 rounded-tl-xl rounded-bl-xl shadow-2xl transform transition-transform duration-300 overflow-hidden flex flex-col z-20">
           <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
@@ -102,7 +198,6 @@ export const UIOverlay: React.FC<Props> = ({
               <button onClick={onCloseSidebar} className="text-slate-400 hover:text-white transition-colors p-1">✕</button>
             </div>
             
-            {/* Оборачиваем тексты в Latex */}
             <h2 className="text-2xl font-bold text-white mb-3 leading-tight">
               <Latex>{selectedNode.label}</Latex>
             </h2>

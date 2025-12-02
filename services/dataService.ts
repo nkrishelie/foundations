@@ -2507,4 +2507,3 @@ export const getGraphData = (lang: Language = 'en'): GraphData => {
 
   return { nodes, links };
 };
-};

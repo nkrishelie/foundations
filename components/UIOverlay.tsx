@@ -36,6 +36,10 @@ interface Props {
   onCloseSidebar: () => void;
   currentLang: Language;
   onToggleLang: (lang: Language) => void;
+  
+  // === НОВЫЕ ПОЛЯ ===
+  hiddenGroups: Set<Discipline>;
+  onToggleGroup: (group: Discipline) => void;
 }
 
 export const UIOverlay: React.FC<Props> = ({ 
@@ -45,7 +49,10 @@ export const UIOverlay: React.FC<Props> = ({
   onSearch, 
   onCloseSidebar,
   currentLang,
-  onToggleLang
+  onToggleLang,
+  // === ДОБАВИТЬ СЮДА ===
+  hiddenGroups,
+  onToggleGroup
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [isLegendOpen, setIsLegendOpen] = useState(true);
@@ -229,14 +236,34 @@ export const UIOverlay: React.FC<Props> = ({
             <div className="mt-3 space-y-4">
               <div>
                 <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Disciplines' : 'Разделы'}</h4>
-                <div className="space-y-1.5">
-                  {(Object.keys(DISCIPLINE_COLORS) as Discipline[]).map((disc) => (
-                    <div key={disc} className="flex items-center space-x-2">
-                      <span className="w-3 h-3 rounded-full shadow-glow flex-shrink-0" style={{ backgroundColor: DISCIPLINE_COLORS[disc], boxShadow: `0 0 6px ${DISCIPLINE_COLORS[disc]}` }}></span>
-                      <span className="text-xs text-slate-300 leading-tight">{DISCIPLINE_LABELS[disc][currentLang]}</span>
-                    </div>
-                  ))}
-                </div>
+                {/* Внутри return, в блоке Легенды */}
+<div className="space-y-1.5">
+  {(Object.keys(DISCIPLINE_COLORS) as Discipline[]).map((disc) => {
+    const isHidden = hiddenGroups.has(disc);
+    return (
+      <div 
+        key={disc} 
+        // Добавляем кликабельность и стили для курсора
+        className={`flex items-center space-x-2 cursor-pointer transition-opacity duration-200 ${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}`}
+        onClick={() => onToggleGroup(disc)}
+      >
+        {/* Кружок цвета (меняется на "пустой", если скрыто, или можно просто менять прозрачность) */}
+        <span 
+          className={`w-3 h-3 rounded-full flex-shrink-0 ${isHidden ? 'border border-slate-500' : 'shadow-glow'}`} 
+          style={{ 
+            backgroundColor: isHidden ? 'transparent' : DISCIPLINE_COLORS[disc], 
+            boxShadow: isHidden ? 'none' : `0 0 6px ${DISCIPLINE_COLORS[disc]}` 
+          }}
+        ></span>
+        
+        {/* Название (зачеркиваем, если скрыто) */}
+        <span className={`text-xs text-slate-300 leading-tight ${isHidden ? 'line-through decoration-slate-500' : ''}`}>
+          {DISCIPLINE_LABELS[disc][currentLang]}
+        </span>
+      </div>
+    );
+  })}
+</div>
               </div>
               <div>
                 <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Relations' : 'Связи'}</h4>

@@ -2069,7 +2069,6 @@ const RAW_LINKS = [
 
     { source: 'cumulative_hierarchy', target: 'model_R', type: LinkType.CONTAINS }, 
     { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS },
-    { source: 'model_Q', target: 'model_R', type: LinkType.EXTENDS }, 
     { source: 'model_Z', target: 'model_Q', type: LinkType.EXTENDS },
     { source: 'model_N', target: 'model_Z', type: LinkType.EXTENDS },
 
@@ -2494,9 +2493,18 @@ export const getGraphData = (lang: Language = 'en'): GraphData => {
     };
   });
 
-  const links = RAW_LINKS.map(link => ({
-    ...link,
-  }));
+  const links = RAW_LINKS.map(link => {
+    // ИСПРАВЛЕНИЕ:
+    // Для связей типа EXTENDS ("Расширяет") мы меняем направление.
+    // Было: Base -> Extension (Булева -> Модальная)
+    // Стало: Extension -> Base (Модальная -> Булева)
+    // Теперь стрелка значит: "X extends Y" (X наследуется от Y)
+    if (link.type === LinkType.EXTENDS) {
+      return { ...link, source: link.target, target: link.source };
+    }
+    return { ...link };
+  });
 
   return { nodes, links };
+};
 };

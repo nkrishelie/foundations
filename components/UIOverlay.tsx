@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { GraphNode, GraphLink, Discipline, LinkType, Language } from '../types';
-import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS } from '../constants';
+import { GraphNode, GraphLink, Discipline, LinkType, Language, NodeKind } from '../types';
+import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS, KIND_LABELS } from '../constants';
 import Latex from 'react-latex-next';
 
 // Функция очистки для поиска
@@ -21,12 +21,12 @@ const escapeCsv = (str: string) => {
   if (!str) return '';
   const result = str.replace(/"/g, '""');
   if (result.search(/("|,|\n)/g) >= 0) {
-    return `"${result}"`;
+    return \`"\${result}"\`;
   }
   return result;
 };
 
-const normalize = (str: string) => str.toLowerCase().replace(/\s/g, '');
+const normalize = (str: string) => str.toLowerCase().replace(/\\s/g, '');
 
 interface Props {
   nodes: GraphNode[];
@@ -58,20 +58,20 @@ export const UIOverlay: React.FC<Props> = ({
   const [filteredNodes, setFilteredNodes] = useState<GraphNode[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // === НОВОЕ: Вычисляем, какие дисциплины реально есть в графе ===
-  // Это скроет "пустые" категории (например, Foundations), если в них нет узлов
+  // Активные дисциплины
   const activeDisciplines = useMemo(() => {
     const groups = new Set(nodes.map(n => n.group));
     return groups;
   }, [nodes]);
-  // ==============================================================
 
   // --- ЛОГИКА ЭКСПОРТА ---
   const handleExport = () => {
-    const nodesHeader = ['ID', 'Label', 'Group', 'Description', 'Details'];
+    // Добавлена колонка Kind
+    const nodesHeader = ['ID', 'Label', 'Kind', 'Group', 'Description', 'Details'];
     const nodesRows = nodes.map(n => [
       n.id,
       cleanForSearch(n.label),
+      KIND_LABELS[n.kind][currentLang], // <-- Export Kind
       DISCIPLINE_LABELS[n.group][currentLang],
       cleanForSearch(n.description),
       n.details ? n.details.map(cleanForSearch).join('; ') : ''
@@ -80,7 +80,7 @@ export const UIOverlay: React.FC<Props> = ({
     const nodesCsvContent = [
       nodesHeader.join(','),
       ...nodesRows.map(row => row.map(escapeCsv).join(','))
-    ].join('\n');
+    ].join('\\n');
 
     const linksHeader = ['Source ID', 'Target ID', 'Relation Type'];
     const linksRows = links.map((l: any) => [
@@ -92,14 +92,14 @@ export const UIOverlay: React.FC<Props> = ({
     const linksCsvContent = [
       linksHeader.join(','),
       ...linksRows.map(row => row.map(escapeCsv).join(','))
-    ].join('\n');
+    ].join('\\n');
 
-    downloadFile(nodesCsvContent, `math_nexus_nodes_${currentLang}.csv`);
-    downloadFile(linksCsvContent, `math_nexus_links_${currentLang}.csv`);
+    downloadFile(nodesCsvContent, \`math_nexus_nodes_\${currentLang}.csv\`);
+    downloadFile(linksCsvContent, \`math_nexus_links_\${currentLang}.csv\`);
   };
 
   const downloadFile = (content: string, fileName: string) => {
-    const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = fileName;
@@ -176,7 +176,6 @@ export const UIOverlay: React.FC<Props> = ({
             {showDropdown && filteredNodes.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-y-auto custom-scrollbar">
                 {filteredNodes.map((node) => {
-                  // Умный выбор синонима
                   const displaySynonym = node.synonyms?.find(s => {
                     const isCyrillic = /[а-яА-ЯёЁ]/.test(s);
                     return currentLang === 'ru' ? isCyrillic : !isCyrillic;
@@ -193,9 +192,15 @@ export const UIOverlay: React.FC<Props> = ({
                           className="w-2 h-2 rounded-full flex-shrink-0"
                           style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
                         />
-                        <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
-                          <Latex>{node.label}</Latex>
-                        </span>
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
+                            <Latex>{node.label}</Latex>
+                          </span>
+                          {/* Показываем Kind в поиске мелким шрифтом */}
+                          <span className="text-[10px] text-slate-500 uppercase tracking-wider">
+                            {KIND_LABELS[node.kind][currentLang]}
+                          </span>
+                        </div>
                       </div>
                       {displaySynonym && (
                         <span className="text-xs text-slate-500 ml-2 hidden sm:block truncate max-w-[100px] text-right">
@@ -216,43 +221,44 @@ export const UIOverlay: React.FC<Props> = ({
             <span className="text-lg">💾</span>
           </button>
           <div className="flex space-x-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 backdrop-blur-md">
-            <button onClick={() => onToggleLang('ru')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'ru' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇷🇺</button>
-            <button onClick={() => onToggleLang('en')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'en' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇺🇸</button>
+            <button onClick={() => onToggleLang('ru')} className={\`px-3 py-1.5 rounded-md text-xl transition-all \${currentLang === 'ru' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}\`}>🇷🇺</button>
+            <button onClick={() => onToggleLang('en')} className={\`px-3 py-1.5 rounded-md text-xl transition-all \${currentLang === 'en' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}\`}>🇺🇸</button>
           </div>
         </div>
       </div>
       
-      {/* Legend (Filtered) */}
+      {/* Legend */}
       <div className="pointer-events-auto absolute top-24 right-4 max-h-[70vh] overflow-y-auto custom-scrollbar z-10">
-        <div className={`bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-lg transition-all duration-300 ${isLegendOpen ? 'p-4' : 'p-2'}`}>
+        <div className={\`bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-lg transition-all duration-300 \${isLegendOpen ? 'p-4' : 'p-2'}\`}>
           <div className="flex items-center justify-between cursor-pointer gap-4" onClick={() => setIsLegendOpen(!isLegendOpen)}>
-            <h3 className={`font-semibold text-slate-200 ${!isLegendOpen && 'hidden'}`}>{currentLang === 'en' ? 'Legend' : 'Легенда'}</h3>
+            <h3 className={\`font-semibold text-slate-200 \${!isLegendOpen && 'hidden'}\`}>{currentLang === 'en' ? 'Legend' : 'Легенда'}</h3>
             <span className="text-slate-400 text-sm">{isLegendOpen ? '▼' : '▲'}</span>
           </div>
           
           {isLegendOpen && (
             <div className="mt-3 space-y-4">
+              {/* Disciplines */}
               <div>
                 <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Disciplines' : 'Разделы'}</h4>
                 <div className="space-y-1.5">
                   {(Object.keys(DISCIPLINE_COLORS) as Discipline[])
-                    .filter(disc => activeDisciplines.has(disc)) // <--- СКРЫВАЕМ ПУСТЫЕ КАТЕГОРИИ
+                    .filter(disc => activeDisciplines.has(disc))
                     .map((disc) => {
                       const isHidden = hiddenGroups.has(disc);
                       return (
                         <div 
                           key={disc} 
-                          className={`flex items-center space-x-2 cursor-pointer transition-opacity duration-200 ${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}`}
+                          className={\`flex items-center space-x-2 cursor-pointer transition-opacity duration-200 \${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}\`}
                           onClick={() => onToggleGroup(disc)}
                         >
                           <span 
-                            className={`w-3 h-3 rounded-full flex-shrink-0 ${isHidden ? 'border border-slate-500' : 'shadow-glow'}`} 
+                            className={\`w-3 h-3 rounded-full flex-shrink-0 \${isHidden ? 'border border-slate-500' : 'shadow-glow'}\`} 
                             style={{ 
                               backgroundColor: isHidden ? 'transparent' : DISCIPLINE_COLORS[disc], 
-                              boxShadow: isHidden ? 'none' : `0 0 6px ${DISCIPLINE_COLORS[disc]}` 
+                              boxShadow: isHidden ? 'none' : \`0 0 6px \${DISCIPLINE_COLORS[disc]}\` 
                             }}
                           ></span>
-                          <span className={`text-xs text-slate-300 leading-tight ${isHidden ? 'line-through decoration-slate-500' : ''}`}>
+                          <span className={\`text-xs text-slate-300 leading-tight \${isHidden ? 'line-through decoration-slate-500' : ''}\`}>
                             {DISCIPLINE_LABELS[disc][currentLang]}
                           </span>
                         </div>
@@ -260,6 +266,8 @@ export const UIOverlay: React.FC<Props> = ({
                   })}
                 </div>
               </div>
+              
+              {/* Relations Legend */}
               <div>
                 <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Relations' : 'Связи'}</h4>
                 <div className="space-y-1.5">
@@ -282,20 +290,33 @@ export const UIOverlay: React.FC<Props> = ({
       {selectedNode && (
         <div className="pointer-events-auto absolute right-4 bottom-4 top-1/4 w-96 bg-slate-900/95 backdrop-blur-xl border-l border-t border-slate-700 rounded-tl-xl rounded-bl-xl shadow-2xl transform transition-transform duration-300 overflow-hidden flex flex-col z-20">
           <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
-            <div className="flex justify-between items-start mb-4">
+            
+            {/* Header Tags */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {/* Discipline Badge */}
               <span className="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded text-white shadow-sm" style={{ backgroundColor: DISCIPLINE_COLORS[selectedNode.group] }}>
                 {DISCIPLINE_LABELS[selectedNode.group][currentLang]}
               </span>
-              <button onClick={onCloseSidebar} className="text-slate-400 hover:text-white transition-colors p-1">✕</button>
+              
+              {/* Kind Badge (New) */}
+              <span className="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded border border-slate-600 text-slate-300 bg-slate-800/50">
+                {KIND_LABELS[selectedNode.kind][currentLang]}
+              </span>
+
+              <button onClick={onCloseSidebar} className="text-slate-400 hover:text-white transition-colors p-1 ml-auto">✕</button>
             </div>
             
+            {/* Title */}
             <h2 className="text-2xl font-bold text-white mb-3 leading-tight">
               <Latex>{selectedNode.label}</Latex>
             </h2>
+            
+            {/* Description */}
             <div className="text-slate-300 leading-relaxed mb-6 text-sm">
               <Latex>{selectedNode.description}</Latex>
             </div>
 
+            {/* Details List */}
             {selectedNode.details && selectedNode.details.length > 0 && (
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider border-b border-slate-700 pb-1">
@@ -314,6 +335,7 @@ export const UIOverlay: React.FC<Props> = ({
               </div>
             )}
           </div>
+          
           <div className="p-3 border-t border-slate-800 bg-slate-900/80 text-center text-[10px] text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-300 transition-colors" onClick={onCloseSidebar}>
             {currentLang === 'en' ? 'Close Panel' : 'Закрыть'}
           </div>

@@ -83,27 +83,34 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
     isInited.current = false;
   }, [activeLanguage]);
 
-  // === НАСТРОЙКА ФИЗИКИ (РАСПРЕДЕЛЕНИЕ) ===
+  // === НАСТРОЙКА ФИЗИКИ (БЕЗОПАСНАЯ) ===
   useEffect(() => {
-    const fg = graphRef.current;
-    if (!fg) return;
+    // 1. Критическая проверка: если данных нет, не трогаем физику!
+    if (!data || data.nodes.length === 0) return;
 
-    // Усиливаем отталкивание, чтобы граф был "шире"
-    fg.d3Force('charge')?.strength(-200);
+    // 2. Используем setTimeout, чтобы React успел привязать ref
+    const timer = setTimeout(() => {
+      const fg = graphRef.current;
+      if (!fg) return;
 
-    // Увеличиваем длину связей
-    fg.d3Force('link')?.distance((link: any) => {
-      if (link.type === 'RELATED') return 100; // Слабые связи длиннее
-      return 70; // Основные связи
-    });
-    
-    // Перезапуск симуляции с новыми параметрами
-    fg.d3ReheatSimulation();
-  }, [data]);
+      // Настройка сил (делаем граф "шире")
+      fg.d3Force('charge')?.strength(-150); // Отталкивание
+
+      fg.d3Force('link')?.distance((link: any) => {
+        if (link.type === 'RELATED') return 90; 
+        return 60; 
+      });
+      
+      // Перезапуск только если данные уже есть
+      fg.d3ReheatSimulation();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [data]); // Зависимость от data гарантирует перезапуск при загрузке
 
   // === ПОИСК И ФОКУСИРОВКА ===
   useEffect(() => {
-    if (searchQuery && graphRef.current) {
+    if (searchQuery && graphRef.current && data.nodes.length > 0) {
       const normalizeForSearch = (str: string) => {
         if (!str) return '';
         return str
@@ -132,14 +139,13 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         const distance = nodeSize > 20 ? 60 : 40; 
         const distRatio = 1 + distance/Math.hypot(foundNode.x || 1, foundNode.y || 1, foundNode.z || 1);
         
-        // Если координаты 0,0,0 (баг инициализации), ставим дефолт
         const targetPos = (foundNode.x || foundNode.y || foundNode.z) 
           ? { x: foundNode.x * distRatio, y: foundNode.y * distRatio, z: foundNode.z * distRatio }
           : { x: 0, y: 0, z: distance };
 
         graphRef.current.cameraPosition(
           targetPos,
-          { x: foundNode.x, y: foundNode.y, z: foundNode.z }, // LookAt: фиксированные координаты для плавности
+          { x: foundNode.x, y: foundNode.y, z: foundNode.z },
           2000
         );
       }
@@ -187,7 +193,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         ref={graphRef}
         graphData={data}
         
-        // Взаимодействие (Клик с плавным подлетом)
+        // Взаимодействие
         onNodeClick={(node: any) => {
           const distance = 40;
           const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
@@ -198,20 +204,19 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
 
           graphRef.current.cameraPosition(
             newPos,
-            { x: node.x, y: node.y, z: node.z }, // LookAt координаты (не объект node!)
+            { x: node.x, y: node.y, z: node.z },
             3000 
           );
-          
           onNodeClick(node);
         }}
 
-        // Оптимизация физики (Быстрый старт и остановка)
+        // Оптимизация физики
         warmupTicks={50}
         cooldownTicks={50}
-        d3VelocityDecay={0.2} // Чуть больше вязкости для стабильности (0.2)
+        d3VelocityDecay={0.2}
         d3AlphaDecay={0.05}
         
-        // Всплывашка (Чистая, только название)
+        // Всплывашка
         nodeLabel={(node: any) => {
           const labelText = cleanLabel(node.label);
           return `
@@ -223,7 +228,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
           `;
         }}
 
-        // Отрисовка узлов (Оптимизированная геометрия 16x16)
+        // Отрисовка узлов
         nodeThreeObject={(node: any) => {
           const color = DISCIPLINE_COLORS[node.group as any] || '#cccccc';
           const size = (node.val || 1);
@@ -266,11 +271,11 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
           return group;
         }}
 
-        // Настройки связей (Статичные)
+        // Настройки связей
         linkColor={(link: any) => LINK_COLORS[link.type as LinkType] || '#ffffff'}
         linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
         
-        // Частицы (бегут всегда, но немного)
+        // Частицы
         linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
         linkDirectionalParticleSpeed={0.005}
         linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { GraphNode, GraphLink, Discipline, LinkType, Language, NodeKind } from '../types';
+import { GraphNode, GraphLink, Discipline, LinkType, Language } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS, KIND_LABELS } from '../constants';
 import Latex from 'react-latex-next';
 
@@ -7,12 +7,12 @@ import Latex from 'react-latex-next';
 const cleanForSearch = (str: string) => {
   if (!str) return '';
   return str
-    .replace(/\$/g, '')
-    .replace(/\\mathbb{([a-z])}/gi, '$1')
-    .replace(/\\mathsf{([a-z0-9]+)}/gi, '$1')
-    .replace(/\\mathbf{([a-z0-9]+)}/gi, '$1')
-    .replace(/\\mathrm{([a-z0-9]+)}/gi, '$1')
-    .replace(/\\/g, '')
+    .replace(/\\$/g, '')
+    .replace(/\\\\mathbb{([a-z])}/gi, '$1')
+    .replace(/\\\\mathsf{([a-z0-9]+)}/gi, '$1')
+    .replace(/\\\\mathbf{([a-z0-9]+)}/gi, '$1')
+    .replace(/\\\\mathrm{([a-z0-9]+)}/gi, '$1')
+    .replace(/\\\\/g, '')
     .trim();
 };
 
@@ -20,7 +20,7 @@ const cleanForSearch = (str: string) => {
 const escapeCsv = (str: string) => {
   if (!str) return '';
   const result = str.replace(/"/g, '""');
-  if (result.search(/("|,|\n)/g) >= 0) {
+  if (result.search(/("|,|\\n)/g) >= 0) {
     return \`"\${result}"\`;
   }
   return result;
@@ -66,12 +66,11 @@ export const UIOverlay: React.FC<Props> = ({
 
   // --- ЛОГИКА ЭКСПОРТА ---
   const handleExport = () => {
-    // Добавлена колонка Kind
     const nodesHeader = ['ID', 'Label', 'Kind', 'Group', 'Description', 'Details'];
     const nodesRows = nodes.map(n => [
       n.id,
       cleanForSearch(n.label),
-      KIND_LABELS[n.kind][currentLang], // <-- Export Kind
+      KIND_LABELS[n.kind][currentLang],
       DISCIPLINE_LABELS[n.group][currentLang],
       cleanForSearch(n.description),
       n.details ? n.details.map(cleanForSearch).join('; ') : ''
@@ -196,7 +195,6 @@ export const UIOverlay: React.FC<Props> = ({
                           <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
                             <Latex>{node.label}</Latex>
                           </span>
-                          {/* Показываем Kind в поиске мелким шрифтом */}
                           <span className="text-[10px] text-slate-500 uppercase tracking-wider">
                             {KIND_LABELS[node.kind][currentLang]}
                           </span>
@@ -291,14 +289,10 @@ export const UIOverlay: React.FC<Props> = ({
         <div className="pointer-events-auto absolute right-4 bottom-4 top-1/4 w-96 bg-slate-900/95 backdrop-blur-xl border-l border-t border-slate-700 rounded-tl-xl rounded-bl-xl shadow-2xl transform transition-transform duration-300 overflow-hidden flex flex-col z-20">
           <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
             
-            {/* Header Tags */}
             <div className="flex flex-wrap gap-2 mb-4">
-              {/* Discipline Badge */}
               <span className="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded text-white shadow-sm" style={{ backgroundColor: DISCIPLINE_COLORS[selectedNode.group] }}>
                 {DISCIPLINE_LABELS[selectedNode.group][currentLang]}
               </span>
-              
-              {/* Kind Badge (New) */}
               <span className="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded border border-slate-600 text-slate-300 bg-slate-800/50">
                 {KIND_LABELS[selectedNode.kind][currentLang]}
               </span>
@@ -306,17 +300,14 @@ export const UIOverlay: React.FC<Props> = ({
               <button onClick={onCloseSidebar} className="text-slate-400 hover:text-white transition-colors p-1 ml-auto">✕</button>
             </div>
             
-            {/* Title */}
             <h2 className="text-2xl font-bold text-white mb-3 leading-tight">
               <Latex>{selectedNode.label}</Latex>
             </h2>
             
-            {/* Description */}
             <div className="text-slate-300 leading-relaxed mb-6 text-sm">
               <Latex>{selectedNode.description}</Latex>
             </div>
 
-            {/* Details List */}
             {selectedNode.details && selectedNode.details.length > 0 && (
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider border-b border-slate-700 pb-1">

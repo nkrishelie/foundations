@@ -236,7 +236,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     }
   },
   'math_lang': {
-    group: Discipline.FOUNDATIONS,
+    group: Discipline.LOGIC,
     val: 15,
     synonyms: ['Язык математики', 'Маглиш', 'Синтаксис'],
     content: {
@@ -553,7 +553,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     }
   },
   'reverse_math': {
-    group: Discipline.FOUNDATIONS,
+    group: Discipline.LOGIC,
     val: 22,
     synonyms: ['Обратная математика', 'Reverse Math'],
     content: {
@@ -1391,7 +1391,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     }
   },
   'theory_tf_groups': {
-    group: Discipline.MODEL_THEORY,
+    group: Discipline.ALGEBRA,
     val: 10,
     content: {
       en: { label: 'Torsion-Free Groups', description: 'Abelian groups with no elements of finite order.', details: ['Uncountably categorical', 'Vector spaces over $\\mathbb{Q}$'] },
@@ -1858,7 +1858,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     }
   },
   'jsson_tarski_alg': {
-    group: Discipline.ORDER_THEORY,
+    group: Discipline.ALGEBRA,
     val: 12,
     synonyms: ['Алгебры Йонссона-Тарского', 'Модальные алгебры', 'MA'],
     content: {
@@ -2093,7 +2093,6 @@ const RAW_LINKS = [
     { source: 'comp_theory', target: 'lambda_calc', type: LinkType.CONTAINS },
     { source: 'lambda_calc', target: 'lambda_reductions', type: LinkType.CONTAINS },
     { source: 'lambda_calc', target: 'combinators', type: LinkType.EQUIVALENT },
-    { source: 'lambda_calc', target: 'typed_lambda', type: LinkType.RELATED },
     { source: 'typed_lambda', target: 'system_f', type: LinkType.EXTENDS },
     { source: 'comp_theory', target: 'pred_logic', type: LinkType.RELATED },
     { source: 'comp_theory', target: 'incompleteness', type: LinkType.PROVES },
@@ -2361,6 +2360,39 @@ const RAW_LINKS = [
     { source: 'skolem_paradox', target: 'thm_los_vaught', type: LinkType.RELATED }, // Связан с теоремами Лёвенгейма-Сколема
     { source: 'skolem_paradox', target: 'model_N', type: LinkType.RELATED }, // Оперирует понятием счетности (как N)
     { source: 'skolem_paradox', target: 'zfc', type: LinkType.RELATED },
+  // --- FIXES & CONNECTIONS (User Request) ---
+    // 1. Torsion-Free Groups (связь с моделями)
+    { source: 'theory_tf_groups', target: 'thm_morley', type: LinkType.RELATED }, // Классический пример категоричности в несчетных мощностях
+    { source: 'theory_tf_groups', target: 'model_Q', type: LinkType.RELATED }, // Q - пример такой группы
+
+    // 2. Typed Lambda (расширение)
+    // (Если есть старая связь lambda_calc -> typed_lambda типа RELATED, лучше её удалить вручную, но эта добавит EXTENDS)
+    { source: 'typed_lambda', target: 'lambda_calc', type: LinkType.EXTENDS },
+
+    // 3. Algebra Orphans (связываем с контекстом)
+    { source: 'thm_chevalley', target: 'theory_ACF', type: LinkType.RELATED }, // Уже была, но добавим контекст
+    { source: 'thm_chevalley', target: 'model_C', type: LinkType.RELATED }, // Применяется к C
+    
+    { source: 'diophantine_set', target: 'model_Z', type: LinkType.RELATED }, // Живут в целых числах
+    { source: 'diophantine_set', target: 'theory_rings', type: LinkType.RELATED }, // Полиномы над кольцами
+    
+    { source: 'crt', target: 'model_Z', type: LinkType.RELATED }, // Работает в Z
+    { source: 'crt', target: 'theory_rings', type: LinkType.RELATED }, // Обобщается на кольца
+    
+    // 4. Proof Theory Clusters (соединяем острова)
+    { source: 'curry_howard', target: 'intuitionistic_logic', type: LinkType.RELATED }, // Прямая связь
+    { source: 'curry_howard', target: 'sequent_calculus', type: LinkType.RELATED }, // Доказательства как программы
+    
+    // Связываем "созвездие неполноты" с "большой пятеркой" через PA и ординалы
+    { source: 'gamma_0', target: 'epsilon_0', type: LinkType.EXTENDS }, // Иерархия ординалов: Gamma_0 > Epsilon_0
+    { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT }, // ACA0 консервативна над PA (мост между островами)
+    { source: 'goodstein_theorem', target: 'pi11_ca0', type: LinkType.RELATED }, // Сильные теоремы требуют сильных аксиом
+
+    // 5. Topology
+    { source: 'topology', target: 'open_set_topology', type: LinkType.CONTAINS },
+
+    // 6. Modal Algebra
+    { source: 'jsson_tarski_alg', target: 'bool_alg', type: LinkType.EXTENDS }, // MA = BA + оператор
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

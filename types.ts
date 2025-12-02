@@ -1,4 +1,3 @@
-
 export enum Discipline {
   LOGIC = 'Mathematical Logic',
   SET_THEORY = 'Set Theory',
@@ -8,7 +7,16 @@ export enum Discipline {
   PROOF_THEORY = 'Proof Theory',
   TOPOLOGY = 'Topology',
   ORDER_THEORY = 'Order Theory & Lattices',
-  FOUNDATIONS = 'Foundations & Maglish'
+  //FOUNDATIONS = 'Foundations & Maglish'
+}
+
+// НОВОЕ: Род узла для строгой онтологии
+export enum NodeKind {
+  DISCIPLINE = 'Discipline', // Корневые разделы
+  THEORY = 'Theory',         // Формальные теории (ZFC, PA)
+  STRUCTURE = 'Structure',   // Модели, кольца, поля (N, R, Stone Space)
+  CONCEPT = 'Concept',       // Определения, методы (Идеал, Ранг, Тип)
+  THEOREM = 'Theorem'        // Утверждения, леммы, аксиомы (Цермело, Гёдель)
 }
 
 export enum LinkType {

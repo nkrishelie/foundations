@@ -1,48 +1,56 @@
+import { Discipline, LinkType, Language, NodeKind } from './types';
 
-import { Discipline, LinkType, Language } from './types';
-
+// Цвета для дисциплин (групп)
 export const DISCIPLINE_COLORS: Record<Discipline, string> = {
-  [Discipline.LOGIC]: '#3b82f6',       // Blue
-  [Discipline.SET_THEORY]: '#ef4444',  // Red
-  [Discipline.MODEL_THEORY]: '#10b981',// Emerald
-  [Discipline.COMPUTABILITY]: '#f59e0b',// Amber
-  [Discipline.ALGEBRA]: '#8b5cf6',     // Violet
-  [Discipline.PROOF_THEORY]: '#ec4899', // Pink
-  [Discipline.TOPOLOGY]: '#06b6d4',     // Cyan
-  [Discipline.ORDER_THEORY]: '#ea580c', // Orange
-  [Discipline.FOUNDATIONS]: '#64748b'   // Slate
+  [Discipline.LOGIC]: '#ef4444',        // Red-500
+  [Discipline.SET_THEORY]: '#f97316',   // Orange-500
+  [Discipline.ALGEBRA]: '#eab308',      // Yellow-500
+  [Discipline.MODEL_THEORY]: '#84cc16', // Lime-500
+  [Discipline.TOPOLOGY]: '#06b6d4',     // Cyan-500
+  [Discipline.ORDER_THEORY]: '#3b82f6', // Blue-500
+  [Discipline.PROOF_THEORY]: '#8b5cf6', // Violet-500
+  [Discipline.COMPUTABILITY]: '#d946ef',// Fuchsia-500
+  [Discipline.FOUNDATIONS]: '#64748b',  // Slate-500
 };
 
+// Цвета для связей
 export const LINK_COLORS: Record<LinkType, string> = {
-  [LinkType.EXTENDS]: '#f59e0b',   // Amber (Янтарный) — для иерархии "наследует/расширяет"
-  [LinkType.PROVES]: '#22d3ee',    // Cyan (Голубой) — для логического вывода
-  [LinkType.MODELS]: '#4ade80',    // Green (Зеленый) — для семантики/моделей
-  [LinkType.EQUIVALENT]: '#f472b6',// Pink (Розовый) — для тождеств
-  [LinkType.CONTAINS]: '#a78bfa',  // Purple (Фиолетовый) — для "включает в себя"
-  [LinkType.RELATED]: '#475569'    // Slate-600 (Темно-серый) — чтобы не отвлекало внимание
+  [LinkType.EXTENDS]: '#3b82f6',    // Blue (Иерархия)
+  [LinkType.PROVES]: '#22c55e',     // Green (Доказательство)
+  [LinkType.MODELS]: '#eab308',     // Yellow (Моделирование)
+  [LinkType.CONTAINS]: '#64748b',   // Slate (Состав)
+  [LinkType.EQUIVALENT]: '#d946ef', // Fuchsia (Изоморфизм)
+  [LinkType.RELATED]: '#94a3b8',    // Lighter Slate (Контекст)
 };
 
-export const INITIAL_CAMERA_POSITION = { x: 0, y: 0, z: 400 };
-
-// Translations for Disciplines (Legend)
+// Локализация дисциплин
 export const DISCIPLINE_LABELS: Record<Discipline, Record<Language, string>> = {
-  [Discipline.LOGIC]: { en: 'Mathematical Logic', ru: 'Мат. Логика' },
+  [Discipline.LOGIC]: { en: 'Logic', ru: 'Логика' },
   [Discipline.SET_THEORY]: { en: 'Set Theory', ru: 'Теория Множеств' },
   [Discipline.MODEL_THEORY]: { en: 'Model Theory', ru: 'Теория Моделей' },
-  [Discipline.COMPUTABILITY]: { en: 'Computability Theory', ru: 'Теория Вычислимости' },
-  [Discipline.ALGEBRA]: { en: 'General Algebra', ru: 'Общая Алгебра' },
+  [Discipline.COMPUTABILITY]: { en: 'Computability', ru: 'Вычислимость' },
+  [Discipline.ALGEBRA]: { en: 'Algebra', ru: 'Алгебра' },
   [Discipline.PROOF_THEORY]: { en: 'Proof Theory', ru: 'Теория Доказательств' },
   [Discipline.TOPOLOGY]: { en: 'Topology', ru: 'Топология' },
   [Discipline.ORDER_THEORY]: { en: 'Order Theory', ru: 'Теория Порядков' },
   [Discipline.FOUNDATIONS]: { en: 'Foundations', ru: 'Основания' },
 };
 
-// Translations for Link Types (Legend)
+// НОВОЕ: Локализация типов узлов (Род)
+export const KIND_LABELS: Record<NodeKind, Record<Language, string>> = {
+  [NodeKind.DISCIPLINE]: { en: 'Discipline', ru: 'Раздел' },
+  [NodeKind.THEORY]: { en: 'Theory', ru: 'Теория' },
+  [NodeKind.STRUCTURE]: { en: 'Structure', ru: 'Структура' },
+  [NodeKind.CONCEPT]: { en: 'Concept', ru: 'Понятие' },
+  [NodeKind.THEOREM]: { en: 'Theorem', ru: 'Теорема' },
+};
+
+// Локализация типов связей (Уточненная онтология)
 export const LINK_LABELS: Record<LinkType, Record<Language, string>> = {
-  [LinkType.EXTENDS]: { en: 'Extends', ru: 'Расширяет' },
-  [LinkType.PROVES]: { en: 'Proves', ru: 'Доказывает' },
-  [LinkType.MODELS]: { en: 'Models', ru: 'Моделирует' },
-  [LinkType.EQUIVALENT]: { en: 'Equivalent', ru: 'Эквивалентно' },
-  [LinkType.CONTAINS]: { en: 'Contains', ru: 'Содержит' },
-  [LinkType.RELATED]: { en: 'Related', ru: 'Связано' },
+  [LinkType.EXTENDS]: { en: 'Extends / Generalizes', ru: 'Расширяет / Обобщает' },
+  [LinkType.PROVES]: { en: 'Proves / Implies', ru: 'Доказывает / Влечет' },
+  [LinkType.MODELS]: { en: 'Models / Interprets', ru: 'Моделирует / Реализует' },
+  [LinkType.EQUIVALENT]: { en: 'Equivalent / Isomorphic', ru: 'Эквивалентно / Изоморфно' },
+  [LinkType.CONTAINS]: { en: 'Contains / Includes', ru: 'Содержит / Включает' },
+  [LinkType.RELATED]: { en: 'Related to', ru: 'Связано с' },
 };

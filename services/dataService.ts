@@ -2011,6 +2011,24 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       }
     }
   },
+  // --- SURREAL NUMBERS (User Request) ---
+  'surreal_numbers': {
+    group: Discipline.SET_THEORY, // Или ALGEBRA, но это Собственный Класс
+    val: 18,
+    synonyms: ['Сюрреальные числа', 'Surreal Numbers', 'No'],
+    content: {
+      en: {
+        label: 'Surreal Numbers ($\\mathbf{No}$)',
+        description: 'A proper class containing all real numbers and all ordinals. Constructed via a generalization of Dedekind cuts (Conway\'s cuts).',
+        details: ['Conway Construction', 'Largest Ordered Field', 'Includes Infinitesimals']
+      },
+      ru: {
+        label: 'Сюрреальные числа ($\\mathbf{No}$)',
+        description: 'Собственный класс, содержащий все вещественные числа и все ординалы. Строится обобщением дедекиндовых сечений (сечения Конвея).',
+        details: ['Конструкция Конвея', 'Крупнейшее упорядоченное поле', 'Содержит бесконечно малые']
+      }
+    }
+  },
 };
 
 const RAW_LINKS = [
@@ -2437,6 +2455,27 @@ const RAW_LINKS = [
     { source: 'reverse_math', target: 'theory_PA', type: LinkType.RELATED }, // Базируется на подсистемах PA
     { source: 'reverse_math', target: 'pred_logic', type: LinkType.RELATED },
     { source: 'math_lang', target: 'zfc', type: LinkType.RELATED }, // ZFC как де-факто стандарт языка
+  // --- FIXES ROUND 3 (Number Systems & Surreals) ---
+    // 1. Unify Number Systems -> ZFC connection
+    // Привязываем R и C напрямую к ZFC, как N, Z, Q
+    { source: 'zfc', target: 'model_R', type: LinkType.CONTAINS },
+    { source: 'zfc', target: 'model_C', type: LinkType.CONTAINS },
+    
+    // 2. Surreal Numbers
+    // (Собственный класс, определимый в ZFC)
+    { source: 'zfc', target: 'surreal_numbers', type: LinkType.CONTAINS }, 
+    
+    // (Содержат все числа)
+    { source: 'surreal_numbers', target: 'model_R', type: LinkType.EXTENDS }, // Reals are a subfield
+    { source: 'surreal_numbers', target: 'ordinal_arithmetic', type: LinkType.EXTENDS }, // Ordinals are a subclass
+    
+    // (Алгебраические свойства)
+    { source: 'surreal_numbers', target: 'theory_RCF', type: LinkType.MODELS }, // No is a Real Closed Field
+    { source: 'surreal_numbers', target: 'theory_DLO', type: LinkType.MODELS }, // Dense Linear Order
+    
+    // (Конструкция через сечения)
+    // Поскольку отдельного узла Dedekind Cuts нет, связываем с R, где этот метод классический
+    { source: 'surreal_numbers', target: 'model_R', type: LinkType.RELATED },
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

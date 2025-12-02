@@ -83,6 +83,24 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
     isInited.current = false;
   }, [activeLanguage]);
 
+  // === НАСТРОЙКА ФИЗИКИ (РАСПРЕДЕЛЕНИЕ) ===
+  useEffect(() => {
+    const fg = graphRef.current;
+    if (!fg) return;
+
+    // Усиливаем отталкивание, чтобы граф был "шире"
+    fg.d3Force('charge')?.strength(-200);
+
+    // Увеличиваем длину связей
+    fg.d3Force('link')?.distance((link: any) => {
+      if (link.type === 'RELATED') return 100; // Слабые связи длиннее
+      return 70; // Основные связи
+    });
+    
+    // Перезапуск симуляции с новыми параметрами
+    fg.d3ReheatSimulation();
+  }, [data]);
+
   // === ПОИСК И ФОКУСИРОВКА ===
   useEffect(() => {
     if (searchQuery && graphRef.current) {
@@ -114,13 +132,14 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         const distance = nodeSize > 20 ? 60 : 40; 
         const distRatio = 1 + distance/Math.hypot(foundNode.x || 1, foundNode.y || 1, foundNode.z || 1);
         
+        // Если координаты 0,0,0 (баг инициализации), ставим дефолт
+        const targetPos = (foundNode.x || foundNode.y || foundNode.z) 
+          ? { x: foundNode.x * distRatio, y: foundNode.y * distRatio, z: foundNode.z * distRatio }
+          : { x: 0, y: 0, z: distance };
+
         graphRef.current.cameraPosition(
-          { 
-            x: (foundNode.x || 0) * distRatio, 
-            y: (foundNode.y || 0) * distRatio, 
-            z: (foundNode.z || 0) * distRatio 
-          },
-          foundNode,
+          targetPos,
+          { x: foundNode.x, y: foundNode.y, z: foundNode.z }, // LookAt: фиксированные координаты для плавности
           2000
         );
       }
@@ -168,35 +187,31 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         ref={graphRef}
         graphData={data}
         
-        // Взаимодействие
+        // Взаимодействие (Клик с плавным подлетом)
         onNodeClick={(node: any) => {
-          // Рассчитываем дистанцию камеры (отдаление от центра через узел)
           const distance = 40;
           const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
 
-          // Если координаты 0,0,0 (редкий баг), ставим дефолт
-          const newPos = node.x || node.y || node.z
+          const newPos = (node.x || node.y || node.z)
             ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
-            : { x: 0, y: 0, z: distance }; 
+            : { x: 0, y: 0, z: distance };
 
           graphRef.current.cameraPosition(
-            newPos, // Куда летит камера
-            // ВАЖНО: Передаем копию координат, а не сам объект node!
-            // Это отключает "дёрганое" слежение за физикой
-            { x: node.x, y: node.y, z: node.z }, 
-            3000 // Время полета (мс) - 3 секунды для плавности
+            newPos,
+            { x: node.x, y: node.y, z: node.z }, // LookAt координаты (не объект node!)
+            3000 
           );
           
           onNodeClick(node);
         }}
 
-        // Оптимизация физики
+        // Оптимизация физики (Быстрый старт и остановка)
         warmupTicks={50}
         cooldownTicks={50}
-        d3VelocityDecay={0.1}
+        d3VelocityDecay={0.2} // Чуть больше вязкости для стабильности (0.2)
         d3AlphaDecay={0.05}
         
-        // Всплывашка (только название)
+        // Всплывашка (Чистая, только название)
         nodeLabel={(node: any) => {
           const labelText = cleanLabel(node.label);
           return `
@@ -208,7 +223,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
           `;
         }}
 
-        // Отрисовка узлов
+        // Отрисовка узлов (Оптимизированная геометрия 16x16)
         nodeThreeObject={(node: any) => {
           const color = DISCIPLINE_COLORS[node.group as any] || '#cccccc';
           const size = (node.val || 1);
@@ -216,7 +231,6 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
           
           const group = new THREE.Group();
           
-          // Сфера (оптимизация: меньше полигонов - 16)
           const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
           const geometry = new THREE.SphereGeometry(radius, 16, 16); 
           
@@ -240,7 +254,6 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
             sprite.color = color;
             sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
             sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
-            
             sprite.backgroundColor = '#00000080';
             sprite.padding = 1;
             sprite.borderRadius = 3;
@@ -253,11 +266,11 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
           return group;
         }}
 
-        // Настройки связей
+        // Настройки связей (Статичные)
         linkColor={(link: any) => LINK_COLORS[link.type as LinkType] || '#ffffff'}
         linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
         
-        // Частицы
+        // Частицы (бегут всегда, но немного)
         linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
         linkDirectionalParticleSpeed={0.005}
         linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}

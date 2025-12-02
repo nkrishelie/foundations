@@ -2069,8 +2069,6 @@ const RAW_LINKS = [
 
     { source: 'cumulative_hierarchy', target: 'model_R', type: LinkType.CONTAINS }, 
     { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS },
-    { source: 'model_Z', target: 'model_Q', type: LinkType.EXTENDS },
-    { source: 'model_N', target: 'model_Z', type: LinkType.EXTENDS },
 
     { source: 'intuitionistic_logic', target: 'bhk_interpretation', type: LinkType.RELATED },
     { source: 'bhk_interpretation', target: 'math_lang', type: LinkType.RELATED }, 
@@ -2165,14 +2163,11 @@ const RAW_LINKS = [
     { source: 'theory_RCF', target: 'model_R', type: LinkType.MODELS },
     { source: 'theory_RCF', target: 'thm_tarski_seidenberg', type: LinkType.PROVES },
     { source: 'theory_RCF', target: 'model_A', type: LinkType.RELATED },
-    { source: 'model_C', target: 'model_A', type: LinkType.CONTAINS },
-    { source: 'model_R', target: 'model_Q', type: LinkType.CONTAINS },
     { source: 'theory_groups', target: 'auto_group', type: LinkType.RELATED },
     { source: 'model_Z', target: 'theory_groups', type: LinkType.MODELS },
     { source: 'model_Q', target: 'theory_tf_groups', type: LinkType.MODELS },
     { source: 'theory_tf_groups', target: 'theory_groups', type: LinkType.EXTENDS },
     { source: 'theory_tf_groups', target: 'model_Q', type: LinkType.RELATED },
-    { source: 'model_C', target: 'model_R', type: LinkType.EXTENDS },
 
     { source: 'topology', target: 'stone_space', type: LinkType.CONTAINS },
     { source: 'stone_space', target: 'bool_alg', type: LinkType.EQUIVALENT },
@@ -2311,6 +2306,7 @@ const RAW_LINKS = [
     { source: 'model_R', target: 'model_Q', type: LinkType.EXTENDS },
     { source: 'model_C', target: 'model_R', type: LinkType.EXTENDS },
     { source: 'model_A', target: 'model_Q', type: LinkType.EXTENDS }, 
+    { source: 'model_C', target: 'model_A', type: LinkType.CONTAINS },
 
     { source: 'thm_tarski_truth', target: 'theory_PA', type: LinkType.RELATED },
     { source: 'thm_zorn', target: 'model_R', type: LinkType.RELATED }, 
@@ -2324,7 +2320,6 @@ const RAW_LINKS = [
     
     { source: 'theory_groups', target: 'homomorphism_thms', type: LinkType.RELATED },
     { source: 'theory_rings', target: 'homomorphism_thms', type: LinkType.RELATED },
-    { source: 'model_Z', target: 'model_Q', type: LinkType.RELATED }, 
 
     { source: 'bool_alg', target: 'stone_space', type: LinkType.EQUIVALENT }, 
     { source: 'dist_lattice', target: 'priestley_space', type: LinkType.EQUIVALENT }, 

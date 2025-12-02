@@ -78,14 +78,44 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   const graphRef = useRef<any>(null);
   const isInited = useRef(false);
 
-  // Сброс инициализации при смене языка
+// === НАСТРОЙКА ФИЗИКИ И КАМЕРЫ ===
   useEffect(() => {
-    isInited.current = false;
-  }, [activeLanguage]);
+    // Если данных нет, ничего не делаем
+    if (!data || data.nodes.length === 0) return;
 
+    const fg = graphRef.current;
+    if (!fg) return;
+
+    // Мы применяем настройки ТОЛЬКО если это "свежий" граф (первая загрузка или смена языка).
+    // Если isInited.current === true, значит это просто фильтрация, 
+    // и мы не должны сбрасывать камеру или перезапускать физику.
+    if (!isInited.current) {
+      const timer = setTimeout(() => {
+        // 1. Настройка сил (чтобы граф был широким)
+        fg.d3Force('charge')?.strength(-150);
+        fg.d3Force('link')?.distance((link: any) => {
+          if (link.type === 'RELATED') return 90; 
+          return 60; 
+        });
+
+        // 2. Ставим камеру далеко, чтобы избежать "взрыва" на весь экран
+        fg.cameraPosition({ x: 0, y: 0, z: 1600 }); 
+        
+        // 3. Запускаем симуляцию
+        fg.d3ReheatSimulation();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+    
+    // При фильтрации (else) ничего делать не нужно —
+    // библиотека сама плавно скроет/покажет узлы.
+
+  }, [data, activeLanguage]); // Добавили activeLanguage для надежности
+  
   // === ПОИСК И ФОКУСИРОВКА ===
   useEffect(() => {
-    if (searchQuery && graphRef.current) {
+    if (searchQuery && graphRef.current && data.nodes.length > 0) {
       const normalizeForSearch = (str: string) => {
         if (!str) return '';
         return str
@@ -114,13 +144,13 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         const distance = nodeSize > 20 ? 60 : 40; 
         const distRatio = 1 + distance/Math.hypot(foundNode.x || 1, foundNode.y || 1, foundNode.z || 1);
         
+        const targetPos = (foundNode.x || foundNode.y || foundNode.z) 
+          ? { x: foundNode.x * distRatio, y: foundNode.y * distRatio, z: foundNode.z * distRatio }
+          : { x: 0, y: 0, z: distance };
+
         graphRef.current.cameraPosition(
-          { 
-            x: (foundNode.x || 0) * distRatio, 
-            y: (foundNode.y || 0) * distRatio, 
-            z: (foundNode.z || 0) * distRatio 
-          },
-          foundNode,
+          targetPos,
+          { x: foundNode.x, y: foundNode.y, z: foundNode.z },
           2000
         );
       }
@@ -154,7 +184,8 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   };
 
   const handleReset = () => {
-    graphRef.current?.zoomToFit(1000);
+    // Возврат в исходную далекую позицию
+    graphRef.current?.cameraPosition({ x: 0, y: 0, z: 1600 }, { x: 0, y: 0, z: 0 }, 1000);
   };
   
   if (!data || !data.nodes || data.nodes.length === 0) {
@@ -164,39 +195,39 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   return (
     <div className="relative w-full h-full">
       <ForceGraph3D
-        key={activeLanguage}
+        // key={activeLanguage} <--- УБРАЛИ ЭТОТ КЛЮЧ!
         ref={graphRef}
         graphData={data}
         
         // Взаимодействие
         onNodeClick={(node: any) => {
-          // Рассчитываем дистанцию камеры (отдаление от центра через узел)
           const distance = 40;
           const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
 
-          // Если координаты 0,0,0 (редкий баг), ставим дефолт
-          const newPos = node.x || node.y || node.z
+          const newPos = (node.x || node.y || node.z)
             ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
-            : { x: 0, y: 0, z: distance }; 
+            : { x: 0, y: 0, z: distance };
 
           graphRef.current.cameraPosition(
-            newPos, // Куда летит камера
-            // ВАЖНО: Передаем копию координат, а не сам объект node!
-            // Это отключает "дёрганое" слежение за физикой
-            { x: node.x, y: node.y, z: node.z }, 
-            3000 // Время полета (мс) - 3 секунды для плавности
+            newPos,
+            { x: node.x, y: node.y, z: node.z },
+            3000 
           );
-          
           onNodeClick(node);
         }}
 
         // Оптимизация физики
         warmupTicks={50}
         cooldownTicks={50}
-        d3VelocityDecay={0.1}
+        d3VelocityDecay={0.2}
         d3AlphaDecay={0.05}
         
-        // Всплывашка (только название)
+        // Колбек остановки: только для первой загрузки
+        onEngineStop={() => {
+            isInited.current = true;
+        }}
+
+        // Всплывашка
         nodeLabel={(node: any) => {
           const labelText = cleanLabel(node.label);
           return `
@@ -216,7 +247,6 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
           
           const group = new THREE.Group();
           
-          // Сфера (оптимизация: меньше полигонов - 16)
           const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
           const geometry = new THREE.SphereGeometry(radius, 16, 16); 
           
@@ -273,13 +303,6 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         showNavInfo={false}
         controlType="trackball"
         enableNodeDrag={true}
-        
-        onEngineStop={() => {
-          if (!isInited.current && graphRef.current) {
-            graphRef.current.zoomToFit(400);
-            isInited.current = true;
-          }
-        }}
       />
       
       <NavigationControls 

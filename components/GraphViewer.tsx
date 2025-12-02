@@ -78,39 +78,33 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   const graphRef = useRef<any>(null);
   const isInited = useRef(false);
 
-  // Сброс инициализации при смене языка
-  useEffect(() => {
-    isInited.current = false;
-  }, [activeLanguage]);
-
   // === НАСТРОЙКА ФИЗИКИ И КАМЕРЫ ===
   useEffect(() => {
     if (!data || data.nodes.length === 0) return;
 
-    const timer = setTimeout(() => {
-      const fg = graphRef.current;
-      if (!fg) return;
+    const fg = graphRef.current;
+    if (!fg) return;
 
-      // 1. Настройка сил (делаем граф широким)
-      fg.d3Force('charge')?.strength(-150);
-      fg.d3Force('link')?.distance((link: any) => {
-        if (link.type === 'RELATED') return 90; 
-        return 60; 
-      });
+    // Применяем настройки сил
+    fg.d3Force('charge')?.strength(-150);
+    fg.d3Force('link')?.distance((link: any) => {
+      if (link.type === 'RELATED') return 90; 
+      return 60; 
+    });
 
-      // 2. ИСПРАВЛЕНИЕ "ПРЫЖКА":
-      // Если это инициализация (первая загрузка или смена языка),
-      // СРАЗУ ставим камеру далеко. Граф будет расти ВНУТРИ экрана.
-      if (!isInited.current) {
-        // z: 1600 гарантирует, что даже большой граф поместится
-        fg.cameraPosition({ x: 0, y: 0, z: 1600 }); 
-      }
+    // Инициализация камеры (только 1 раз при старте приложения)
+    if (!isInited.current) {
+      // Ставим камеру сразу далеко, чтобы не было "взрыва" на весь экран
+      // 1600 - оптимально, чтобы весь граф влез в кадр
+      fg.cameraPosition({ x: 0, y: 0, z: 1600 }); 
       
-      fg.d3ReheatSimulation();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [data]);
+      // Запускаем "разогрев" физики только при первом старте
+      // При смене языка (когда data меняется) узлы уже имеют координаты, 
+      // и движок просто плавно их подкорректирует, если нужно, 
+      // без полного рестарта (d3ReheatSimulation не вызываем принудительно здесь, если не хотим сброса)
+    }
+    
+  }, [data]); // Запускается при смене данных (языка)
 
   // === ПОИСК И ФОКУСИРОВКА ===
   useEffect(() => {
@@ -194,7 +188,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   return (
     <div className="relative w-full h-full">
       <ForceGraph3D
-        key={activeLanguage}
+        // key={activeLanguage} <--- УБРАЛИ ЭТОТ КЛЮЧ!
         ref={graphRef}
         graphData={data}
         
@@ -218,10 +212,10 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         // Оптимизация физики
         warmupTicks={50}
         cooldownTicks={50}
-        d3VelocityDecay={0.2} 
+        d3VelocityDecay={0.2}
         d3AlphaDecay={0.05}
         
-        // Убрали zoomToFit из остановки, чтобы не дергалось
+        // Колбек остановки: только для первой загрузки
         onEngineStop={() => {
             isInited.current = true;
         }}
@@ -269,6 +263,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
             sprite.color = color;
             sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
             sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
+            
             sprite.backgroundColor = '#00000080';
             sprite.padding = 1;
             sprite.borderRadius = 3;
@@ -301,10 +296,6 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         showNavInfo={false}
         controlType="trackball"
         enableNodeDrag={true}
-        
-        onEngineStop={() => {
-            isInited.current = true;
-        }}
       />
       
       <NavigationControls 

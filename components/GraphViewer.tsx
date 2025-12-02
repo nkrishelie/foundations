@@ -170,13 +170,23 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         
         // Взаимодействие
         onNodeClick={(node: any) => {
+          // Рассчитываем дистанцию камеры (отдаление от центра через узел)
           const distance = 40;
-          const distRatio = 1 + distance/Math.hypot(node.x || 1, node.y || 1, node.z || 1);
+          const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+
+          // Если координаты 0,0,0 (редкий баг), ставим дефолт
+          const newPos = node.x || node.y || node.z
+            ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
+            : { x: 0, y: 0, z: distance }; 
+
           graphRef.current.cameraPosition(
-            { x: (node.x || 0) * distRatio, y: (node.y || 0) * distRatio, z: (node.z || 0) * distRatio },
-            node,
-            2000
+            newPos, // Куда летит камера
+            // ВАЖНО: Передаем копию координат, а не сам объект node!
+            // Это отключает "дёрганое" слежение за физикой
+            { x: node.x, y: node.y, z: node.z }, 
+            3000 // Время полета (мс) - 3 секунды для плавности
           );
+          
           onNodeClick(node);
         }}
 

@@ -1,4 +1,4 @@
-import { GraphData, Discipline, LinkType, Language } from '../types';
+import { GraphData, Discipline, LinkType, Language, NodeKind } from '../types';
 
 interface LocalizedContent {
   label: string;

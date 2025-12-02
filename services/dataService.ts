@@ -1586,255 +1586,316 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   }
 };
 
+// ==============================================================================
+// МАТРИЦА СВЯЗЕЙ (ONTOLOGY MATRIX)
+// 1. Discipline -> * : CONTAINS (Дисциплина включает тему)
+// 2. Theory     -> Theory   : EXTENDS  (ZFC расширяет HF, S4 расширяет K)
+// 3. Structure  -> Structure: EXTENDS  (R расширяет Q)
+// 4. Concept    -> Concept  : EXTENDS  (Простой идеал расширяет Идеал)
+// 5. Structure  -> Theory   : MODELS   (N моделирует PA)
+// 6. Theory     -> Theorem  : PROVES   (ZFC доказывает Теорему Кантора)
+// 7. Theorem    -> * : RELATED  (Теорема говорит о...)
+// 8. * -> * : EQUIVALENT (Изоморфизмы, двойственности)
+// ==============================================================================
+
 const RAW_LINKS = [
   // ==============================================================================
-  // 1. DISCIPLINE -> ROOT NODES (Тип: CONTAINS)
-  // Привязываем ключевые точки входа к их дисциплинам
+  // 1. DISCIPLINES (ROOTS) -> CONTAINS
   // ==============================================================================
   { source: 'math_lang', target: 'pred_logic', type: LinkType.CONTAINS },
+  { source: 'math_lang', target: 'prop_logic', type: LinkType.CONTAINS },
   { source: 'math_lang', target: 'inference_concept', type: LinkType.CONTAINS },
 
   { source: 'set_theory', target: 'zfc', type: LinkType.CONTAINS },
+  { source: 'set_theory', target: 'theory_HF', type: LinkType.CONTAINS },
   { source: 'set_theory', target: 'ordinal_arithmetic', type: LinkType.CONTAINS },
   { source: 'set_theory', target: 'cardinal_arithmetic', type: LinkType.CONTAINS },
+  { source: 'set_theory', target: 'ultrafilter', type: LinkType.CONTAINS },
+  { source: 'set_theory', target: 'axiom_choice', type: LinkType.CONTAINS },
+  { source: 'set_theory', target: 'continuum_hypothesis', type: LinkType.CONTAINS },
 
   { source: 'model_theory', target: 'mt_concepts', type: LinkType.CONTAINS },
   { source: 'model_theory', target: 'theory_ACF', type: LinkType.CONTAINS },
   { source: 'model_theory', target: 'theory_RCF', type: LinkType.CONTAINS },
+  { source: 'model_theory', target: 'model_nonstd', type: LinkType.CONTAINS },
+  { source: 'model_theory', target: 'ultraproduct', type: LinkType.CONTAINS },
+  { source: 'model_theory', target: 'thm_lowenheim', type: LinkType.CONTAINS },
 
   { source: 'proof_theory', target: 'sequent_calculus', type: LinkType.CONTAINS },
-  { source: 'proof_theory', target: 'rca0', type: LinkType.CONTAINS }, // Reverse Math root
+  { source: 'proof_theory', target: 'reverse_math', type: LinkType.CONTAINS },
+  { source: 'proof_theory', target: 'godel_incompleteness', type: LinkType.CONTAINS },
   { source: 'proof_theory', target: 'epsilon_0', type: LinkType.CONTAINS },
+  { source: 'proof_theory', target: 'gamma_0', type: LinkType.CONTAINS },
+  { source: 'proof_theory', target: 'cut_elimination', type: LinkType.CONTAINS },
 
   { source: 'comp_theory', target: 'turing_machine', type: LinkType.CONTAINS },
   { source: 'comp_theory', target: 'lambda_calc', type: LinkType.CONTAINS },
   { source: 'comp_theory', target: 'recursion_concept', type: LinkType.CONTAINS },
+  { source: 'comp_theory', target: 'halting_problem', type: LinkType.CONTAINS },
+  { source: 'comp_theory', target: 'church_turing', type: LinkType.CONTAINS },
 
   { source: 'algebra_discipline', target: 'algebraic_structure', type: LinkType.CONTAINS },
   { source: 'algebra_discipline', target: 'theory_groups', type: LinkType.CONTAINS },
   { source: 'algebra_discipline', target: 'theory_rings', type: LinkType.CONTAINS },
+  { source: 'algebra_discipline', target: 'theory_fields', type: LinkType.CONTAINS },
+  { source: 'algebra_discipline', target: 'vector_space', type: LinkType.CONTAINS },
+  { source: 'algebra_discipline', target: 'homomorphism_thms', type: LinkType.CONTAINS },
 
   { source: 'topology', target: 'stone_space', type: LinkType.CONTAINS },
   { source: 'topology', target: 'open_set_topology', type: LinkType.CONTAINS },
+  { source: 'topology', target: 'alexandrov_topology', type: LinkType.CONTAINS },
+  { source: 'topology', target: 'clop_alg', type: LinkType.CONTAINS },
 
   { source: 'order_theory', target: 'poset', type: LinkType.CONTAINS },
   { source: 'order_theory', target: 'lattice', type: LinkType.CONTAINS },
+  { source: 'order_theory', target: 'bool_alg', type: LinkType.CONTAINS },
+  { source: 'order_theory', target: 'heyting_alg', type: LinkType.CONTAINS },
+  { source: 'order_theory', target: 'theory_order', type: LinkType.CONTAINS },
 
   // ==============================================================================
-  // 2. THEORY HIERARCHY (Тип: EXTENDS)
-  // Направление: Потомок -> Родитель (в коде), на графе будет Родитель -> Потомок
+  // 2. HIERARCHIES (EXTENDS)
+  // Direction: Child -> Parent (Наследник расширяет Родителя)
   // ==============================================================================
   
-  // Логика и Арифметика
-  { source: 'theory_PA', target: 'theory_Q', type: LinkType.EXTENDS }, // PA расширяет Q (добавляет индукцию)
-  { source: 'theory_PA', target: 'theory_Presburger', type: LinkType.EXTENDS }, // PA сложнее Пресбургера
-  { source: 'theory_PA2', target: 'theory_PA', type: LinkType.EXTENDS }, // 2-й порядок расширяет 1-й
-  { source: 'heyting_arithmetic', target: 'theory_PA', type: LinkType.RELATED }, // HA - интуиционистская версия PA
+  // --- Logic & Arithmetic ---
+  { source: 'theory_PA', target: 'theory_Q', type: LinkType.EXTENDS }, // PA добавляет индукцию к Q
+  { source: 'theory_PA', target: 'theory_Presburger', type: LinkType.EXTENDS }, // PA добавляет умножение
+  { source: 'theory_PA2', target: 'theory_PA', type: LinkType.EXTENDS }, // 2-й порядок > 1-й
+  { source: 'heyting_arithmetic', target: 'theory_PA', type: LinkType.RELATED }, // HA - интуиционистская PA (параллельная ветка)
+  { source: 'modal_GL', target: 'modal_K4', type: LinkType.EXTENDS }, // GL транзитивна + Лёб
 
-  // Теория множеств
-  { source: 'zfc', target: 'theory_HF', type: LinkType.EXTENDS }, // ZFC расширяет HF (добавляет бесконечность)
-  { source: 'large_cardinals', target: 'zfc', type: LinkType.EXTENDS }, // Большие кардиналы расширяют ZFC
+  // --- Set Theory ---
+  { source: 'zfc', target: 'theory_HF', type: LinkType.EXTENDS }, // ZFC добавляет бесконечность
+  { source: 'large_cardinals', target: 'zfc', type: LinkType.EXTENDS }, // Большие кардиналы > ZFC
+  { source: 'ordinal_arithmetic', target: 'transitive_set', type: LinkType.EXTENDS }, // Ординал есть транзитивное мн-во
+  { source: 'cumulative_hierarchy', target: 'transitive_set', type: LinkType.RELATED },
 
-  // Алгебраические теории
-  { source: 'theory_rings', target: 'theory_groups', type: LinkType.EXTENDS }, // Кольцо (по сложению) - группа
+  // --- Algebra (Structures) ---
+  { source: 'theory_rings', target: 'theory_groups', type: LinkType.EXTENDS }, // Кольцо содержит аддитивную группу
   { source: 'theory_fields', target: 'theory_rings', type: LinkType.EXTENDS }, // Поле - это кольцо
   { source: 'theory_ACF', target: 'theory_fields', type: LinkType.EXTENDS },
   { source: 'theory_RCF', target: 'theory_fields', type: LinkType.EXTENDS },
   { source: 'theory_tf_groups', target: 'theory_groups', type: LinkType.EXTENDS },
-  { source: 'theory_DLO', target: 'theory_order', type: LinkType.EXTENDS },
-  { source: 'theory_DisLO', target: 'theory_order', type: LinkType.EXTENDS },
-
-  // Модальные логики (K -> ... -> S5)
-  { source: 'modal_K', target: 'prop_logic', type: LinkType.EXTENDS },
-  { source: 'modal_K4', target: 'modal_K', type: LinkType.EXTENDS },
-  { source: 'modal_S4', target: 'modal_K4', type: LinkType.EXTENDS },
-  { source: 'modal_S5', target: 'modal_S4', type: LinkType.EXTENDS },
-  { source: 'modal_GL', target: 'modal_K4', type: LinkType.EXTENDS }, // GL транзитивна
-
-  // Обратная математика (Иерархия подсистем)
-  { source: 'wkl0', target: 'rca0', type: LinkType.EXTENDS },
-  { source: 'aca0', target: 'wkl0', type: LinkType.EXTENDS },
-  { source: 'atr0', target: 'aca0', type: LinkType.EXTENDS },
-  { source: 'pi11_ca0', target: 'atr0', type: LinkType.EXTENDS },
-  { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT }, // ACA0 консервативна над PA
-
-  // Лямбда исчисления
-  { source: 'typed_lambda', target: 'lambda_calc', type: LinkType.EXTENDS },
-  { source: 'system_f', target: 'typed_lambda', type: LinkType.EXTENDS },
-
-  // ==============================================================================
-  // 3. STRUCTURES -> THEORIES (Тип: MODELS)
-  // Модель реализует теорию
-  // ==============================================================================
-  { source: 'model_N', target: 'theory_PA', type: LinkType.MODELS },
-  { source: 'model_Z', target: 'theory_rings', type: LinkType.MODELS },
-  { source: 'model_Z', target: 'theory_DisLO', type: LinkType.MODELS },
-  { source: 'model_Q', target: 'theory_fields', type: LinkType.MODELS },
-  { source: 'model_Q', target: 'theory_DLO', type: LinkType.MODELS },
-  { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS },
-  { source: 'model_C', target: 'theory_ACF', type: LinkType.MODELS },
-  { source: 'model_A', target: 'theory_ACF', type: LinkType.MODELS },
   
-  { source: 'model_V_omega', target: 'theory_HF', type: LinkType.MODELS },
-  { source: 'model_L', target: 'zfc', type: LinkType.MODELS },
-  { source: 'model_L', target: 'continuum_hypothesis', type: LinkType.MODELS }, // CH верна в L
-  { source: 'surreal_numbers', target: 'theory_RCF', type: LinkType.MODELS },
-  
-  { source: 'bool_alg', target: 'prop_logic', type: LinkType.MODELS },
-  { source: 'heyting_alg', target: 'intuitionistic_logic', type: LinkType.MODELS },
-  { source: 'jsson_tarski_alg', target: 'modal_K', type: LinkType.MODELS }, // Алгебраическая семантика
-  { source: 'lindenbaum_alg', target: 'prop_logic', type: LinkType.RELATED }, // Free algebra
-
-  // Нестандартные модели
-  { source: 'model_nonstd', target: 'theory_PA', type: LinkType.MODELS },
-  { source: 'model_N_ZxQ', target: 'model_nonstd', type: LinkType.RELATED }, // Order type of nonstd models
-
-  // ==============================================================================
-  // 4. STRUCTURE -> STRUCTURE (Тип: EXTENDS / EQUIVALENT)
-  // Вложения и Изоморфизмы
-  // ==============================================================================
-  // Числовые системы (цепочка вложений)
-  { source: 'model_C', target: 'model_R', type: LinkType.EXTENDS },
-  { source: 'model_R', target: 'model_Q', type: LinkType.EXTENDS },
-  { source: 'model_Q', target: 'model_Z', type: LinkType.EXTENDS },
-  { source: 'model_Z', target: 'model_N', type: LinkType.EXTENDS },
-  { source: 'surreal_numbers', target: 'model_R', type: LinkType.EXTENDS },
-
-  // Алгебраические связи
-  { source: 'bool_ring', target: 'bool_alg', type: LinkType.EQUIVALENT },
-  { source: 'heyting_alg', target: 'bool_alg', type: LinkType.EXTENDS }, // Булева - частный случай
-  { source: 'clop_alg', target: 'bool_alg', type: LinkType.EXTENDS },
-
-  // Топологические двойственности (Stone, Priestley, Esakia)
-  { source: 'stone_space', target: 'bool_alg', type: LinkType.EQUIVALENT },
-  { source: 'priestley_space', target: 'dist_lattice', type: LinkType.EQUIVALENT },
-  { source: 'esakia_space', target: 'heyting_alg', type: LinkType.EQUIVALENT },
-
-  // Алгебраическая логика
-  { source: 'cylindric_alg', target: 'bool_alg', type: LinkType.EXTENDS }, // CA расширяет BA
-  { source: 'polyadic_alg', target: 'bool_alg', type: LinkType.EXTENDS },
-  { source: 'cylindric_alg', target: 'pred_logic', type: LinkType.EQUIVALENT }, // Алгебраизация FOL
-
-  // ==============================================================================
-  // 5. THEORY -> THEOREM (Тип: PROVES / RELATED)
-  // Что где доказывается или не доказывается
-  // ==============================================================================
-  // ZFC
-  { source: 'zfc', target: 'thm_cantor', type: LinkType.PROVES },
-  { source: 'zfc', target: 'thm_zermelo_wo', type: LinkType.PROVES },
-  { source: 'zfc', target: 'thm_cbs', type: LinkType.PROVES },
-  { source: 'zfc', target: 'axiom_choice', type: LinkType.PROVES }, // В ZFC выбор - аксиома
-
-  // Логика
-  { source: 'pred_logic', target: 'thm_completeness', type: LinkType.PROVES }, // Мета-теорема
-  { source: 'pred_logic', target: 'thm_compactness', type: LinkType.PROVES },
-  { source: 'pred_logic', target: 'thm_lowenheim', type: LinkType.PROVES },
-  
-  // Арифметика и Неполнота
-  { source: 'theory_PA', target: 'godel_incompleteness', type: LinkType.RELATED }, // PA подвержена неполноте
-  { source: 'theory_PA', target: 'thm_tarski_undef', type: LinkType.PROVES },
-  { source: 'theory_PA', target: 'goodstein_theorem', type: LinkType.RELATED }, // Недоказуема в PA
-  { source: 'theory_PA', target: 'crt', type: LinkType.PROVES }, // КТО доказуема в PA
-
-  // Разрешимые теории
-  { source: 'theory_RCF', target: 'thm_tarski_seidenberg', type: LinkType.EQUIVALENT }, // Основа теории
-  { source: 'theory_Presburger', target: 'qe', type: LinkType.RELATED }, // Допускает QE
-
-  // Категоричность
-  { source: 'theory_ACF', target: 'thm_morley', type: LinkType.RELATED }, // Пример для теоремы
-  { source: 'theory_DLO', target: 'thm_ryll', type: LinkType.RELATED }, // Пример omega-категоричности
-
-  // ==============================================================================
-  // 6. CONCEPT -> CONCEPT (Тип: EXTENDS / CONTAINS)
-  // Иерархии понятий
-  // ==============================================================================
-  // Алгебра
+  // --- Algebra (Concepts) ---
   { source: 'module_ring', target: 'algebraic_structure', type: LinkType.EXTENDS },
   { source: 'algebra_ring', target: 'module_ring', type: LinkType.EXTENDS },
-  { source: 'vector_space', target: 'module_ring', type: LinkType.EXTENDS },
-  
-  { source: 'euclidean_domain', target: 'pid', type: LinkType.EXTENDS },
-  { source: 'pid', target: 'ufd', type: LinkType.EXTENDS },
+  { source: 'vector_space', target: 'module_ring', type: LinkType.EXTENDS }, // Векторное пр-во - модуль над полем
+  { source: 'integral_domain', target: 'theory_rings', type: LinkType.EXTENDS },
   { source: 'ufd', target: 'integral_domain', type: LinkType.EXTENDS },
-  
-  { source: 'maximal_ideal', target: 'prime_ideal', type: LinkType.EXTENDS },
+  { source: 'pid', target: 'ufd', type: LinkType.EXTENDS },
+  { source: 'euclidean_domain', target: 'pid', type: LinkType.EXTENDS },
   { source: 'prime_ideal', target: 'ideal_concept', type: LinkType.EXTENDS },
+  { source: 'maximal_ideal', target: 'prime_ideal', type: LinkType.EXTENDS }, // Максимальный всегда простой
 
-  // Порядки и Решетки
+  // --- Order Theory ---
   { source: 'lattice', target: 'poset', type: LinkType.EXTENDS },
   { source: 'dist_lattice', target: 'lattice', type: LinkType.EXTENDS },
   { source: 'bool_alg', target: 'dist_lattice', type: LinkType.EXTENDS },
   { source: 'heyting_alg', target: 'dist_lattice', type: LinkType.EXTENDS },
+  { source: 'theory_DLO', target: 'theory_order', type: LinkType.EXTENDS },
+  { source: 'theory_DisLO', target: 'theory_order', type: LinkType.EXTENDS },
 
-  // Теория множеств
-  { source: 'ordinal_arithmetic', target: 'transfinite_induction', type: LinkType.RELATED },
-  { source: 'cumulative_hierarchy', target: 'rank_concept', type: LinkType.CONTAINS },
-  { source: 'large_cardinals', target: 'cardinal_arithmetic', type: LinkType.EXTENDS },
-  { source: 'ultrafilter', target: 'ideal_concept', type: LinkType.RELATED }, // Dual
+  // --- Modal Logic Hierarchy ---
+  { source: 'modal_K', target: 'prop_logic', type: LinkType.EXTENDS },
+  { source: 'modal_K4', target: 'modal_K', type: LinkType.EXTENDS },
+  { source: 'modal_S4', target: 'modal_K4', type: LinkType.EXTENDS },
+  { source: 'modal_S5', target: 'modal_S4', type: LinkType.EXTENDS },
 
-  // Теория моделей
-  { source: 'type_theory_model', target: 'complete_type', type: LinkType.CONTAINS },
-  { source: 'type_theory_model', target: 'isolated_type', type: LinkType.CONTAINS },
-  { source: 'saturated_model', target: 'type_theory_model', type: LinkType.RELATED },
-  { source: 'prime_model', target: 'isolated_type', type: LinkType.RELATED },
-  { source: 'omitting_types', target: 'isolated_type', type: LinkType.RELATED },
+  // --- Computability ---
+  { source: 'typed_lambda', target: 'lambda_calc', type: LinkType.EXTENDS },
+  { source: 'system_f', target: 'typed_lambda', type: LinkType.EXTENDS },
+
+  // --- Reverse Math Hierarchy ---
+  { source: 'wkl0', target: 'rca0', type: LinkType.EXTENDS },
+  { source: 'aca0', target: 'wkl0', type: LinkType.EXTENDS },
+  { source: 'atr0', target: 'aca0', type: LinkType.EXTENDS },
+  { source: 'pi11_ca0', target: 'atr0', type: LinkType.EXTENDS },
+
+  // --- Number Systems (Structures) ---
+  { source: 'model_Z', target: 'model_N', type: LinkType.EXTENDS },
+  { source: 'model_Q', target: 'model_Z', type: LinkType.EXTENDS },
+  { source: 'model_R', target: 'model_Q', type: LinkType.EXTENDS },
+  { source: 'model_C', target: 'model_R', type: LinkType.EXTENDS },
+  { source: 'model_A', target: 'model_Q', type: LinkType.EXTENDS }, // Алгебраические расширяют Q
+  { source: 'surreal_numbers', target: 'model_R', type: LinkType.EXTENDS },
+  { source: 'surreal_numbers', target: 'ordinal_arithmetic', type: LinkType.EXTENDS },
+
+  // ==============================================================================
+  // 3. MODELS (Structure -> Theory)
+  // Структура является моделью теории
+  // ==============================================================================
+  { source: 'model_N', target: 'theory_PA', type: LinkType.MODELS },
+  { source: 'model_N', target: 'theory_DisLO', type: LinkType.MODELS }, // N дискретно упорядочено
+  { source: 'model_Z', target: 'theory_rings', type: LinkType.MODELS },
+  { source: 'model_Z', target: 'euclidean_domain', type: LinkType.MODELS },
+  { source: 'model_Q', target: 'theory_fields', type: LinkType.MODELS },
+  { source: 'model_Q', target: 'theory_DLO', type: LinkType.MODELS },
+  { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS },
+  { source: 'model_C', target: 'theory_ACF', type: LinkType.MODELS },
+  { source: 'model_A', target: 'theory_ACF', type: LinkType.MODELS }, // A - тоже модель ACF
   
-  // Вычислимость
-  { source: 'lambda_calc', target: 'lambda_reductions', type: LinkType.CONTAINS },
-  { source: 'lambda_calc', target: 'fixed_point_comb', type: LinkType.CONTAINS },
-  { source: 'ski_combinators', target: 'lambda_calc', type: LinkType.EQUIVALENT },
-  { source: 'turing_machine', target: 'halting_problem', type: LinkType.RELATED },
+  { source: 'model_V_omega', target: 'theory_HF', type: LinkType.MODELS },
+  { source: 'model_L', target: 'zfc', type: LinkType.MODELS },
+  { source: 'model_L', target: 'continuum_hypothesis', type: LinkType.MODELS }, // L |= CH
+  { source: 'surreal_numbers', target: 'theory_RCF', type: LinkType.MODELS },
+  { source: 'model_nonstd', target: 'theory_PA', type: LinkType.MODELS },
+  { source: 'model_quine', target: 'set_theory', type: LinkType.MODELS }, // NF models
 
-  // Логика
-  { source: 'inference_rules', target: 'inference_concept', type: LinkType.RELATED },
-  { source: 'soundness_completeness', target: 'inference_concept', type: LinkType.RELATED },
+  { source: 'bool_alg', target: 'prop_logic', type: LinkType.MODELS },
+  { source: 'heyting_alg', target: 'intuitionistic_logic', type: LinkType.MODELS },
+  { source: 'jsson_tarski_alg', target: 'modal_K', type: LinkType.MODELS },
+  { source: 'lindenbaum_alg', target: 'prop_logic', type: LinkType.MODELS }, // Каноническая модель
+  { source: 'open_set_topology', target: 'intuitionistic_logic', type: LinkType.MODELS },
+  
+  { source: 'alexandrov_topology', target: 'modal_S4', type: LinkType.MODELS },
+  { source: 'stone_space', target: 'prop_logic', type: LinkType.RELATED }, // Через двойственность
 
   // ==============================================================================
-  // 7. THEOREM -> CONCEPT/STRUCTURE (Тип: RELATED)
-  // Какая теорема про что говорит
+  // 4. PROVES (Theory -> Theorem)
+  // Теория доказывает теорему или утверждение
   // ==============================================================================
+  // ZFC proofs
+  { source: 'zfc', target: 'thm_cantor', type: LinkType.PROVES },
+  { source: 'zfc', target: 'thm_cbs', type: LinkType.PROVES },
+  { source: 'zfc', target: 'thm_zermelo_wo', type: LinkType.PROVES },
+  { source: 'zfc', target: 'axiom_choice', type: LinkType.PROVES }, // В ZFC это аксиома
+  { source: 'zfc', target: 'ordinal_arithmetic', type: LinkType.PROVES },
+  { source: 'zfc', target: 'cardinal_arithmetic', type: LinkType.PROVES },
+  
+  // PA & Logic proofs
+  { source: 'theory_PA', target: 'crt', type: LinkType.PROVES }, // КТО
+  { source: 'theory_PA', target: 'sequence_coding', type: LinkType.PROVES }, // Бета-функция
+  { source: 'theory_PA', target: 'thm_tarski_undef', type: LinkType.PROVES },
+  { source: 'pred_logic', target: 'thm_completeness', type: LinkType.PROVES },
+  { source: 'pred_logic', target: 'thm_compactness', type: LinkType.PROVES },
+  { source: 'pred_logic', target: 'thm_lowenheim', type: LinkType.PROVES },
+  
+  // Computability proofs
+  { source: 'comp_theory', target: 'smn_theorem', type: LinkType.PROVES },
+  { source: 'comp_theory', target: 'recursion_theorem', type: LinkType.PROVES },
+  { source: 'comp_theory', target: 'rice_theorem', type: LinkType.PROVES },
+  { source: 'lambda_calc', target: 'church_rosser', type: LinkType.PROVES },
+  
+  // Algebra & Other
+  { source: 'theory_ACF', target: 'thm_chevalley', type: LinkType.PROVES },
+  { source: 'theory_ACF', target: 'thm_morley', type: LinkType.PROVES },
+  { source: 'theory_RCF', target: 'thm_tarski_seidenberg', type: LinkType.PROVES },
+  { source: 'pi11_ca0', target: 'thm_kruskal', type: LinkType.PROVES },
+
+  // ==============================================================================
+  // 5. EQUIVALENT (Any <-> Any)
+  // Эквивалентность, Изоморфизм, Двойственность
+  // ==============================================================================
+  // Теоремы
   { source: 'axiom_choice', target: 'thm_zorn', type: LinkType.EQUIVALENT },
   { source: 'axiom_choice', target: 'thm_zermelo_wo', type: LinkType.EQUIVALENT },
-  { source: 'axiom_choice', target: 'cardinal_arithmetic', type: LinkType.RELATED }, // AC нужна для арифметики кардиналов
-  { source: 'axiom_choice', target: 'dedekind_finite', type: LinkType.RELATED }, // Связь определений конечности
-
-  { source: 'continuum_hypothesis', target: 'cardinal_aleph1', type: LinkType.RELATED },
-  { source: 'continuum_hypothesis', target: 'forcing_method', type: LinkType.RELATED }, // Форсинг доказывает независимость
-  
-  { source: 'thm_cantor', target: 'cardinal_arithmetic', type: LinkType.RELATED },
-  { source: 'thm_stone', target: 'stone_space', type: LinkType.RELATED }, // Теорема Стоуна вводит пр-ва Стоуна
-  { source: 'thm_stone', target: 'bool_alg', type: LinkType.RELATED },
   { source: 'bpi', target: 'thm_stone', type: LinkType.EQUIVALENT },
-  { source: 'bpi', target: 'ultrafilter', type: LinkType.RELATED },
+  
+  // Двойственности
+  { source: 'bool_alg', target: 'stone_space', type: LinkType.EQUIVALENT }, // Двойственность Стоуна
+  { source: 'dist_lattice', target: 'priestley_space', type: LinkType.EQUIVALENT }, // Двойственность Пристли
+  { source: 'heyting_alg', target: 'esakia_space', type: LinkType.EQUIVALENT }, // Двойственность Эсакиа
+  { source: 'bool_alg', target: 'bool_ring', type: LinkType.EQUIVALENT }, // Алгебраическая экв.
+  
+  // Структуры и теории
+  { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT }, // Би-интерпретируемость
+  { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT }, // Консервативность
+  { source: 'ordinal_omega', target: 'model_N', type: LinkType.EQUIVALENT },
+  { source: 'lambda_calc', target: 'combinators', type: LinkType.EQUIVALENT }, // Эквивалентность по вычислимости
+  { source: 'ski_combinators', target: 'combinators', type: LinkType.EQUIVALENT },
+  
+  // ==============================================================================
+  // 6. RELATED / CONTAINS (Contextual Links)
+  // Смысловые связи, методы, применения
+  // ==============================================================================
+  // Incompleteness cluster
+  { source: 'theory_PA', target: 'godel_incompleteness', type: LinkType.RELATED },
+  { source: 'godel_incompleteness', target: 'sequence_coding', type: LinkType.RELATED }, // Метод доказательства
+  { source: 'godel_incompleteness', target: 'recursion_concept', type: LinkType.RELATED }, // Самореференция
+  { source: 'godel_incompleteness', target: 'halting_problem', type: LinkType.RELATED }, // Связь
+  { source: 'diophantine_set', target: 'godel_incompleteness', type: LinkType.RELATED }, // MRDP теорема
 
+  // Independence cluster
+  { source: 'continuum_hypothesis', target: 'forcing_method', type: LinkType.RELATED }, // Метод доказательства
+  { source: 'axiom_choice', target: 'forcing_method', type: LinkType.RELATED },
+  { source: 'forcing_method', target: 'model_L', type: LinkType.RELATED }, // L - ground model
+  
+  // Reverse Math cluster
+  { source: 'wkl0', target: 'thm_kruskal', type: LinkType.RELATED }, // WKL0 не доказывает Kruskal
+  { source: 'rca0', target: 'comp_theory', type: LinkType.RELATED }, // Computable math
+  { source: 'bpi', target: 'wkl0', type: LinkType.RELATED }, // BPI доказуема в WKL0+
+  
+  // Model Theory cluster
+  { source: 'mt_concepts', target: 'ultraproduct', type: LinkType.CONTAINS },
+  { source: 'mt_concepts', target: 'saturated_model', type: LinkType.CONTAINS },
+  { source: 'mt_concepts', target: 'indiscernibles', type: LinkType.CONTAINS },
+  { source: 'mt_concepts', target: 'omitting_types', type: LinkType.CONTAINS },
+  { source: 'mt_concepts', target: 'type_theory_model', type: LinkType.CONTAINS },
+  { source: 'mt_concepts', target: 'qe', type: LinkType.CONTAINS },
+  
+  { source: 'type_theory_model', target: 'stone_space_types', type: LinkType.RELATED },
+  { source: 'stone_space_types', target: 'complete_type', type: LinkType.CONTAINS },
+  { source: 'stone_space_types', target: 'isolated_type', type: LinkType.CONTAINS },
+  { source: 'thm_ryll', target: 'type_theory_model', type: LinkType.RELATED },
+  { source: 'thm_los_vaught', target: 'thm_morley', type: LinkType.RELATED },
+  { source: 'model_random_graph', target: 'thm_ryll', type: LinkType.RELATED }, // Пример
+
+  // Ultraproducts & Non-standard
+  { source: 'ultraproduct', target: 'ultrafilter', type: LinkType.CONTAINS },
+  { source: 'ultraproduct', target: 'model_nonstd', type: LinkType.RELATED },
+  { source: 'ultraproduct', target: 'thm_compactness', type: LinkType.RELATED }, // Метод доказательства
+  { source: 'model_nonstd', target: 'surreal_numbers', type: LinkType.RELATED },
+  
+  // Algebra & Ideals
+  { source: 'theory_rings', target: 'ideal_concept', type: LinkType.CONTAINS },
+  { source: 'ideal_concept', target: 'prime_ideal', type: LinkType.CONTAINS },
+  { source: 'ideal_concept', target: 'maximal_ideal', type: LinkType.CONTAINS },
+  { source: 'prime_ideal', target: 'integral_domain', type: LinkType.RELATED }, // Фактор - область целостности
+  { source: 'maximal_ideal', target: 'theory_fields', type: LinkType.RELATED }, // Фактор - поле
+  { source: 'bpi', target: 'prime_ideal', type: LinkType.RELATED }, // Теорема о простом идеале
+
+  // Proof Theory & Ordinals
+  { source: 'epsilon_0', target: 'theory_PA', type: LinkType.RELATED },
+  { source: 'epsilon_0', target: 'goodstein_theorem', type: LinkType.RELATED },
+  { source: 'gamma_0', target: 'atr0', type: LinkType.RELATED },
+  { source: 'cut_elimination', target: 'sequent_calculus', type: LinkType.RELATED },
+  
+  // Computability Misc
   { source: 'church_turing', target: 'turing_machine', type: LinkType.RELATED },
   { source: 'church_turing', target: 'lambda_calc', type: LinkType.RELATED },
+  { source: 'lambda_calc', target: 'lambda_reductions', type: LinkType.CONTAINS },
+  { source: 'lambda_calc', target: 'fixed_point_comb', type: LinkType.CONTAINS },
+  { source: 'realizability', target: 'heyting_arithmetic', type: LinkType.RELATED },
+  { source: 'markov_principle', target: 'heyting_arithmetic', type: LinkType.RELATED },
   
-  { source: 'thm_knaster', target: 'lattice', type: LinkType.RELATED },
-  { source: 'thm_knaster', target: 'thm_cbs', type: LinkType.PROVES }, // Используется в доказательстве CBS
-
-  { source: 'godel_incompleteness', target: 'sequence_coding', type: LinkType.RELATED }, // Кодирование - основа доказательства
-  { source: 'godel_incompleteness', target: 'diophantine_set', type: LinkType.RELATED }, // MRDP теорема
-
-  { source: 'thm_kruskal', target: 'pi11_ca0', type: LinkType.RELATED }, // Требуется для доказательства
-
-  { source: 'cut_elimination', target: 'sequent_calculus', type: LinkType.RELATED },
+  // Curry-Howard
   { source: 'curry_howard', target: 'intuitionistic_logic', type: LinkType.RELATED },
   { source: 'curry_howard', target: 'typed_lambda', type: LinkType.RELATED },
+  { source: 'curry_howard', target: 'proof_theory', type: LinkType.RELATED },
 
-  // ==============================================================================
-  // 8. CROSS-DOMAIN & MISC
-  // ==============================================================================
-  { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT }, // Би-интерпретируемость
-  { source: 'ordinal_omega', target: 'model_N', type: LinkType.EQUIVALENT }, // Омега = N как ординал
-  { source: 'epsilon_0', target: 'transfinite_induction', type: LinkType.RELATED },
-  { source: 'gamma_0', target: 'atr0', type: LinkType.RELATED }, // Доказательный ординал
+  // Topology & Order
+  { source: 'thm_stone', target: 'stone_space', type: LinkType.RELATED },
+  { source: 'thm_stone', target: 'bool_alg', type: LinkType.RELATED },
+  { source: 'thm_knaster', target: 'lattice', type: LinkType.RELATED },
+  { source: 'thm_knaster', target: 'thm_cbs', type: LinkType.PROVES }, // Используется в доказательстве
+  { source: 'modal_S4', target: 'topology', type: LinkType.RELATED }, // Топологическая семантика
+  { source: 'modal_GL', target: 'scattered_space', type: LinkType.RELATED },
+  { source: 'alexandrov_topology', target: 'poset', type: LinkType.RELATED }, // Связь порядков и топологии
+
+  // Set Theory Misc
+  { source: 'skolem_paradox', target: 'thm_lowenheim', type: LinkType.RELATED },
+  { source: 'skolem_paradox', target: 'model_N', type: LinkType.RELATED },
+  { source: 'hartogs_number', target: 'ordinal_arithmetic', type: LinkType.RELATED },
+  { source: 'axiom_choice', target: 'cardinal_arithmetic', type: LinkType.RELATED }, // Нужна для арифметики кардиналов
+  { source: 'dedekind_finite', target: 'axiom_choice', type: LinkType.RELATED }, // Зависимость
+  { source: 'ac_omega', target: 'topology', type: LinkType.RELATED }, // Нужна для анализа (мера Лебега)
+  { source: 'axiom_determinacy', target: 'large_cardinals', type: LinkType.RELATED }, // Связь с Woodin cardinals
   
-  { source: 'ac_omega', target: 'topology', type: LinkType.RELATED }, // Нужна для меры Лебега
-  { source: 'axiom_determinacy', target: 'large_cardinals', type: LinkType.RELATED }, // Связана с Woodin cardinals
-  
-  { source: 'model_random_graph', target: 'thm_ryll', type: LinkType.RELATED }, // Пример категоричности
-  { source: 'ultraproduct', target: 'model_nonstd', type: LinkType.CONTAINS }, // Метод построения
+  // Algebra & Logic (Algebraic Logic)
+  { source: 'cylindric_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },
+  { source: 'polyadic_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },
+  { source: 'cylindric_alg', target: 'bool_alg', type: LinkType.EXTENDS },
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { GraphNode, GraphLink, Discipline, LinkType, Language } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS } from '../constants';
 import Latex from 'react-latex-next';
@@ -37,7 +37,7 @@ interface Props {
   currentLang: Language;
   onToggleLang: (lang: Language) => void;
   
-  // === НОВЫЕ ПОЛЯ ===
+  // Пропсы для фильтрации
   hiddenGroups: Set<Discipline>;
   onToggleGroup: (group: Discipline) => void;
 }
@@ -50,7 +50,6 @@ export const UIOverlay: React.FC<Props> = ({
   onCloseSidebar,
   currentLang,
   onToggleLang,
-  // === ДОБАВИТЬ СЮДА ===
   hiddenGroups,
   onToggleGroup
 }) => {
@@ -58,6 +57,14 @@ export const UIOverlay: React.FC<Props> = ({
   const [isLegendOpen, setIsLegendOpen] = useState(true);
   const [filteredNodes, setFilteredNodes] = useState<GraphNode[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+
+  // === НОВОЕ: Вычисляем, какие дисциплины реально есть в графе ===
+  // Это скроет "пустые" категории (например, Foundations), если в них нет узлов
+  const activeDisciplines = useMemo(() => {
+    const groups = new Set(nodes.map(n => n.group));
+    return groups;
+  }, [nodes]);
+  // ==============================================================
 
   // --- ЛОГИКА ЭКСПОРТА ---
   const handleExport = () => {
@@ -102,7 +109,7 @@ export const UIOverlay: React.FC<Props> = ({
     document.body.removeChild(link);
   };
 
-  // Логика фильтрации
+  // Логика фильтрации поиска
   useEffect(() => {
     if (!inputValue || inputValue.length < 2) {
       setFilteredNodes([]);
@@ -118,7 +125,6 @@ export const UIOverlay: React.FC<Props> = ({
       if (labelClean.includes(q)) return true;
       if (n.synonyms?.some(s => normalize(s).includes(q))) return true;
       if (normalize(cleanForSearch(n.description)).includes(q)) return true;
-      if (n.details?.some(d => normalize(cleanForSearch(d)).includes(q))) return true;
       return false;
     });
 
@@ -170,14 +176,11 @@ export const UIOverlay: React.FC<Props> = ({
             {showDropdown && filteredNodes.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-y-auto custom-scrollbar">
                 {filteredNodes.map((node) => {
-                  
-                  // --- ИСПРАВЛЕНИЕ: Умный выбор синонима ---
+                  // Умный выбор синонима
                   const displaySynonym = node.synonyms?.find(s => {
                     const isCyrillic = /[а-яА-ЯёЁ]/.test(s);
-                    // Если язык RU - ищем кириллицу, если EN - ищем то, что НЕ кириллица
                     return currentLang === 'ru' ? isCyrillic : !isCyrillic;
                   }) || node.synonyms?.[0];
-                  // -----------------------------------------
 
                   return (
                     <div
@@ -207,16 +210,11 @@ export const UIOverlay: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Buttons: Language + Export */}
+        {/* Buttons */}
         <div className="flex gap-2 pointer-events-auto">
-          <button
-            onClick={handleExport}
-            className="flex items-center justify-center px-3 py-1.5 bg-slate-800/80 border border-slate-600 rounded-lg hover:bg-blue-600 hover:border-blue-500 text-slate-300 hover:text-white transition-all backdrop-blur-md"
-            title={currentLang === 'en' ? "Export Data to CSV" : "Экспорт данных в CSV"}
-          >
+          <button onClick={handleExport} className="flex items-center justify-center px-3 py-1.5 bg-slate-800/80 border border-slate-600 rounded-lg hover:bg-blue-600 text-slate-300 hover:text-white transition-all backdrop-blur-md">
             <span className="text-lg">💾</span>
           </button>
-
           <div className="flex space-x-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 backdrop-blur-md">
             <button onClick={() => onToggleLang('ru')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'ru' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇷🇺</button>
             <button onClick={() => onToggleLang('en')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'en' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇺🇸</button>
@@ -224,7 +222,7 @@ export const UIOverlay: React.FC<Props> = ({
         </div>
       </div>
       
-      {/* Legend */}
+      {/* Legend (Filtered) */}
       <div className="pointer-events-auto absolute top-24 right-4 max-h-[70vh] overflow-y-auto custom-scrollbar z-10">
         <div className={`bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-lg transition-all duration-300 ${isLegendOpen ? 'p-4' : 'p-2'}`}>
           <div className="flex items-center justify-between cursor-pointer gap-4" onClick={() => setIsLegendOpen(!isLegendOpen)}>
@@ -236,34 +234,31 @@ export const UIOverlay: React.FC<Props> = ({
             <div className="mt-3 space-y-4">
               <div>
                 <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Disciplines' : 'Разделы'}</h4>
-                {/* Внутри return, в блоке Легенды */}
-<div className="space-y-1.5">
-  {(Object.keys(DISCIPLINE_COLORS) as Discipline[]).map((disc) => {
-    const isHidden = hiddenGroups.has(disc);
-    return (
-      <div 
-        key={disc} 
-        // Добавляем кликабельность и стили для курсора
-        className={`flex items-center space-x-2 cursor-pointer transition-opacity duration-200 ${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}`}
-        onClick={() => onToggleGroup(disc)}
-      >
-        {/* Кружок цвета (меняется на "пустой", если скрыто, или можно просто менять прозрачность) */}
-        <span 
-          className={`w-3 h-3 rounded-full flex-shrink-0 ${isHidden ? 'border border-slate-500' : 'shadow-glow'}`} 
-          style={{ 
-            backgroundColor: isHidden ? 'transparent' : DISCIPLINE_COLORS[disc], 
-            boxShadow: isHidden ? 'none' : `0 0 6px ${DISCIPLINE_COLORS[disc]}` 
-          }}
-        ></span>
-        
-        {/* Название (зачеркиваем, если скрыто) */}
-        <span className={`text-xs text-slate-300 leading-tight ${isHidden ? 'line-through decoration-slate-500' : ''}`}>
-          {DISCIPLINE_LABELS[disc][currentLang]}
-        </span>
-      </div>
-    );
-  })}
-</div>
+                <div className="space-y-1.5">
+                  {(Object.keys(DISCIPLINE_COLORS) as Discipline[])
+                    .filter(disc => activeDisciplines.has(disc)) // <--- СКРЫВАЕМ ПУСТЫЕ КАТЕГОРИИ
+                    .map((disc) => {
+                      const isHidden = hiddenGroups.has(disc);
+                      return (
+                        <div 
+                          key={disc} 
+                          className={`flex items-center space-x-2 cursor-pointer transition-opacity duration-200 ${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}`}
+                          onClick={() => onToggleGroup(disc)}
+                        >
+                          <span 
+                            className={`w-3 h-3 rounded-full flex-shrink-0 ${isHidden ? 'border border-slate-500' : 'shadow-glow'}`} 
+                            style={{ 
+                              backgroundColor: isHidden ? 'transparent' : DISCIPLINE_COLORS[disc], 
+                              boxShadow: isHidden ? 'none' : `0 0 6px ${DISCIPLINE_COLORS[disc]}` 
+                            }}
+                          ></span>
+                          <span className={`text-xs text-slate-300 leading-tight ${isHidden ? 'line-through decoration-slate-500' : ''}`}>
+                            {DISCIPLINE_LABELS[disc][currentLang]}
+                          </span>
+                        </div>
+                      );
+                  })}
+                </div>
               </div>
               <div>
                 <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Relations' : 'Связи'}</h4>

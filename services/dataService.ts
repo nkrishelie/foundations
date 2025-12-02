@@ -2393,6 +2393,50 @@ const RAW_LINKS = [
 
     // 6. Modal Algebra
     { source: 'jsson_tarski_alg', target: 'bool_alg', type: LinkType.EXTENDS }, // MA = BA + оператор
+  // --- FIXES ROUND 2 (User Feedback) ---
+    // 1. Модальные алгебры -> Алгебра
+    // (Связываем их с Булевыми кольцами, которые являются кольцами, т.е. Алгеброй)
+    { source: 'jsson_tarski_alg', target: 'bool_ring', type: LinkType.RELATED }, 
+    { source: 'jsson_tarski_alg', target: 'theory_rings', type: LinkType.RELATED }, 
+
+    // 2. Curry-Howard -> Proof Theory
+    // (Нормализация термов соответствует устранению сечений, Типы соответствуют формулам)
+    { source: 'curry_howard', target: 'cut_elimination', type: LinkType.RELATED }, 
+    { source: 'curry_howard', target: 'sequent_calculus', type: LinkType.RELATED }, 
+    { source: 'curry_howard', target: 'typed_lambda', type: LinkType.EQUIVALENT }, // Изоморфизм
+
+    // 3. Topology Orphans (Привязываем к Общей Топологии)
+    { source: 'priestley_space', target: 'topology', type: LinkType.CONTAINS },
+    { source: 'priestley_space', target: 'stone_space', type: LinkType.EXTENDS }, // Обобщение пространств Стоуна
+    { source: 'alexandrov_topology', target: 'topology', type: LinkType.CONTAINS },
+
+    // 4. Logic <-> Set Theory
+    // (ZFC формулируется на языке Логики Первого Порядка)
+    { source: 'zfc', target: 'pred_logic', type: LinkType.RELATED }, 
+    { source: 'zfc', target: 'model_L', type: LinkType.CONTAINS }, // L строится внутри ZFC (уже было, но усилим контекст)
+    // (Связь через Теорию Моделей)
+    { source: 'zfc', target: 'mt_concepts', type: LinkType.RELATED }, 
+
+    // 5. Set Theory <-> Algebra
+    // (Аксиома Выбора критична для алгебраических теорем)
+    { source: 'axiom_choice', target: 'theory_rings', type: LinkType.RELATED }, // Теорема о максимальном идеале (Krull)
+    { source: 'axiom_choice', target: 'theory_fields', type: LinkType.RELATED }, // Существование алг. замыкания
+    { source: 'axiom_choice', target: 'theory_groups', type: LinkType.RELATED }, // Nielsen-Schreier (подгруппа свободной группы свободна)
+    // (Конструкция числовых систем внутри ZFC)
+    { source: 'zfc', target: 'model_Z', type: LinkType.CONTAINS }, 
+    { source: 'zfc', target: 'model_Q', type: LinkType.CONTAINS },
+
+    // 6. Topology <-> Set Theory
+    // (Аксиома Выбора и Топология)
+    { source: 'axiom_choice', target: 'topology', type: LinkType.RELATED }, // Теорема Тихонова
+    { source: 'ac_omega', target: 'topology', type: LinkType.RELATED }, // Мера Лебега, Борелевские множества
+    { source: 'continuum_hypothesis', target: 'topology', type: LinkType.RELATED }, // Топология прямой (Суслинская прямая и т.д.)
+
+    // 7. Fix "Foundations" Orphans
+    // (Переносим их в Логику связями, раз уж категорию убрали/переименовали)
+    { source: 'reverse_math', target: 'theory_PA', type: LinkType.RELATED }, // Базируется на подсистемах PA
+    { source: 'reverse_math', target: 'pred_logic', type: LinkType.RELATED },
+    { source: 'math_lang', target: 'zfc', type: LinkType.RELATED }, // ZFC как де-факто стандарт языка
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

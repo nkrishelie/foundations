@@ -1,5 +1,5 @@
 import { WelcomeModal } from './components/WelcomeModal';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { GraphViewer } from './components/GraphViewer';
 import { UIOverlay } from './components/UIOverlay';
 import { getGraphData } from './services/dataService';

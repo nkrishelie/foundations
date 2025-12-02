@@ -2166,6 +2166,7 @@ const RAW_LINKS = [
     { source: 'theory_RCF', target: 'model_R', type: LinkType.MODELS },
     { source: 'theory_RCF', target: 'thm_tarski_seidenberg', type: LinkType.PROVES },
     { source: 'theory_RCF', target: 'model_A', type: LinkType.RELATED },
+    { source: 'model_C', target: 'model_A', type: LinkType.CONTAINS },
     { source: 'model_R', target: 'model_Q', type: LinkType.CONTAINS },
     { source: 'theory_groups', target: 'auto_group', type: LinkType.RELATED },
     { source: 'model_Z', target: 'theory_groups', type: LinkType.MODELS },

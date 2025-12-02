@@ -83,30 +83,34 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
     isInited.current = false;
   }, [activeLanguage]);
 
-  // === НАСТРОЙКА ФИЗИКИ (БЕЗОПАСНАЯ) ===
+  // === НАСТРОЙКА ФИЗИКИ И КАМЕРЫ ===
   useEffect(() => {
-    // 1. Критическая проверка: если данных нет, не трогаем физику!
     if (!data || data.nodes.length === 0) return;
 
-    // 2. Используем setTimeout, чтобы React успел привязать ref
     const timer = setTimeout(() => {
       const fg = graphRef.current;
       if (!fg) return;
 
-      // Настройка сил (делаем граф "шире")
-      fg.d3Force('charge')?.strength(-150); // Отталкивание
-
+      // 1. Настройка сил (делаем граф широким)
+      fg.d3Force('charge')?.strength(-150);
       fg.d3Force('link')?.distance((link: any) => {
         if (link.type === 'RELATED') return 90; 
         return 60; 
       });
+
+      // 2. ИСПРАВЛЕНИЕ "ПРЫЖКА":
+      // Если это инициализация (первая загрузка или смена языка),
+      // СРАЗУ ставим камеру далеко. Граф будет расти ВНУТРИ экрана.
+      if (!isInited.current) {
+        // z: 1600 гарантирует, что даже большой граф поместится
+        fg.cameraPosition({ x: 0, y: 0, z: 1600 }); 
+      }
       
-      // Перезапуск только если данные уже есть
       fg.d3ReheatSimulation();
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [data]); // Зависимость от data гарантирует перезапуск при загрузке
+  }, [data]);
 
   // === ПОИСК И ФОКУСИРОВКА ===
   useEffect(() => {
@@ -179,7 +183,8 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   };
 
   const handleReset = () => {
-    graphRef.current?.zoomToFit(1000);
+    // Возврат в исходную далекую позицию
+    graphRef.current?.cameraPosition({ x: 0, y: 0, z: 1600 }, { x: 0, y: 0, z: 0 }, 1000);
   };
   
   if (!data || !data.nodes || data.nodes.length === 0) {
@@ -213,9 +218,14 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         // Оптимизация физики
         warmupTicks={50}
         cooldownTicks={50}
-        d3VelocityDecay={0.2}
+        d3VelocityDecay={0.2} 
         d3AlphaDecay={0.05}
         
+        // Убрали zoomToFit из остановки, чтобы не дергалось
+        onEngineStop={() => {
+            isInited.current = true;
+        }}
+
         // Всплывашка
         nodeLabel={(node: any) => {
           const labelText = cleanLabel(node.label);
@@ -293,10 +303,7 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         enableNodeDrag={true}
         
         onEngineStop={() => {
-          if (!isInited.current && graphRef.current) {
-            graphRef.current.zoomToFit(400);
             isInited.current = true;
-          }
         }}
       />
       

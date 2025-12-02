@@ -2156,18 +2156,17 @@ const RAW_LINKS = [
     { source: 'heyting_alg', target: 'intuitionistic_logic', type: LinkType.MODELS },
     { source: 'lattice', target: 'thm_knaster', type: LinkType.RELATED },
 
-    { source: 'theory_ACF', target: 'model_C', type: LinkType.MODELS },
-    { source: 'theory_ACF', target: 'model_A', type: LinkType.MODELS },
+    { source: 'model_C', target: 'theory_ACF', type: LinkType.MODELS },
+    { source: 'model_A', target: 'theory_ACF', type: LinkType.MODELS },
     { source: 'theory_ACF', target: 'thm_morley', type: LinkType.RELATED },
     { source: 'theory_ACF', target: 'thm_chevalley', type: LinkType.RELATED },
-    { source: 'theory_RCF', target: 'model_R', type: LinkType.MODELS },
-    { source: 'theory_RCF', target: 'thm_tarski_seidenberg', type: LinkType.PROVES },
+    { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS },
+    { source: 'theory_RCF', target: 'thm_tarski_seidenberg', type: LinkType.RELATED },
     { source: 'theory_RCF', target: 'model_A', type: LinkType.RELATED },
     { source: 'theory_groups', target: 'auto_group', type: LinkType.RELATED },
     { source: 'model_Z', target: 'theory_groups', type: LinkType.MODELS },
     { source: 'model_Q', target: 'theory_tf_groups', type: LinkType.MODELS },
     { source: 'theory_tf_groups', target: 'theory_groups', type: LinkType.EXTENDS },
-    { source: 'theory_tf_groups', target: 'model_Q', type: LinkType.RELATED },
 
     { source: 'topology', target: 'stone_space', type: LinkType.CONTAINS },
     { source: 'stone_space', target: 'bool_alg', type: LinkType.EQUIVALENT },
@@ -2306,7 +2305,9 @@ const RAW_LINKS = [
     { source: 'model_R', target: 'model_Q', type: LinkType.EXTENDS },
     { source: 'model_C', target: 'model_R', type: LinkType.EXTENDS },
     { source: 'model_A', target: 'model_Q', type: LinkType.EXTENDS }, 
-    { source: 'model_C', target: 'model_A', type: LinkType.CONTAINS },
+    { source: 'model_C', target: 'model_A', type: LinkType.EXTENDS },
+    { source: 'model_C', target: 'theory_fields', type: LinkType.MODELS },
+  
 
     { source: 'thm_tarski_truth', target: 'theory_PA', type: LinkType.RELATED },
     { source: 'thm_zorn', target: 'model_R', type: LinkType.RELATED }, 

@@ -78,34 +78,41 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   const graphRef = useRef<any>(null);
   const isInited = useRef(false);
 
-  // === НАСТРОЙКА ФИЗИКИ И КАМЕРЫ ===
+// === НАСТРОЙКА ФИЗИКИ И КАМЕРЫ ===
   useEffect(() => {
+    // Если данных нет, ничего не делаем
     if (!data || data.nodes.length === 0) return;
 
     const fg = graphRef.current;
     if (!fg) return;
 
-    // Применяем настройки сил
-    fg.d3Force('charge')?.strength(-150);
-    fg.d3Force('link')?.distance((link: any) => {
-      if (link.type === 'RELATED') return 90; 
-      return 60; 
-    });
-
-    // Инициализация камеры (только 1 раз при старте приложения)
+    // Мы применяем настройки ТОЛЬКО если это "свежий" граф (первая загрузка или смена языка).
+    // Если isInited.current === true, значит это просто фильтрация, 
+    // и мы не должны сбрасывать камеру или перезапускать физику.
     if (!isInited.current) {
-      // Ставим камеру сразу далеко, чтобы не было "взрыва" на весь экран
-      // 1600 - оптимально, чтобы весь граф влез в кадр
-      fg.cameraPosition({ x: 0, y: 0, z: 1600 }); 
-      
-      // Запускаем "разогрев" физики только при первом старте
-      // При смене языка (когда data меняется) узлы уже имеют координаты, 
-      // и движок просто плавно их подкорректирует, если нужно, 
-      // без полного рестарта (d3ReheatSimulation не вызываем принудительно здесь, если не хотим сброса)
+      const timer = setTimeout(() => {
+        // 1. Настройка сил (чтобы граф был широким)
+        fg.d3Force('charge')?.strength(-150);
+        fg.d3Force('link')?.distance((link: any) => {
+          if (link.type === 'RELATED') return 90; 
+          return 60; 
+        });
+
+        // 2. Ставим камеру далеко, чтобы избежать "взрыва" на весь экран
+        fg.cameraPosition({ x: 0, y: 0, z: 1600 }); 
+        
+        // 3. Запускаем симуляцию
+        fg.d3ReheatSimulation();
+      }, 100);
+
+      return () => clearTimeout(timer);
     }
     
-  }, [data]); // Запускается при смене данных (языка)
+    // При фильтрации (else) ничего делать не нужно —
+    // библиотека сама плавно скроет/покажет узлы.
 
+  }, [data, activeLanguage]); // Добавили activeLanguage для надежности
+  
   // === ПОИСК И ФОКУСИРОВКА ===
   useEffect(() => {
     if (searchQuery && graphRef.current && data.nodes.length > 0) {

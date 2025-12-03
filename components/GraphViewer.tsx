@@ -3,7 +3,7 @@ import ForceGraph3D from 'react-force-graph-3d';
 import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
 import { GraphData, GraphNode, GraphLink, LinkType } from '../types';
-import { DISCIPLINE_COLORS, LINK_COLORS } from '../constants';
+import { DISCIPLINE_COLORS, LINK_COLORS, LINK_LABELS } from '../constants';
 import { NavigationControls } from './NavigationControls';
 
 interface Props {
@@ -238,6 +238,23 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
             </div>
           `;
         }}
+
+        // === НОВОЕ: Тултип для связей ===
+        linkLabel={(link: any) => {
+          // Получаем локализованное название связи
+          // activeLanguage приводим к типу Language ('en' | 'ru')
+          const label = LINK_LABELS[link.type as LinkType]?.[activeLanguage as Language] || String(link.type);
+
+          // Возвращаем HTML-строку (стиль как у узлов, но чуть компактнее)
+          return `
+            <div class="px-2 py-1 bg-black/80 border border-slate-700 rounded shadow-sm backdrop-blur-sm pointer-events-none">
+              <div class="text-slate-200 text-[10px] uppercase tracking-wide font-semibold">
+                ${label}
+              </div>
+            </div>
+          `;
+        }}
+        linkHoverPrecision={4}
 
         // Отрисовка узлов
         nodeThreeObject={(node: any) => {

@@ -122,6 +122,16 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: 'Логика первого порядка', description: 'Логика, допускающая квантификацию по индивидам.', details: ['Кванторы', 'Термы', 'Формулы'] }
     }
   },
+  'modal_logic': {
+    group: Discipline.LOGIC,
+    kind: NodeKind.THEORY,
+    val: 22,
+    synonyms: ['Modal Logic', 'Модальная логика'],
+    content: {
+      en: { label: 'Modal Logic', description: 'Extensions of logic with modalities (necessity, possibility).', details: ['Kripke Semantics', 'Possible Worlds', 'Accessibility Relation'] },
+      ru: { label: 'Модальная логика', description: 'Расширения логики модальностями (необходимость, возможность).', details: ['Семантика Крипке', 'Возможные миры', 'Отношение достижимости'] }
+    }
+  },
   'zfc': {
     group: Discipline.SET_THEORY,
     kind: NodeKind.THEORY,
@@ -1662,6 +1672,8 @@ const RAW_LINKS = [
   { source: 'theory_PA2', target: 'theory_PA', type: LinkType.EXTENDS }, // 2-й порядок > 1-й
   { source: 'heyting_arithmetic', target: 'theory_PA', type: LinkType.RELATED }, // HA - интуиционистская PA (параллельная ветка)
   { source: 'modal_GL', target: 'modal_K4', type: LinkType.EXTENDS }, // GL транзитивна + Лёб
+  { source: 'modal_logic', target: 'topology', type: LinkType.RELATED },
+  { source: 'theory_PA', target: 'pred_logic', type: LinkType.EXTENDS },
 
   // --- Set Theory ---
   { source: 'zfc', target: 'theory_HF', type: LinkType.EXTENDS }, // ZFC добавляет бесконечность
@@ -1688,6 +1700,8 @@ const RAW_LINKS = [
   { source: 'maximal_ideal', target: 'prime_ideal', type: LinkType.EXTENDS }, // Максимальный всегда простой
 
   // --- Order Theory ---
+  { source: 'theory_order', target: 'pred_logic', type: LinkType.EXTENDS },
+  { source: 'theory_order', target: 'poset', type: LinkType.CONTAINS },
   { source: 'lattice', target: 'poset', type: LinkType.EXTENDS },
   { source: 'dist_lattice', target: 'lattice', type: LinkType.EXTENDS },
   { source: 'bool_alg', target: 'dist_lattice', type: LinkType.EXTENDS },
@@ -1696,7 +1710,8 @@ const RAW_LINKS = [
   { source: 'theory_DisLO', target: 'theory_order', type: LinkType.EXTENDS },
 
   // --- Modal Logic Hierarchy ---
-  { source: 'modal_K', target: 'prop_logic', type: LinkType.EXTENDS },
+  { source: 'modal_logic', target: 'prop_logic', type: LinkType.EXTENDS },
+  { source: 'modal_K', target: 'modal_logic', type: LinkType.EXTENDS },
   { source: 'modal_K4', target: 'modal_K', type: LinkType.EXTENDS },
   { source: 'modal_S4', target: 'modal_K4', type: LinkType.EXTENDS },
   { source: 'modal_S5', target: 'modal_S4', type: LinkType.EXTENDS },
@@ -1878,7 +1893,6 @@ const RAW_LINKS = [
   { source: 'thm_stone', target: 'bool_alg', type: LinkType.RELATED },
   { source: 'thm_knaster', target: 'lattice', type: LinkType.RELATED },
   { source: 'thm_knaster', target: 'thm_cbs', type: LinkType.PROVES }, // Используется в доказательстве
-  { source: 'modal_S4', target: 'topology', type: LinkType.RELATED }, // Топологическая семантика
   { source: 'modal_GL', target: 'scattered_space', type: LinkType.RELATED },
   { source: 'alexandrov_topology', target: 'poset', type: LinkType.RELATED }, // Связь порядков и топологии
 

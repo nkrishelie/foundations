@@ -1776,9 +1776,9 @@ const RAW_LINKS = [
   // --- Algebra (Structures) ---
   { source: 'theory_rings', target: 'theory_groups', type: LinkType.EXTENDS }, // Кольцо содержит аддитивную группу
   { source: 'theory_fields', target: 'theory_rings', type: LinkType.EXTENDS }, // Поле - это кольцо
-  { source: 'theory_ACF', target: 'theory_fields', type: LinkType.EXTENDS },
+  { source: 'theory_ACF', target: 'theory_fields', type: LinkType.EXTENDS, label: 'Adds algebraic closure' },
   { source: 'theory_RCF', target: 'theory_fields', type: LinkType.EXTENDS },
-  { source: 'theory_tf_groups', target: 'theory_groups', type: LinkType.EXTENDS },
+  { source: 'theory_tf_groups', target: 'theory_groups', type: LinkType.EXTENDS, label: 'Adds real closure' },
   
   // --- Algebra (Concepts) ---
   { source: 'module_ring', target: 'algebraic_structure', type: LinkType.EXTENDS },
@@ -1801,6 +1801,8 @@ const RAW_LINKS = [
   { source: 'poset', target: 'linear_order', type: LinkType.CONTAINS },
   { source: 'theory_DLO', target: 'linear_order', type: LinkType.CONTAINS },
   { source: 'theory_DisLO', target: 'linear_order', type: LinkType.CONTAINS },
+  // RCF integrates Order Theory
+  { source: 'theory_RCF', target: 'theory_order', type: LinkType.EXTENDS, label: 'Includes linear order' },
   
   // --- Modal Logic Hierarchy ---
   { source: 'modal_logic', target: 'prop_logic', type: LinkType.EXTENDS },
@@ -1838,8 +1840,8 @@ const RAW_LINKS = [
   { source: 'model_Z', target: 'euclidean_domain', type: LinkType.MODELS },
   { source: 'model_Q', target: 'theory_fields', type: LinkType.MODELS },
   { source: 'model_Q', target: 'theory_DLO', type: LinkType.MODELS },
-  { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS },
-  { source: 'model_C', target: 'theory_ACF', type: LinkType.MODELS },
+  { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS, label: 'Standard model' },
+  { source: 'model_C', target: 'theory_ACF', type: LinkType.MODELS, label: 'Standard model' },
   { source: 'model_A', target: 'theory_ACF', type: LinkType.MODELS }, // A - тоже модель ACF
   
   { source: 'model_V_omega', target: 'theory_HF', type: LinkType.MODELS },
@@ -1853,9 +1855,12 @@ const RAW_LINKS = [
   { source: 'heyting_alg', target: 'intuitionistic_logic', type: LinkType.MODELS },
   { source: 'jsson_tarski_alg', target: 'modal_K', type: LinkType.MODELS },
   { source: 'lindenbaum_alg', target: 'prop_logic', type: LinkType.MODELS }, // Каноническая модель
-  { source: 'open_set_topology', target: 'intuitionistic_logic', type: LinkType.MODELS },
+  // Intuitionistic logic corresponds to the lattice of Open Sets
+  { source: 'intuitionistic_logic', target: 'open_set_topology', type: LinkType.EQUIVALENT, label: 'Heyting Algebra of Open Sets' },
   
   { source: 'alexandrov_topology', target: 'modal_S4', type: LinkType.MODELS },
+  // S4 is topologically equivalent to the interior operator (Kuratowski)
+  { source: 'modal_S4', target: 'topology', type: LinkType.EQUIVALENT, label: 'Topological Interpretation (McKinsey-Tarski)' },
   { source: 'stone_space', target: 'prop_logic', type: LinkType.RELATED }, // Через двойственность
 
   // ==============================================================================
@@ -1873,7 +1878,7 @@ const RAW_LINKS = [
   // PA & Logic proofs
   { source: 'theory_PA', target: 'crt', type: LinkType.PROVES }, // КТО
   { source: 'theory_PA', target: 'sequence_coding', type: LinkType.PROVES }, // Бета-функция
-  { source: 'theory_PA', target: 'thm_tarski_undef', type: LinkType.PROVES },
+  { source: 'theory_PA', target: 'thm_tarski_undef', type: LinkType.RELATED, label: 'Subject of theorem' },
   { source: 'pred_logic', target: 'thm_completeness', type: LinkType.PROVES },
   { source: 'pred_logic', target: 'thm_compactness', type: LinkType.PROVES },
   { source: 'pred_logic', target: 'thm_lowenheim', type: LinkType.PROVES },
@@ -1903,11 +1908,11 @@ const RAW_LINKS = [
   { source: 'bool_alg', target: 'stone_space', type: LinkType.EQUIVALENT }, // Двойственность Стоуна
   { source: 'dist_lattice', target: 'priestley_space', type: LinkType.EQUIVALENT }, // Двойственность Пристли
   { source: 'heyting_alg', target: 'esakia_space', type: LinkType.EQUIVALENT }, // Двойственность Эсакиа
-  { source: 'bool_alg', target: 'bool_ring', type: LinkType.EQUIVALENT }, // Алгебраическая экв.
+  { source: 'bool_alg', target: 'bool_ring', type: LinkType.EQUIVALENT, label: 'Structure isomorphism' }, // Алгебраическая экв.
   
   // Структуры и теории
   { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT }, // Би-интерпретируемость
-  { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT }, // Консервативность
+  { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT, label: 'Conservative extension' }, // Консервативность
   { source: 'ordinal_omega', target: 'model_N', type: LinkType.EQUIVALENT },
   { source: 'lambda_calc', target: 'combinators', type: LinkType.EQUIVALENT }, // Эквивалентность по вычислимости
   { source: 'ski_combinators', target: 'combinators', type: LinkType.EQUIVALENT },
@@ -1922,17 +1927,20 @@ const RAW_LINKS = [
   { source: 'godel_incompleteness', target: 'recursion_concept', type: LinkType.RELATED }, // Самореференция
   { source: 'godel_incompleteness', target: 'halting_problem', type: LinkType.RELATED }, // Связь
   { source: 'diophantine_set', target: 'godel_incompleteness', type: LinkType.RELATED }, // MRDP теорема
-
+  // MRDP Theorem connects Diophantine sets to Computability
+  { source: 'diophantine_set', target: 'comp_theory', type: LinkType.RELATED, label: 'MRDP Theorem / Enumerable sets' },
+  
   // Independence cluster
   { source: 'continuum_hypothesis', target: 'forcing_method', type: LinkType.RELATED }, // Метод доказательства
   { source: 'axiom_choice', target: 'forcing_method', type: LinkType.RELATED },
   { source: 'forcing_method', target: 'model_L', type: LinkType.RELATED }, // L - ground model
   
   // Reverse Math cluster
-  { source: 'wkl0', target: 'thm_kruskal', type: LinkType.RELATED }, // WKL0 не доказывает Kruskal
+  { source: 'wkl0', target: 'thm_compactness', type: LinkType.PROVES, label: 'Proves compactness' },
   { source: 'rca0', target: 'comp_theory', type: LinkType.RELATED }, // Computable math
   { source: 'bpi', target: 'wkl0', type: LinkType.RELATED }, // BPI доказуема в WKL0+
-  
+  // Q is essential for undecidability
+  { source: 'theory_Q', target: 'comp_theory', type: LinkType.RELATED, label: 'Essential for incompleteness' },
   // Model Theory cluster
   { source: 'mt_concepts', target: 'ultraproduct', type: LinkType.CONTAINS },
   { source: 'mt_concepts', target: 'saturated_model', type: LinkType.CONTAINS },
@@ -1967,6 +1975,7 @@ const RAW_LINKS = [
   { source: 'epsilon_0', target: 'goodstein_theorem', type: LinkType.RELATED },
   { source: 'gamma_0', target: 'atr0', type: LinkType.RELATED },
   { source: 'cut_elimination', target: 'sequent_calculus', type: LinkType.RELATED },
+  { source: 'gamma_0', target: 'epsilon_0', type: LinkType.EXTENDS, label: 'Extends Veblen hierarchy' },
   
   // Computability Misc
   { source: 'church_turing', target: 'turing_machine', type: LinkType.RELATED },
@@ -1990,7 +1999,7 @@ const RAW_LINKS = [
   { source: 'alexandrov_topology', target: 'poset', type: LinkType.RELATED }, // Связь порядков и топологии
 
   // Set Theory Misc
-  { source: 'skolem_paradox', target: 'thm_lowenheim', type: LinkType.RELATED },
+  { source: 'skolem_paradox', target: 'thm_lowenheim', type: LinkType.RELATED, label: 'Derived from' },
   { source: 'skolem_paradox', target: 'model_N', type: LinkType.RELATED },
   { source: 'hartogs_number', target: 'ordinal_arithmetic', type: LinkType.RELATED },
   { source: 'axiom_choice', target: 'cardinal_arithmetic', type: LinkType.RELATED }, // Нужна для арифметики кардиналов

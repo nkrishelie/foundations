@@ -19,8 +19,8 @@ interface Props {
 }
 
 export const GraphViewer: React.FC<Props> = ({ 
-  nodes, 
-  links, 
+  nodes = [], // Добавлено значение по умолчанию
+  links = [], // Добавлено значение по умолчанию
   onNodeClick, 
   selectedNodeId,
   onBackgroundClick,
@@ -31,9 +31,11 @@ export const GraphViewer: React.FC<Props> = ({
   const fgRef = useRef<ForceGraphMethods>();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Фильтруем узлы и связи
+  // Фильтруем узлы и связи (с защитой от undefined)
   const visibleNodes = useMemo(() => {
+    if (!nodes) return [];
     return nodes.filter(n => {
+      if (!n) return false;
       if (hiddenGroups.has(n.group)) return false;
       if (n.kind && hiddenKinds.has(n.kind)) return false;
       return true;
@@ -41,8 +43,11 @@ export const GraphViewer: React.FC<Props> = ({
   }, [nodes, hiddenGroups, hiddenKinds]);
 
   const visibleLinks = useMemo(() => {
+    if (!links || !visibleNodes) return [];
+    
     const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
     return links.filter(l => {
+      if (!l) return false;
       const sourceId = typeof l.source === 'object' ? (l.source as any).id : l.source;
       const targetId = typeof l.target === 'object' ? (l.target as any).id : l.target;
       return visibleNodeIds.has(sourceId) && visibleNodeIds.has(targetId);
@@ -62,7 +67,7 @@ export const GraphViewer: React.FC<Props> = ({
 
   // Функция фокусировки камеры на узле
   const focusOnNode = useCallback((node: GraphNode) => {
-    if (!fgRef.current) return;
+    if (!fgRef.current || !node) return;
 
     // Целевое расстояние от камеры до узла
     const targetDistance = 40;
@@ -70,59 +75,59 @@ export const GraphViewer: React.FC<Props> = ({
     // Получаем текущую позицию камеры
     const currentPos = fgRef.current.cameraPosition();
 
+    // Проверка на наличие координат у узла
+    if (node.x === undefined || node.y === undefined || node.z === undefined) return;
+
     // Вектор от узла к текущей позиции камеры
-    const dx = currentPos.x - node.x!;
-    const dy = currentPos.y - node.y!;
-    const dz = currentPos.z - node.z!;
+    const dx = currentPos.x - node.x;
+    const dy = currentPos.y - node.y;
+    const dz = currentPos.z - node.z;
     
     // Текущее расстояние
     const currentDist = Math.hypot(dx, dy, dz);
 
     let newPos;
 
-    // Если камера слишком близко или координаты сбиты (первая загрузка),
-    // используем запасной вариант (смотреть от центра)
+    // Если камера слишком близко или координаты сбиты (первая загрузка)
     if (currentDist < 0.1) {
-       const distRatio = 1 + targetDistance / Math.hypot(node.x!, node.y!, node.z!);
+       const distRatio = 1 + targetDistance / Math.hypot(node.x, node.y, node.z);
        newPos = { 
-         x: node.x! * distRatio, 
-         y: node.y! * distRatio, 
-         z: node.z! * distRatio 
+         x: node.x * distRatio, 
+         y: node.y * distRatio, 
+         z: node.z * distRatio 
        };
     } else {
        // Иначе сохраняем текущий угол обзора, но меняем дистанцию
        const scale = targetDistance / currentDist;
        newPos = {
-         x: node.x! + dx * scale,
-         y: node.y! + dy * scale,
-         z: node.z! + dz * scale
+         x: node.x + dx * scale,
+         y: node.y + dy * scale,
+         z: node.z + dz * scale
        };
     }
 
     fgRef.current.cameraPosition(
       newPos, // Новая позиция камеры
-      { x: node.x!, y: node.y!, z: node.z! }, // LookAt (точка, куда смотрим - центр экрана)
+      { x: node.x, y: node.y, z: node.z }, // LookAt (точка, куда смотрим - центр экрана)
       2000 // Длительность анимации (ms)
     );
   }, []);
 
-  // Эффект для программного выбора узла (например, через поиск)
+  // Эффект для программного выбора узла
   useEffect(() => {
-    if (selectedNodeId && fgRef.current) {
-      // Ищем узел среди видимых, так как координаты есть только у них
+    if (selectedNodeId && fgRef.current && visibleNodes.length > 0) {
       const node = visibleNodes.find(n => n.id === selectedNodeId);
       if (node && node.x !== undefined && node.y !== undefined) {
-        // Небольшая задержка, чтобы движок успел обновить координаты, если граф перестраивался
         setTimeout(() => focusOnNode(node), 100);
       }
     }
   }, [selectedNodeId, visibleNodes, focusOnNode]);
 
   const handleNodeClick = useCallback((node: GraphNode) => {
+    if (!node) return;
     console.log("Node clicked:", node);
     onNodeClick(node);
     
-    // Фокусируемся при клике
     if (node.x !== undefined) {
       focusOnNode(node);
     }
@@ -154,11 +159,6 @@ export const GraphViewer: React.FC<Props> = ({
         
         // Engine
         cooldownTicks={100}
-        onEngineStop={() => {
-           console.log("Engine stopped");
-           // Если есть выбранный узел при остановке, можно подкорректировать камеру,
-           // но лучше не дергать лишний раз
-        }}
         
         // Visuals
         backgroundColor={isDark ? "#000000" : "#ffffff"}
@@ -170,8 +170,8 @@ export const GraphViewer: React.FC<Props> = ({
           const sprite = new SpriteText(node.label);
           sprite.color = isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)';
           sprite.textHeight = 4;
-          sprite.padding = 2; // Увеличил padding для читаемости
-          sprite.backgroundColor = isDark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)'; // Полупрозрачный фон
+          sprite.padding = 2;
+          sprite.backgroundColor = isDark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
           sprite.borderRadius = 4;
           return sprite;
         }}

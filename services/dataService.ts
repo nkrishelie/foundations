@@ -1638,7 +1638,6 @@ const RAW_LINKS = [
   { source: 'algebra_discipline', target: 'theory_groups', type: LinkType.CONTAINS },
   { source: 'algebra_discipline', target: 'theory_rings', type: LinkType.CONTAINS },
   { source: 'algebra_discipline', target: 'theory_fields', type: LinkType.CONTAINS },
-  { source: 'algebra_discipline', target: 'vector_space', type: LinkType.CONTAINS },
   { source: 'algebra_discipline', target: 'homomorphism_thms', type: LinkType.CONTAINS },
 
   { source: 'topology', target: 'stone_space', type: LinkType.CONTAINS },

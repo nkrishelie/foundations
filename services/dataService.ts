@@ -1986,7 +1986,7 @@ const RAW_LINKS = [
   // Model Theory cluster
   { source: 'model_theory', target: 'ultraproduct', type: LinkType.CONTAINS },
   { source: 'model_theory', target: 'type_theory_model', type: LinkType.CONTAINS, label: 'Core concept' },
-  { source: 'model_theory', target: 'saturated_model', type: LinkType.CONTAINS, 'Model property' },
+  { source: 'model_theory', target: 'saturated_model', type: LinkType.CONTAINS, label:'Model property' },
   { source: 'model_theory', target: 'prime_model', type: LinkType.CONTAINS, label: 'Model property' },
   { source: 'model_theory', target: 'indiscernibles', type: LinkType.CONTAINS, label: 'Structural property' },
   { source: 'model_theory', target: 'qe', type: LinkType.CONTAINS, label: 'Method' },

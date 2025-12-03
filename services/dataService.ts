@@ -24,8 +24,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 30,
     synonyms: ['Язык математики', 'Маглиш', 'Math Language', 'Syntax'],
     content: {
-      en: { label: 'Language of Math', description: 'The syntactic and semantic framework used to express mathematical concepts.', details: ['Syntax vs. Semantics', 'Matryoshka Principle', 'First-order Languages'] },
-      ru: { label: 'Язык математики', description: 'Синтаксический и семантический каркас для выражения математических понятий.', details: ['Синтаксис и Семантика', 'Принцип Матрешки', 'Языки первого порядка'] }
+      en: { label: 'Logic', description: 'The syntactic and semantic framework used to express mathematical concepts.', details: ['Syntax vs. Semantics', 'Matryoshka Principle', 'First-order Languages'] },
+      ru: { label: 'Логика', description: 'Синтаксический и семантический каркас для выражения математических понятий.', details: ['Синтаксис и Семантика', 'Принцип Матрешки', 'Языки первого порядка'] }
     }
   },
   'set_theory': {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { GraphNode, GraphLink, Discipline, LinkType, Language, NodeKind } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS, KIND_LABELS } from '../constants';
 import Latex from 'react-latex-next';
@@ -60,6 +60,62 @@ export const UIOverlay: React.FC<Props> = ({
   const [filteredNodes, setFilteredNodes] = useState<GraphNode[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  // --- Draggable Logic State ---
+  const [position, setPosition] = useState({ x: -1, y: 100 }); // -1 indicates "use default right align"
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Сброс позиции при закрытии или первом открытии можно не делать, чтобы сохранять местоположение,
+  // но если узел поменялся, карточка останется там, куда ее утащили.
+  
+  // Вычисляем ширину экрана для начального позиционирования, если нужно
+  useEffect(() => {
+    if (selectedNode && position.x === -1) {
+       // При первом открытии ставим справа, но вычисляем координату
+       // (window.innerWidth - ширина карточки (500) - отступ (16))
+       setPosition({ x: window.innerWidth - 520, y: 100 });
+    }
+  }, [selectedNode]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (cardRef.current && e.button === 0) { // Left click only
+      setIsDragging(true);
+      const rect = cardRef.current.getBoundingClientRect();
+      dragStartRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+      e.stopPropagation(); // Prevent text selection or other events
+    }
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        // Ограничиваем движение пределами окна
+        const newX = Math.max(0, Math.min(window.innerWidth - 500, e.clientX - dragStartRef.current.x));
+        const newY = Math.max(0, Math.min(window.innerHeight - 100, e.clientY - dragStartRef.current.y));
+        setPosition({ x: newX, y: newY });
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
+  // --- End Draggable Logic ---
+
   const activeDisciplines = useMemo(() => {
     return new Set(nodes.map(n => n.group));
   }, [nodes]);
@@ -67,6 +123,41 @@ export const UIOverlay: React.FC<Props> = ({
   const activeKinds = useMemo(() => {
     return new Set(nodes.filter(n => n.kind).map(n => n.kind!));
   }, [nodes]);
+
+  // --- Neighbors (Connected Nodes) Calculation ---
+  const relatedNodesGrouped = useMemo(() => {
+    if (!selectedNode) return null;
+
+    const neighbors: GraphNode[] = [];
+    const seenIds = new Set<string>();
+
+    links.forEach(l => {
+      const sourceId = typeof l.source === 'object' ? (l.source as any).id : l.source;
+      const targetId = typeof l.target === 'object' ? (l.target as any).id : l.target;
+
+      let otherId: string | null = null;
+      if (sourceId === selectedNode.id) otherId = targetId;
+      else if (targetId === selectedNode.id) otherId = sourceId;
+
+      if (otherId && !seenIds.has(otherId)) {
+        const node = nodes.find(n => n.id === otherId);
+        if (node) {
+          neighbors.push(node);
+          seenIds.add(otherId);
+        }
+      }
+    });
+
+    // Group by Kind
+    const groups: Record<string, GraphNode[]> = {};
+    neighbors.forEach(n => {
+      const k = n.kind || 'OTHER'; // Fallback key
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(n);
+    });
+
+    return groups;
+  }, [selectedNode, links, nodes]);
 
   const handleExport = () => {
     const nodesHeader = ['ID', 'Label', 'Group', 'Kind', 'Description', 'Details'];
@@ -147,9 +238,9 @@ export const UIOverlay: React.FC<Props> = ({
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4">
+    <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4 overflow-hidden">
       {/* Top Bar */}
-      <div className="pointer-events-none w-full flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative">
+      <div className="pointer-events-none w-full flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative z-30">
         <div className="w-full max-w-md relative pointer-events-auto">
           <h1 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight mb-2">
             MathLogic <span className="text-blue-400">Nexus</span>
@@ -222,7 +313,7 @@ export const UIOverlay: React.FC<Props> = ({
       </div>
       
       {/* Legend */}
-      <div className="pointer-events-auto absolute top-24 right-4 max-h-[70vh] overflow-y-auto custom-scrollbar z-10">
+      <div className="pointer-events-auto absolute top-24 right-4 max-h-[70vh] overflow-y-auto custom-scrollbar z-20">
         <div className={`bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-lg transition-all duration-300 ${isLegendOpen ? 'p-4' : 'p-2'}`}>
           <div className="flex items-center justify-between cursor-pointer gap-4" onClick={() => setIsLegendOpen(!isLegendOpen)}>
             <h3 className={`font-semibold text-slate-200 ${!isLegendOpen && 'hidden'}`}>{currentLang === 'en' ? 'Legend' : 'Легенда'}</h3>
@@ -313,25 +404,39 @@ export const UIOverlay: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Detail Sidebar - UPDATED */}
+      {/* Detail Sidebar - DRAGGABLE & WIDER */}
       {selectedNode && (
-        <div className="pointer-events-auto absolute right-4 bottom-4 top-1/4 w-96 bg-slate-900/95 backdrop-blur-xl border-l border-t border-slate-700 rounded-tl-xl rounded-bl-xl shadow-2xl transform transition-transform duration-300 overflow-hidden flex flex-col z-20">
-          <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
-            
-            {/* 1. Header: Title and Close Button */}
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-white leading-tight select-text">
+        <div 
+          ref={cardRef}
+          className="pointer-events-auto absolute bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl flex flex-col z-40 w-[500px]"
+          style={{
+            // Если координаты вычислены, используем их, иначе (первый рендер) используем дефолт
+            left: position.x >= 0 ? position.x : undefined,
+            top: position.y,
+            right: position.x === -1 ? 16 : undefined, // fallback for initial render
+            maxHeight: '80vh'
+          }}
+        >
+          {/* Header (Drag Handle) */}
+          <div 
+            className={`p-4 border-b border-slate-700 flex justify-between items-start select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            onMouseDown={handleMouseDown}
+          >
+             <h2 className="text-2xl font-bold text-white leading-tight pointer-events-none">
                 <Latex>{selectedNode.label}</Latex>
               </h2>
               <button 
                 onClick={onCloseSidebar} 
                 className="text-slate-400 hover:text-white transition-colors p-1 ml-4 flex-shrink-0"
+                onMouseDown={(e) => e.stopPropagation()} // Prevent drag when clicking close
               >
                 ✕
               </button>
-            </div>
+          </div>
 
-            {/* 2. Meta Info (Discipline | Type) - Moved below title */}
+          <div className="p-6 overflow-y-auto flex-1 custom-scrollbar cursor-auto">
+            
+            {/* Meta Info */}
             <div className="flex flex-wrap items-center gap-3 mb-6 text-sm text-slate-400 font-medium">
               <div className="flex items-center gap-2">
                 <span 
@@ -361,14 +466,15 @@ export const UIOverlay: React.FC<Props> = ({
               <Latex>{selectedNode.description}</Latex>
             </div>
 
+            {/* Key Concepts */}
             {selectedNode.details && selectedNode.details.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-3 mb-6">
                 <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider border-b border-slate-700 pb-1">
                   {currentLang === 'en' ? 'Key Concepts' : 'Ключевые понятия'}
                 </h3>
                 <ul className="space-y-2">
                   {selectedNode.details.map((detail, idx) => (
-                    <li key={idx} className="flex items-start space-x-2 bg-slate-800/50 p-2.5 rounded-md border border-slate-700/50 hover:border-blue-500/30 transition-colors">
+                    <li key={idx} className="flex items-start space-x-2 bg-slate-800/50 p-2.5 rounded-md border border-slate-700/50">
                       <span className="text-blue-400 mt-0.5 text-xs">●</span>
                       <span className="text-sm text-slate-200 leading-snug">
                         <Latex>{detail}</Latex>
@@ -378,8 +484,47 @@ export const UIOverlay: React.FC<Props> = ({
                 </ul>
               </div>
             )}
+
+            {/* Connected Nodes (New Block) */}
+            {relatedNodesGrouped && Object.keys(relatedNodesGrouped).length > 0 && (
+              <div className="space-y-3">
+                 <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider border-b border-slate-700 pb-1">
+                  {currentLang === 'en' ? 'Related Nodes' : 'Связанные узлы'}
+                </h3>
+                <div className="max-h-60 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+                  {Object.entries(relatedNodesGrouped).map(([kindKey, nodesInGroup]) => {
+                     const kind = kindKey as NodeKind | 'OTHER';
+                     const label = kind === 'OTHER' ? 'Other' : KIND_LABELS[kind][currentLang];
+                     
+                     return (
+                       <div key={kindKey}>
+                         <div className="text-[10px] text-slate-500 uppercase font-semibold mb-1">{label}</div>
+                         <div className="grid grid-cols-1 gap-1">
+                           {nodesInGroup.map(n => (
+                             <div 
+                               key={n.id}
+                               onClick={() => handleSelectNode(n)}
+                               className="flex items-center gap-2 px-2 py-1.5 bg-slate-800/30 hover:bg-slate-700 rounded cursor-pointer transition-colors border border-transparent hover:border-slate-600"
+                             >
+                                <span 
+                                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                  style={{ backgroundColor: DISCIPLINE_COLORS[n.group] }}
+                                />
+                                <span className="text-xs text-slate-300 truncate">
+                                  <Latex>{n.label}</Latex>
+                                </span>
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+                     )
+                  })}
+                </div>
+              </div>
+            )}
+
           </div>
-          <div className="p-3 border-t border-slate-800 bg-slate-900/80 text-center text-[10px] text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-300 transition-colors" onClick={onCloseSidebar}>
+          <div className="p-3 border-t border-slate-800 bg-slate-900/80 text-center text-[10px] text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-300 transition-colors rounded-b-xl" onClick={onCloseSidebar}>
             {currentLang === 'en' ? 'Close Panel' : 'Закрыть'}
           </div>
         </div>

@@ -500,6 +500,32 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   // ==========================================
   // 3. STRUCTURES (Модели, пространства, алгебры)
   // ==========================================
+  'model_quine': {
+    group: Discipline.SET_THEORY,
+    kind: NodeKind.STRUCTURE,
+    val: 14,
+    synonyms: ['NF Model', 'Модель NF', 'New Foundations', 'Universum V in V'],
+    content: {
+      en: { 
+        label: 'Quine\'s Model (NF)', 
+        description: 'A model of New Foundations set theory, allowing a universal set.', 
+        details: [
+          'Universal Set: $V \\in V$', 
+          'Stratified formulas', 
+          'Disproves Choice (Specker)' // Теорема Шпеккера: в NF аксиома выбора ложна
+        ] 
+      },
+      ru: { 
+        label: 'Модель Куайна (NF)', 
+        description: 'Модель теории множеств New Foundations, допускающая универсальное множество.', 
+        details: [
+          'Универсальное множество: $V \\in V$', 
+          'Стратификация формул', 
+          'Опровергает Выбор (Шпеккер)' 
+        ] 
+      }
+    }
+  },
   'ordinal_arithmetic': {
     group: Discipline.SET_THEORY,
     kind: NodeKind.STRUCTURE,
@@ -1715,7 +1741,6 @@ const RAW_LINKS = [
   { source: 'set_theory', target: 'ultrafilter', type: LinkType.CONTAINS },
   { source: 'set_theory', target: 'continuum_hypothesis', type: LinkType.CONTAINS },
 
-  { source: 'model_theory', target: 'mt_concepts', type: LinkType.CONTAINS },
   { source: 'model_theory', target: 'theory_ACF', type: LinkType.CONTAINS },
   { source: 'model_theory', target: 'theory_RCF', type: LinkType.CONTAINS },
   { source: 'model_theory', target: 'model_nonstd', type: LinkType.CONTAINS },
@@ -1723,11 +1748,11 @@ const RAW_LINKS = [
   { source: 'model_theory', target: 'thm_lowenheim', type: LinkType.CONTAINS },
 
   { source: 'proof_theory', target: 'sequent_calculus', type: LinkType.CONTAINS },
-  { source: 'proof_theory', target: 'reverse_math', type: LinkType.CONTAINS },
   { source: 'proof_theory', target: 'godel_incompleteness', type: LinkType.CONTAINS },
   { source: 'proof_theory', target: 'epsilon_0', type: LinkType.CONTAINS },
   { source: 'proof_theory', target: 'gamma_0', type: LinkType.CONTAINS },
   { source: 'proof_theory', target: 'cut_elimination', type: LinkType.CONTAINS },
+  { source: 'proof_theory', target: 'rca0', type: LinkType.CONTAINS, label: 'Subsystem of analysis' },
 
   { source: 'comp_theory', target: 'turing_machine', type: LinkType.CONTAINS },
   { source: 'comp_theory', target: 'lambda_calc', type: LinkType.CONTAINS },
@@ -1770,8 +1795,6 @@ const RAW_LINKS = [
   { source: 'zfc', target: 'pred_logic', type: LinkType.EXTENDS },
   { source: 'zfc', target: 'theory_HF', type: LinkType.EXTENDS }, // ZFC добавляет бесконечность
   { source: 'large_cardinals', target: 'zfc', type: LinkType.EXTENDS }, // Большие кардиналы > ZFC
-  { source: 'ordinal_arithmetic', target: 'transitive_set', type: LinkType.EXTENDS }, // Ординал есть транзитивное мн-во
-  { source: 'cumulative_hierarchy', target: 'transitive_set', type: LinkType.RELATED },
 
   // --- Algebra (Structures) ---
   { source: 'theory_rings', target: 'theory_groups', type: LinkType.EXTENDS }, // Кольцо содержит аддитивную группу
@@ -1914,13 +1937,17 @@ const RAW_LINKS = [
   { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT }, // Би-интерпретируемость
   { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT, label: 'Conservative extension' }, // Консервативность
   { source: 'ordinal_omega', target: 'model_N', type: LinkType.EQUIVALENT },
-  { source: 'lambda_calc', target: 'combinators', type: LinkType.EQUIVALENT }, // Эквивалентность по вычислимости
-  { source: 'ski_combinators', target: 'combinators', type: LinkType.EQUIVALENT },
+  { source: 'lambda_calc', target: 'ski_combinators', type: LinkType.EQUIVALENT, label: 'Computational equivalence' }, // Эквивалентность по вычислимости
   
   // ==============================================================================
   // 6. RELATED / CONTAINS (Contextual Links)
   // Смысловые связи, методы, применения
   // ==============================================================================
+  // Cross-discipline
+  { source: 'algebra_discipline', target: 'set_theory', type: LinkType.RELATED, label: 'Structures are sets with operations' },
+  { source: 'topology', target: 'set_theory', type: LinkType.EXTENDS, label: 'Structure on a set' },
+  // ZFC обеспечивает универсум для большинства математических объектов
+  { source: 'set_theory', target: 'math_lang', type: LinkType.RELATED, label: 'Provides foundation' },
   // Incompleteness cluster
   { source: 'theory_PA', target: 'godel_incompleteness', type: LinkType.RELATED },
   { source: 'godel_incompleteness', target: 'sequence_coding', type: LinkType.RELATED }, // Метод доказательства
@@ -1929,7 +1956,6 @@ const RAW_LINKS = [
   { source: 'diophantine_set', target: 'godel_incompleteness', type: LinkType.RELATED }, // MRDP теорема
   // MRDP Theorem connects Diophantine sets to Computability
   { source: 'diophantine_set', target: 'comp_theory', type: LinkType.RELATED, label: 'MRDP Theorem / Enumerable sets' },
-  
   // Independence cluster
   { source: 'continuum_hypothesis', target: 'forcing_method', type: LinkType.RELATED }, // Метод доказательства
   { source: 'axiom_choice', target: 'forcing_method', type: LinkType.RELATED },
@@ -1942,12 +1968,14 @@ const RAW_LINKS = [
   // Q is essential for undecidability
   { source: 'theory_Q', target: 'comp_theory', type: LinkType.RELATED, label: 'Essential for incompleteness' },
   // Model Theory cluster
-  { source: 'mt_concepts', target: 'ultraproduct', type: LinkType.CONTAINS },
-  { source: 'mt_concepts', target: 'saturated_model', type: LinkType.CONTAINS },
-  { source: 'mt_concepts', target: 'indiscernibles', type: LinkType.CONTAINS },
-  { source: 'mt_concepts', target: 'omitting_types', type: LinkType.CONTAINS },
-  { source: 'mt_concepts', target: 'type_theory_model', type: LinkType.CONTAINS },
-  { source: 'mt_concepts', target: 'qe', type: LinkType.CONTAINS },
+  { source: 'model_theory', target: 'ultraproduct', type: LinkType.CONTAINS },
+  { source: 'model_theory', target: 'type_theory_model', type: LinkType.CONTAINS, label: 'Core concept' },
+  { source: 'model_theory', target: 'saturated_model', type: LinkType.CONTAINS, 'Model property' },
+  { source: 'model_theory', target: 'prime_model', type: LinkType.CONTAINS, label: 'Model property' },
+  { source: 'model_theory', target: 'indiscernibles', type: LinkType.CONTAINS, label: 'Structural property' },
+  { source: 'model_theory', target: 'qe', type: LinkType.CONTAINS, label: 'Method' },
+  { source: 'model_theory', target: 'omitting_types', type: LinkType.CONTAINS, label: 'Method' },
+  { source: 'model_theory', target: 'thm_ef_games', type: LinkType.CONTAINS, label: 'Method' },
   
   { source: 'type_theory_model', target: 'stone_space_types', type: LinkType.RELATED },
   { source: 'stone_space_types', target: 'complete_type', type: LinkType.CONTAINS },

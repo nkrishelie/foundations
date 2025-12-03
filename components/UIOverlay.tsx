@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { GraphNode, GraphLink, Discipline, LinkType, Language } from '../types';
-import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS } from '../constants';
+import { GraphNode, GraphLink, Discipline, LinkType, Language, NodeKind } from '../types';
+import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS, KIND_LABELS } from '../constants';
 import Latex from 'react-latex-next';
 
-// Функция очистки для поиска
+// ... (функции cleanForSearch, escapeCsv, normalize остаются без изменений)
 const cleanForSearch = (str: string) => {
   if (!str) return '';
   return str
@@ -16,7 +16,6 @@ const cleanForSearch = (str: string) => {
     .trim();
 };
 
-// Функция экранирования для CSV
 const escapeCsv = (str: string) => {
   if (!str) return '';
   const result = str.replace(/"/g, '""');
@@ -37,9 +36,12 @@ interface Props {
   currentLang: Language;
   onToggleLang: (lang: Language) => void;
   
-  // Пропсы для фильтрации
   hiddenGroups: Set<Discipline>;
   onToggleGroup: (group: Discipline) => void;
+
+  // Новые пропсы
+  hiddenKinds: Set<NodeKind>;
+  onToggleKind: (kind: NodeKind) => void;
 }
 
 export const UIOverlay: React.FC<Props> = ({ 
@@ -51,28 +53,32 @@ export const UIOverlay: React.FC<Props> = ({
   currentLang,
   onToggleLang,
   hiddenGroups,
-  onToggleGroup
+  onToggleGroup,
+  hiddenKinds,
+  onToggleKind
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [isLegendOpen, setIsLegendOpen] = useState(true);
   const [filteredNodes, setFilteredNodes] = useState<GraphNode[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // === НОВОЕ: Вычисляем, какие дисциплины реально есть в графе ===
-  // Это скроет "пустые" категории (например, Foundations), если в них нет узлов
   const activeDisciplines = useMemo(() => {
-    const groups = new Set(nodes.map(n => n.group));
-    return groups;
+    return new Set(nodes.map(n => n.group));
   }, [nodes]);
-  // ==============================================================
 
-  // --- ЛОГИКА ЭКСПОРТА ---
+  // Вычисляем активные Kinds (чтобы не показывать пустые категории в легенде)
+  const activeKinds = useMemo(() => {
+    return new Set(nodes.filter(n => n.kind).map(n => n.kind!));
+  }, [nodes]);
+
   const handleExport = () => {
-    const nodesHeader = ['ID', 'Label', 'Group', 'Description', 'Details'];
+    // Добавил колонку Kind в экспорт
+    const nodesHeader = ['ID', 'Label', 'Group', 'Kind', 'Description', 'Details'];
     const nodesRows = nodes.map(n => [
       n.id,
       cleanForSearch(n.label),
       DISCIPLINE_LABELS[n.group][currentLang],
+      n.kind ? KIND_LABELS[n.kind][currentLang] : '',
       cleanForSearch(n.description),
       n.details ? n.details.map(cleanForSearch).join('; ') : ''
     ]);
@@ -82,6 +88,7 @@ export const UIOverlay: React.FC<Props> = ({
       ...nodesRows.map(row => row.map(escapeCsv).join(','))
     ].join('\n');
 
+    // Ссылки (без изменений)
     const linksHeader = ['Source ID', 'Target ID', 'Relation Type'];
     const linksRows = links.map((l: any) => [
       typeof l.source === 'object' ? l.source.id : l.source,
@@ -109,16 +116,14 @@ export const UIOverlay: React.FC<Props> = ({
     document.body.removeChild(link);
   };
 
-  // Логика фильтрации поиска
+  // ... (useEffect для поиска и handleSelectNode остаются без изменений)
   useEffect(() => {
     if (!inputValue || inputValue.length < 2) {
       setFilteredNodes([]);
       setShowDropdown(false);
       return;
     }
-
     const q = normalize(inputValue);
-    
     const results = nodes.filter(n => {
       if (normalize(n.id).includes(q)) return true;
       const labelClean = normalize(cleanForSearch(n.label));
@@ -127,7 +132,6 @@ export const UIOverlay: React.FC<Props> = ({
       if (normalize(cleanForSearch(n.description)).includes(q)) return true;
       return false;
     });
-
     setFilteredNodes(results.slice(0, 50));
     setShowDropdown(true);
   }, [inputValue, nodes]);
@@ -150,16 +154,12 @@ export const UIOverlay: React.FC<Props> = ({
 
   return (
     <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4">
-      
-      {/* Top Bar */}
+      {/* Top Bar (Поиск и кнопки) - без изменений */}
       <div className="pointer-events-none w-full flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative">
-        
-        {/* Search Block */}
         <div className="w-full max-w-md relative pointer-events-auto">
           <h1 className="text-3xl font-bold text-white drop-shadow-lg tracking-tight mb-2">
             MathLogic <span className="text-blue-400">Nexus</span>
           </h1>
-          
           <div className="relative">
             <input
               type="text"
@@ -171,12 +171,9 @@ export const UIOverlay: React.FC<Props> = ({
               placeholder={currentLang === 'en' ? "Search..." : "Поиск..."}
               className="w-full px-4 py-2 bg-slate-800/90 text-white border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400 backdrop-blur-md shadow-xl"
             />
-
-            {/* Dropdown Results */}
             {showDropdown && filteredNodes.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-y-auto custom-scrollbar">
                 {filteredNodes.map((node) => {
-                  // Умный выбор синонима
                   const displaySynonym = node.synonyms?.find(s => {
                     const isCyrillic = /[а-яА-ЯёЁ]/.test(s);
                     return currentLang === 'ru' ? isCyrillic : !isCyrillic;
@@ -209,8 +206,6 @@ export const UIOverlay: React.FC<Props> = ({
             )}
           </div>
         </div>
-
-        {/* Buttons */}
         <div className="flex gap-2 pointer-events-auto">
           <button onClick={handleExport} className="flex items-center justify-center px-3 py-1.5 bg-slate-800/80 border border-slate-600 rounded-lg hover:bg-blue-600 text-slate-300 hover:text-white transition-all backdrop-blur-md">
             <span className="text-lg">💾</span>
@@ -222,7 +217,7 @@ export const UIOverlay: React.FC<Props> = ({
         </div>
       </div>
       
-      {/* Legend (Filtered) */}
+      {/* Legend (Updated) */}
       <div className="pointer-events-auto absolute top-24 right-4 max-h-[70vh] overflow-y-auto custom-scrollbar z-10">
         <div className={`bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-lg transition-all duration-300 ${isLegendOpen ? 'p-4' : 'p-2'}`}>
           <div className="flex items-center justify-between cursor-pointer gap-4" onClick={() => setIsLegendOpen(!isLegendOpen)}>
@@ -232,11 +227,13 @@ export const UIOverlay: React.FC<Props> = ({
           
           {isLegendOpen && (
             <div className="mt-3 space-y-4">
+              
+              {/* Disciplines */}
               <div>
                 <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Disciplines' : 'Разделы'}</h4>
                 <div className="space-y-1.5">
                   {(Object.keys(DISCIPLINE_COLORS) as Discipline[])
-                    .filter(disc => activeDisciplines.has(disc)) // <--- СКРЫВАЕМ ПУСТЫЕ КАТЕГОРИИ
+                    .filter(disc => activeDisciplines.has(disc))
                     .map((disc) => {
                       const isHidden = hiddenGroups.has(disc);
                       return (
@@ -260,6 +257,42 @@ export const UIOverlay: React.FC<Props> = ({
                   })}
                 </div>
               </div>
+
+              {/* Node Kinds (НОВЫЙ БЛОК) */}
+              <div>
+                <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Node Types' : 'Типы Узлов'}</h4>
+                <div className="space-y-1.5">
+                  {(Object.values(NodeKind) as NodeKind[])
+                    .filter(kind => activeKinds.has(kind)) // Показываем только если есть узлы этого типа
+                    .map((kind) => {
+                      const isHidden = hiddenKinds.has(kind);
+                      return (
+                        <div 
+                          key={kind} 
+                          className={`flex items-center space-x-2 cursor-pointer transition-opacity duration-200 ${isHidden ? 'opacity-40' : 'opacity-100 hover:opacity-80'}`}
+                          onClick={() => onToggleKind(kind)}
+                        >
+                          {/* Используем квадратик для визуального отличия от дисциплин */}
+                          <span 
+                            className={`w-3 h-3 rounded-sm flex-shrink-0 border flex items-center justify-center`}
+                            style={{
+                              borderColor: isHidden ? '#64748b' : '#94a3b8', // slate-500 vs slate-400
+                              backgroundColor: isHidden ? 'transparent' : '#475569' // slate-600
+                            }}
+                          >
+                            {/* Опционально: галочка, если активен */}
+                            {!isHidden && <span className="block w-1.5 h-1.5 bg-blue-400 rounded-[1px]"></span>}
+                          </span>
+                          <span className={`text-xs text-slate-300 leading-tight ${isHidden ? 'line-through decoration-slate-500' : ''}`}>
+                            {KIND_LABELS[kind][currentLang]}
+                          </span>
+                        </div>
+                      );
+                  })}
+                </div>
+              </div>
+
+              {/* Relations */}
               <div>
                 <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">{currentLang === 'en' ? 'Relations' : 'Связи'}</h4>
                 <div className="space-y-1.5">
@@ -278,14 +311,22 @@ export const UIOverlay: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Detail Sidebar */}
+      {/* Detail Sidebar - без изменений */}
       {selectedNode && (
         <div className="pointer-events-auto absolute right-4 bottom-4 top-1/4 w-96 bg-slate-900/95 backdrop-blur-xl border-l border-t border-slate-700 rounded-tl-xl rounded-bl-xl shadow-2xl transform transition-transform duration-300 overflow-hidden flex flex-col z-20">
           <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
             <div className="flex justify-between items-start mb-4">
-              <span className="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded text-white shadow-sm" style={{ backgroundColor: DISCIPLINE_COLORS[selectedNode.group] }}>
-                {DISCIPLINE_LABELS[selectedNode.group][currentLang]}
-              </span>
+              <div className="flex flex-col gap-1">
+                <span className="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded text-white shadow-sm self-start" style={{ backgroundColor: DISCIPLINE_COLORS[selectedNode.group] }}>
+                  {DISCIPLINE_LABELS[selectedNode.group][currentLang]}
+                </span>
+                {/* Можно добавить бейдж для Kind, если он есть */}
+                {selectedNode.kind && (
+                  <span className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded text-slate-300 border border-slate-600 self-start">
+                    {KIND_LABELS[selectedNode.kind][currentLang]}
+                  </span>
+                )}
+              </div>
               <button onClick={onCloseSidebar} className="text-slate-400 hover:text-white transition-colors p-1">✕</button>
             </div>
             

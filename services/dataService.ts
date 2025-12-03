@@ -271,24 +271,33 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: 'WKL_0', description: 'Система со слабой леммой Кенига.', details: ['Компактность', 'Гейне-Борель'] }
     }
   },
-  'aca0': {
+'aca0': {
     group: Discipline.PROOF_THEORY,
     kind: NodeKind.THEORY,
     val: 14,
     synonyms: ['ACA0', 'Arithmetic Comprehension'],
     content: {
-      en: { label: 'ACA_0', description: 'Arithmetic Comprehension Axiom system.', details: ['Equivalent to PA', 'Bolzano-Weierstrass'] },
-      ru: { label: 'ACA_0', description: 'Система с аксиомой арифметического свертывания.', details: ['Эквивалентна PA', 'Больцано-Вейерштрасс'] }
+      en: { 
+        // Используем \mathsf для шрифта без засечек, как принято в статьях
+        label: '$\\mathsf{ACA}_0$', 
+        description: 'Second-order system with Arithmetic Comprehension. It is a conservative extension of PA (proves exactly the same arithmetical theorems).', 
+        details: ['Conservative over PA', 'Arithmetical Comprehension', 'Ordinal $\\varepsilon_0$'] 
+      },
+      ru: { 
+        label: '$\\mathsf{ACA}_0$', 
+        description: 'Система второго порядка с арифметическим свертыванием. Является консервативным расширением PA (доказывает ровно те же арифметические теоремы).', 
+        details: ['Консервативно над PA', 'Арифметическое свертывание', 'Ординал $\\varepsilon_0$'] 
+      }
     }
   },
-  'atr0': {
+    'atr0': {
     group: Discipline.PROOF_THEORY,
     kind: NodeKind.THEORY,
     val: 12,
     synonyms: ['ATR0', 'Arith Transfinite Recursion'],
     content: {
-      en: { label: 'ATR_0', description: 'Arithmetic Transfinite Recursion.', details: ['Well-ordering proofs', 'Ulm Theory'] },
-      ru: { label: 'ATR_0', description: 'Арифметическая трансфинитная рекурсия.', details: ['Доказательства фундированности', 'Теория Ульма'] }
+      en: { label: '$\\mathsf{ATR}_0$', description: 'Arithmetic Transfinite Recursion.', details: ['Well-ordering proofs', 'Ulm Theory'] },
+      ru: { label: '$\\mathsf{ATR}_0$', description: 'Арифметическая трансфинитная рекурсия.', details: ['Доказательства фундированности', 'Теория Ульма'] }
     }
   },
   'pi11_ca0': {
@@ -297,8 +306,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Pi-1-1 CA0', 'Strong Comprehension'],
     content: {
-      en: { label: 'Pi-1-1 CA_0', description: 'Strongest of the Big Five systems.', details: ['Hyperarithmetic', 'Kruskal\'s Theorem'] },
-      ru: { label: 'Pi-1-1 CA_0', description: 'Сильнейшая из "Большой пятерки".', details: ['Гиперарифметика', 'Теорема Крускала'] }
+      en: { label: '$\\Pi^1_1-CA_0$', description: 'Strongest of the Big Five systems.', details: ['Hyperarithmetic', 'Kruskal\'s Theorem'] },
+      ru: { label: '$\\Pi^1_1-CA_0$', description: 'Сильнейшая из "Большой пятерки".', details: ['Гиперарифметика', 'Теорема Крускала'] }
     }
   },
   'modal_K': {
@@ -581,8 +590,16 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 10,
     synonyms: ['Boolean Ring', 'Булево кольцо'],
     content: {
-      en: { label: 'Boolean Ring', description: 'Ring where x^2 = x.', details: ['Equivalent to Boolean Algebra'] },
-      ru: { label: 'Булево кольцо', description: 'Кольцо, где x^2 = x.', details: ['Эквивалентно булевой алгебре'] }
+      en: { 
+        label: 'Boolean Ring', 
+        description: 'Ring where every element is idempotent: $x^2 = x$.', 
+        details: ['Equivalent to Boolean Algebra', 'Characteristic $2$'] 
+      },
+      ru: { 
+        label: 'Булево кольцо', 
+        description: 'Кольцо, в котором каждый элемент идемпотентен: $x^2 = x$.', 
+        details: ['Эквивалентно булевой алгебре', 'Характеристика $2$'] 
+      }
     }
   },
   'clop_alg': {

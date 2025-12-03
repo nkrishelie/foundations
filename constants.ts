@@ -10,8 +10,7 @@ export const DISCIPLINE_COLORS: Record<Discipline, string> = {
   [Discipline.PROOF_THEORY]: '#A855F7', // Violet
   [Discipline.COMPUTABILITY]: '#FFFFFF',// White
   [Discipline.ORDER_THEORY]: '#84CC16', // Lime
-  
-  [Discipline.FOUNDATIONS]: '#94A3B8',  // Slate
+  //[Discipline.FOUNDATIONS]: '#94A3B8',  // Slate
 };
 
 // Цвета для связей (согласованные с дисциплинами)

@@ -316,8 +316,22 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 10,
     synonyms: ['System K', 'Система K'],
     content: {
-      en: { label: 'System K', description: 'The minimal normal modal logic.', details: ['Distribution Axiom', 'Necessitation'] },
-      ru: { label: 'Система K', description: 'Минимальная нормальная модальная логика.', details: ['Аксиома нормальности', 'Усиление'] }
+      en: { 
+        label: 'System K', 
+        description: 'The minimal normal modal logic.', 
+        details: [
+          'Distributivity: $\\Box(p \\to q) \\to (\\Box p \\to \\Box q)$', // [cite: 1004]
+          'Rule of Necessitation: $p \\vdash \\Box p$' 
+        ] 
+      },
+      ru: { 
+        label: 'Система K', 
+        description: 'Минимальная нормальная модальная логика.', 
+        details: [
+          'Дистрибутивность: $\\Box(p \\to q) \\to (\\Box p \\to \\Box q)$', 
+          'Правило усиления: $p \\vdash \\Box p$' 
+        ] 
+      }
     }
   },
   'modal_K4': {
@@ -326,8 +340,22 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 10,
     synonyms: ['System K4', 'Система K4'],
     content: {
-      en: { label: 'System K4', description: 'Transitive modal logic.', details: ['Transitivity'] },
-      ru: { label: 'Система K4', description: 'Транзитивная модальная логика.', details: ['Транзитивность'] }
+      en: { 
+        label: 'System K4', 
+        description: 'Transitive modal logic.', 
+        details: [
+          'Transitivity: $\\Box p \\to \\Box\\Box p$', // [cite: 1006]
+          'Frame property: Transitive' 
+        ] 
+      },
+      ru: { 
+        label: 'Система K4', 
+        description: 'Транзитивная модальная логика.', 
+        details: [
+          'Транзитивность: $\\Box p \\to \\Box\\Box p$', 
+          'Свойство шкалы: Транзитивность' 
+        ] 
+      }
     }
   },
   'modal_S4': {
@@ -336,8 +364,24 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['System S4', 'Система S4'],
     content: {
-      en: { label: 'System S4', description: 'Reflexive and transitive modal logic.', details: ['Topology', 'Knowledge'] },
-      ru: { label: 'Система S4', description: 'Рефлексивная и транзитивная модальная логика.', details: ['Топология', 'Знание'] }
+      en: { 
+        label: 'System S4', 
+        description: 'Reflexive and transitive modal logic (Logic of Knowledge/Topology).', 
+        details: [
+          'Reflexivity (T): $\\Box p \\to p$', // [cite: 1006]
+          'Transitivity (4): $\\Box p \\to \\Box\\Box p$',
+          'Topological Interior'
+        ] 
+      },
+      ru: { 
+        label: 'Система S4', 
+        description: 'Рефлексивная и транзитивная логика (Логика знания/Топология).', 
+        details: [
+          'Рефлексивность (T): $\\Box p \\to p$', 
+          'Транзитивность (4): $\\Box p \\to \\Box\\Box p$',
+          'Топологическая внутренность'
+        ] 
+      }
     }
   },
   'modal_S5': {
@@ -346,8 +390,24 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['System S5', 'Система S5'],
     content: {
-      en: { label: 'System S5', description: 'Logic of equivalence relations.', details: ['Metaphysical necessity'] },
-      ru: { label: 'Система S5', description: 'Логика отношений эквивалентности.', details: ['Метафизическая необходимость'] }
+      en: { 
+        label: 'System S5', 
+        description: 'Logic of equivalence relations.', 
+        details: [
+          'Euclidean: $\\Diamond p \\to \\Box\\Diamond p$', // [cite: 1006]
+          'Symmetry: $p \\to \\Box\\Diamond p$',
+          'Frame property: Equivalence'
+        ] 
+      },
+      ru: { 
+        label: 'Система S5', 
+        description: 'Логика отношений эквивалентности.', 
+        details: [
+          'Евклидовость: $\\Diamond p \\to \\Box\\Diamond p$', 
+          'Симметричность: $p \\to \\Box\\Diamond p$',
+          'Свойство шкалы: Эквивалентность'
+        ] 
+      }
     }
   },
   'modal_GL': {
@@ -356,8 +416,24 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['GL', 'Provability Logic', 'Логика доказуемости'],
     content: {
-      en: { label: 'Gödel-Löb (GL)', description: 'Logic of provability in Peano Arithmetic.', details: ['Löb\'s Axiom', 'Well-founded frames'] },
-      ru: { label: 'Гёдель-Лёб (GL)', description: 'Логика доказуемости в арифметике Пеано.', details: ['Аксиома Лёба', 'Обратная фундированность'] }
+      en: { 
+        label: 'Gödel-Löb (GL)', 
+        description: 'Logic of provability in Peano Arithmetic.', 
+        details: [
+          'Löb Axiom: $\\Box(\\Box p \\to p) \\to \\Box p$', // [cite: 1004]
+          'No infinite ascent',
+          'Arithmetical Completeness'
+        ] 
+      },
+      ru: { 
+        label: 'Гёдель-Лёб (GL)', 
+        description: 'Логика доказуемости в арифметике Пеано.', 
+        details: [
+          'Аксиома Лёба: $\\Box(\\Box p \\to p) \\to \\Box p$', 
+          'Нет бесконечного возрастания',
+          'Арифметическая полнота'
+        ] 
+      }
     }
   },
   'intuitionistic_logic': {
@@ -424,6 +500,26 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   // ==========================================
   // 3. STRUCTURES (Модели, пространства, алгебры)
   // ==========================================
+  'ordinal_arithmetic': {
+    group: Discipline.SET_THEORY,
+    kind: NodeKind.STRUCTURE,
+    val: 15,
+    synonyms: ['Ordinals', 'Ординалы', 'Порядковые числа'],
+    content: {
+      en: { label: 'Ordinals', description: 'Order types of well-ordered sets.', details: ['Transfinite Induction', 'Cantor Normal Form'] },
+      ru: { label: 'Ординалы', description: 'Порядковые типы вполне упорядоченных множеств.', details: ['Трансфинитная индукция', 'Нормальная форма Кантора'] }
+    }
+  },
+  'cardinal_arithmetic': {
+    group: Discipline.SET_THEORY,
+    kind: NodeKind.STRUCTURE,
+    val: 15,
+    synonyms: ['Cardinals', 'Кардиналы', 'Мощность'],
+    content: {
+      en: { label: 'Cardinals', description: 'Measures of set size.', details: ['Alephs', 'Cardinal Arithmetic'] },
+      ru: { label: 'Кардиналы', description: 'Меры размера множеств.', details: ['Алефы', 'Кардинальная арифметика'] }
+    }
+  },
   'model_N': {
     group: Discipline.MODEL_THEORY,
     kind: NodeKind.STRUCTURE,
@@ -764,26 +860,6 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     content: {
       en: { label: 'Ultrafilter', description: 'Maximal proper filter on a set or algebra.', details: ['Voting system', 'Ultraproduct'] },
       ru: { label: 'Ультрафильтр', description: 'Максимальный собственный фильтр.', details: ['Система голосования', 'Ультрапроизведение'] }
-    }
-  },
-  'ordinal_arithmetic': {
-    group: Discipline.SET_THEORY,
-    kind: NodeKind.CONCEPT,
-    val: 15,
-    synonyms: ['Ordinals', 'Ординалы', 'Порядковые числа'],
-    content: {
-      en: { label: 'Ordinals', description: 'Order types of well-ordered sets.', details: ['Transfinite Induction', 'Cantor Normal Form'] },
-      ru: { label: 'Ординалы', description: 'Порядковые типы вполне упорядоченных множеств.', details: ['Трансфинитная индукция', 'Нормальная форма Кантора'] }
-    }
-  },
-  'cardinal_arithmetic': {
-    group: Discipline.SET_THEORY,
-    kind: NodeKind.CONCEPT,
-    val: 15,
-    synonyms: ['Cardinals', 'Кардиналы', 'Мощность'],
-    content: {
-      en: { label: 'Cardinals', description: 'Measures of set size.', details: ['Alephs', 'Cardinal Arithmetic'] },
-      ru: { label: 'Кардиналы', description: 'Меры размера множеств.', details: ['Алефы', 'Кардинальная арифметика'] }
     }
   },
   'ideal_concept': {
@@ -1637,7 +1713,6 @@ const RAW_LINKS = [
   { source: 'set_theory', target: 'ordinal_arithmetic', type: LinkType.CONTAINS },
   { source: 'set_theory', target: 'cardinal_arithmetic', type: LinkType.CONTAINS },
   { source: 'set_theory', target: 'ultrafilter', type: LinkType.CONTAINS },
-  { source: 'set_theory', target: 'axiom_choice', type: LinkType.CONTAINS },
   { source: 'set_theory', target: 'continuum_hypothesis', type: LinkType.CONTAINS },
 
   { source: 'model_theory', target: 'mt_concepts', type: LinkType.CONTAINS },
@@ -1791,7 +1866,7 @@ const RAW_LINKS = [
   { source: 'zfc', target: 'thm_cantor', type: LinkType.PROVES },
   { source: 'zfc', target: 'thm_cbs', type: LinkType.PROVES },
   { source: 'zfc', target: 'thm_zermelo_wo', type: LinkType.PROVES },
-  { source: 'zfc', target: 'axiom_choice', type: LinkType.PROVES }, // В ZFC это аксиома
+  { source: 'zfc', target: 'axiom_choice', type: LinkType.CONTAINS }, // В ZFC это аксиома
   { source: 'zfc', target: 'ordinal_arithmetic', type: LinkType.PROVES },
   { source: 'zfc', target: 'cardinal_arithmetic', type: LinkType.PROVES },
   

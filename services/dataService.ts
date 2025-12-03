@@ -2204,6 +2204,23 @@ const RAW_LINKS = [
   
   // --- Stone Spaces Examples ---
   { source: 'bool_alg', target: 'stone_space', type: LinkType.EQUIVALENT, label: 'Stone Duality' },
+
+  // --- Transfinite Induction Fixes ---
+  // Связываем с Ординалами (это "родная" структура для индукции)
+  { source: 'ordinal_arithmetic', target: 'transfinite_induction', type: LinkType.MODELS, label: 'Defined on well-orders'  },
+  // Связываем с теорией ATR0 (она постулирует трансфинитную рекурсию)
+  { source: 'atr0', target: 'transfinite_induction', type: LinkType.CONTAINS, label: 'Axiom of Transfinite Recursion' },
+  // Связываем с ординалом Epsilon-0 (предел индукции для PA)
+  { source: 'epsilon_0', target: 'transfinite_induction', type: LinkType.MODELS, label: 'Proof-theoretic limit' },
+  // --- Dedekind Finite Fixes ---
+  // Связываем с Кардиналами (это понятие о размере/мощности)
+  { source: 'dedekind_finite', target: 'cardinal_arithmetic', type: LinkType.EXTENDS, label: 'Definition of finiteness' },
+  // Связываем с Омегой (Dedekind finite <=> нет подмножества равномощного omega)
+  { source: 'dedekind_finite', target: 'ordinal_omega', type: LinkType.RELATED, label: 'Contrast with infinity' },
+  // Связываем с моделью наследственно конечных множеств
+  { source: 'model_V_omega', target: 'dedekind_finite', type: LinkType.MODELS, label: 'Contains standard finite sets' },
+  // Связь с ZFC (в ZFC это эквивалентно обычной конечности)
+  { source: 'dedekind_finite', target: 'zfc', type: LinkType.RELATED, label: 'Equivalent to finite in ZFC' }
   
 ];
 

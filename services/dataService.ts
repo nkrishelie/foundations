@@ -2098,6 +2098,33 @@ const RAW_LINKS = [
 { source: 'cumulative_hierarchy', target: 'ordinal_arithmetic', type: LinkType.CONTAINS, label: 'Indexed by ordinals' },
 { source: 'cumulative_hierarchy', target: 'rank_concept', type: LinkType.CONTAINS, label: 'Defines rank' },
 { source: 'model_V_omega', target: 'cumulative_hierarchy', type: LinkType.RELATED, label: 'Stage ω' },
+
+// --- Automorphism Group ---
+  // Группа автоморфизмов — важнейший инструмент в Теории Моделей (анализ симметрий)
+  { source: 'model_theory', target: 'auto_group', type: LinkType.RELATED, label: 'Tool for analyzing structures' },
+  // Сама по себе группа автоморфизмов удовлетворяет аксиомам Групп
+  { source: 'auto_group', target: 'theory_groups', type: LinkType.MODELS, label: 'Is a group structure' },
+
+  // --- Specific Models ---
+  // Z+Z — модель дискретного линейного порядка
+  { source: 'model_Z_plus_Z', target: 'theory_DisLO', type: LinkType.MODELS, label: 'Model of discrete order' },
+  // N + ZxQ — порядковый тип нестандартных моделей арифметики
+  { source: 'model_N_ZxQ', target: 'theory_PA', type: LinkType.MODELS, label: 'Order type of non-standard models' },
+  // Свяжем с концептом нестандартных моделей
+  { source: 'model_N_ZxQ', target: 'model_nonstd', type: LinkType.RELATED, label: 'Specific instance' },
+
+  // --- Logic Meta-properties ---
+  // Soundness & Completeness относятся к Логике в целом
+  { source: 'math_lang', target: 'soundness_completeness', type: LinkType.CONTAINS, label: 'Meta-logical properties' },
+  // Теорема о полноте формализует концепт полноты
+  { source: 'thm_completeness', target: 'soundness_completeness', type: LinkType.RELATED, label: 'Formal statement' },
+
+  // --- Inference Rules ---
+  // Выводимость (Inference Concept) состоит из Правил вывода
+  { source: 'inference_concept', target: 'inference_rules', type: LinkType.CONTAINS, label: 'Defined by rules' },
+  // Правила вывода являются частью Логики предикатов
+  { source: 'pred_logic', target: 'inference_rules', type: LinkType.CONTAINS, label: 'Modus Ponens, Generalization' },
+  
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

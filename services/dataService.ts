@@ -88,17 +88,6 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: 'Общая топология', description: 'Изучение свойств, сохраняющихся при деформациях.', details: ['Открытые множества', 'Непрерывность', 'Компактность'] }
     }
   },
-  'order_theory': {
-    group: Discipline.ORDER_THEORY,
-    kind: NodeKind.DISCIPLINE,
-    val: 30,
-    synonyms: ['Теория порядков', 'Order Theory', 'Lattices'],
-    content: {
-      en: { label: 'Order Theory', description: 'The study of binary relations capturing the intuitive notion of order.', details: ['Posets', 'Lattices', 'Boolean Algebras'] },
-      ru: { label: 'Теория порядков', description: 'Изучение бинарных отношений, формализующих понятие порядка.', details: ['ЧУМы', 'Решетки', 'Булевы алгебры'] }
-    }
-  },
-
   // ==========================================
   // 2. THEORIES (Формальные теории)
   // ==========================================
@@ -385,7 +374,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   'theory_order': {
     group: Discipline.ORDER_THEORY,
     kind: NodeKind.THEORY,
-    val: 15,
+    val: 20,
     synonyms: ['Order Axioms', 'Аксиомы порядка'],
     content: {
       en: { label: 'Theory of Order', description: 'Axioms defining partial and linear orders.', details: ['Reflexivity', 'Antisymmetry', 'Transitivity'] },
@@ -1030,6 +1019,16 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: 'ЧУМ', description: 'Частично упорядоченное множество.', details: ['Рефлексивность', 'Антисимметричность'] }
     }
   },
+  'linear_order': {
+    group: Discipline.ORDER_THEORY,
+    kind: NodeKind.CONCEPT,
+    val: 15,
+    synonyms: ['Linear Order', 'Total Order', 'ЛУМ', 'Линейно упорядоченное множество'],
+    content: {
+      en: { label: 'Linear Order', description: 'A poset satisfying the connexity property.', details: ['Comparable elements', 'Line'] },
+      ru: { label: 'Линейный порядок (ЛУМ)', description: 'ЧУМ, удовлетворяющий свойству связности.', details: ['Сравнимые элементы', 'Линия'] }
+    }
+  },
   'lattice': {
     group: Discipline.ORDER_THEORY,
     kind: NodeKind.CONCEPT,
@@ -1655,12 +1654,6 @@ const RAW_LINKS = [
   { source: 'topology', target: 'alexandrov_topology', type: LinkType.CONTAINS },
   { source: 'topology', target: 'clop_alg', type: LinkType.CONTAINS },
 
-  { source: 'order_theory', target: 'poset', type: LinkType.CONTAINS },
-  { source: 'order_theory', target: 'lattice', type: LinkType.CONTAINS },
-  { source: 'order_theory', target: 'bool_alg', type: LinkType.CONTAINS },
-  { source: 'order_theory', target: 'heyting_alg', type: LinkType.CONTAINS },
-  { source: 'order_theory', target: 'theory_order', type: LinkType.CONTAINS },
-
   // ==============================================================================
   // 2. HIERARCHIES (EXTENDS)
   // Direction: Child -> Parent (Наследник расширяет Родителя)
@@ -1713,9 +1706,10 @@ const RAW_LINKS = [
   { source: 'dist_lattice', target: 'lattice', type: LinkType.EXTENDS },
   { source: 'bool_alg', target: 'dist_lattice', type: LinkType.EXTENDS },
   { source: 'heyting_alg', target: 'dist_lattice', type: LinkType.EXTENDS },
-  { source: 'theory_DLO', target: 'theory_order', type: LinkType.EXTENDS },
-  { source: 'theory_DisLO', target: 'theory_order', type: LinkType.EXTENDS },
-
+  { source: 'poset', target: 'linear_order', type: LinkType.CONTAINS },
+  { source: 'theory_DLO', target: 'linear_order', type: LinkType.CONTAINS },
+  { source: 'theory_DisLO', target: 'linear_order', type: LinkType.CONTAINS },
+  
   // --- Modal Logic Hierarchy ---
   { source: 'modal_logic', target: 'prop_logic', type: LinkType.EXTENDS },
   { source: 'modal_K', target: 'modal_logic', type: LinkType.EXTENDS },

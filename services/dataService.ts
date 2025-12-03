@@ -2220,7 +2220,27 @@ const RAW_LINKS = [
   // Связываем с моделью наследственно конечных множеств
   { source: 'model_V_omega', target: 'dedekind_finite', type: LinkType.MODELS, label: 'Contains standard finite sets' },
   // Связь с ZFC (в ZFC это эквивалентно обычной конечности)
-  { source: 'dedekind_finite', target: 'zfc', type: LinkType.RELATED, label: 'Equivalent to finite in ZFC' }
+  { source: 'dedekind_finite', target: 'zfc', type: LinkType.RELATED, label: 'Equivalent to finite in ZFC' },
+
+  // --- Computability & Lambda Fixes ---
+  // Typed Lambda is a formal theory within Computability
+  { source: 'comp_theory', target: 'typed_lambda', type: LinkType.CONTAINS, label: 'Formal system' },
+  // Church-Rosser holds for Typed Lambda Calculus
+  { source: 'typed_lambda', target: 'church_rosser', type: LinkType.PROVES, label: 'Confluence property' },
+  // Also connects to Proof Theory via Curry-Howard
+  { source: 'proof_theory', target: 'typed_lambda', type: LinkType.RELATED, label: 'Corresponds to Intuitionistic Logic' },
+  // --- Model Theory Fixes ---
+  // Random Graph is a key structure in Model Theory (zero-one law)
+  { source: 'model_theory', target: 'model_random_graph', type: LinkType.CONTAINS, label: 'Example of omega-categorical structure' },
+  // Ryll-Nardzewski is a fundamental theorem of Model Theory
+  { source: 'model_theory', target: 'thm_ryll', type: LinkType.CONTAINS, label: 'Characterizes omega-categoricity' },
+  // The Random Graph is the prime example for this theorem
+  { source: 'model_random_graph', target: 'thm_ryll', type: LinkType.MODELS, label: 'Illustrates' },
+  // --- Set Theory Fixes ---
+  // Axiom of Determinacy is a candidate axiom for Set Theory
+  { source: 'set_theory', target: 'axiom_determinacy', type: LinkType.CONTAINS, label: 'Alternative axiom'  },
+  // It conflicts with AC
+  { source: 'axiom_determinacy', target: 'axiom_choice', type: LinkType.RELATED, label: 'Contradicts (in full universe)' },
   
 ];
 

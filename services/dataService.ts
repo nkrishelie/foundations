@@ -1990,12 +1990,14 @@ const RAW_LINKS = [
   // Смысловые связи, методы, применения
   // ==============================================================================
   // Cross-discipline
-  { source: 'algebra_discipline', target: 'set_theory', type: LinkType.RELATED, label: 'Structures are sets with operations' },
+  { source: 'algebra_discipline', target: 'set_theory', type: LinkType.EXTENDS, label: 'Structures are sets with operations' },
   { source: 'topology', target: 'set_theory', type: LinkType.EXTENDS, label: 'Structure on a set' },
+  { source: 'model_theory', target: 'set_theory', type: LinkType.EXTENDS, label: 'All structures' },
   // ZFC обеспечивает универсум для большинства математических объектов
   { source: 'math_lang', target: 'set_theory', type: LinkType.RELATED, label: 'Provides formal language' },
-  { source: 'model_theory', target: 'algebra_discipline', type: LinkType.RELATED, label: 'Studies algebraic structures' },
+  //{ source: 'model_theory', target: 'algebra_discipline', type: LinkType.RELATED, label: 'Studies algebraic structures' },
   { source: 'proof_theory', target: 'comp_theory', type: LinkType.RELATED, label: 'Via Curry-Howard, decidability' },
+  { source: 'proof_theory', target: 'math_lang', type: LinkType.RELATED, label: 'Syntactic analysis' },
   { source: 'comp_theory', target: 'math_lang', type: LinkType.RELATED, label: 'Computability of logical systems' },
   
   // Incompleteness cluster
@@ -2241,6 +2243,21 @@ const RAW_LINKS = [
   { source: 'set_theory', target: 'axiom_determinacy', type: LinkType.CONTAINS, label: 'Alternative axiom'  },
   // It conflicts with AC
   { source: 'axiom_determinacy', target: 'axiom_choice', type: LinkType.RELATED, label: 'Contradicts (in full universe)' },
+  // Hartogs number is the least ordinal not map-able into X. 
+  // Fundamental to set theory cardinality without Choice.
+  { source: 'set_theory', target: 'hartogs_number', type: LinkType.CONTAINS, label: 'Cardinality concept' },
+  // Cumulative Hierarchy is the universe V for ZFC
+  { source: 'set_theory', target: 'cumulative_hierarchy', type: LinkType.CONTAINS, label: 'Universe construction' },
+  { source: 'zfc', target: 'cumulative_hierarchy', type: LinkType.RELATED, label: 'Standard universe V' },
+  // Rank is the index in the hierarchy
+  { source: 'cumulative_hierarchy', target: 'rank_concept', type: LinkType.CONTAINS, label: 'Defined by hierarchy stage' },
+  // Rank is crucial for the Axiom of Foundation (Regularity) in ZFC
+  { source: 'zfc', target: 'rank_concept', type: LinkType.RELATED, label: 'Foundation axiom' },
+  // --- Order Theory Hierarchy Fixes ---
+  // DLO extends general Order Theory
+  { source: 'theory_DLO', target: 'theory_order', type: LinkType.EXTENDS, label: 'Adds density and no endpoints' },
+  // Discrete Linear Order extends general Order Theory
+  { source: 'theory_DisLO', target: 'theory_order', type: LinkType.EXTENDS, label: 'Adds discreteness' }
   
 ];
 

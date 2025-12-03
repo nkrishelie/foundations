@@ -34,6 +34,7 @@ export interface GraphNode {
   id: string;
   label: string;
   group: Discipline;
+  kind?: NodeKind;
   description: string;
   details?: string[]; 
   synonyms?: string[]; 

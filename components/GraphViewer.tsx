@@ -13,14 +13,13 @@ interface Props {
   onBackgroundClick: () => void;
   isDark: boolean;
   
-  // New props for filtering
   hiddenGroups: Set<string>;
   hiddenKinds: Set<NodeKind>;
 }
 
 export const GraphViewer: React.FC<Props> = ({ 
-  nodes = [], // Добавлено значение по умолчанию
-  links = [], // Добавлено значение по умолчанию
+  nodes = [], 
+  links = [], 
   onNodeClick, 
   selectedNodeId,
   onBackgroundClick,
@@ -31,9 +30,9 @@ export const GraphViewer: React.FC<Props> = ({
   const fgRef = useRef<ForceGraphMethods>();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Фильтруем узлы и связи (с защитой от undefined)
+  // Безопасная фильтрация с проверками на undefined
   const visibleNodes = useMemo(() => {
-    if (!nodes) return [];
+    if (!nodes || !Array.isArray(nodes)) return [];
     return nodes.filter(n => {
       if (!n) return false;
       if (hiddenGroups.has(n.group)) return false;
@@ -43,7 +42,7 @@ export const GraphViewer: React.FC<Props> = ({
   }, [nodes, hiddenGroups, hiddenKinds]);
 
   const visibleLinks = useMemo(() => {
-    if (!links || !visibleNodes) return [];
+    if (!links || !Array.isArray(links) || visibleNodes.length === 0) return [];
     
     const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
     return links.filter(l => {
@@ -69,35 +68,31 @@ export const GraphViewer: React.FC<Props> = ({
   const focusOnNode = useCallback((node: GraphNode) => {
     if (!fgRef.current || !node) return;
 
-    // Целевое расстояние от камеры до узла
-    const targetDistance = 40;
+    // Проверка на валидность координат (защита от краша камеры)
+    if (typeof node.x !== 'number' || typeof node.y !== 'number' || typeof node.z !== 'number') return;
     
-    // Получаем текущую позицию камеры
+    // Если координаты NaN (бывает при старте физики), выходим
+    if (isNaN(node.x) || isNaN(node.y) || isNaN(node.z)) return;
+
+    const targetDistance = 40;
     const currentPos = fgRef.current.cameraPosition();
 
-    // Проверка на наличие координат у узла
-    if (node.x === undefined || node.y === undefined || node.z === undefined) return;
-
-    // Вектор от узла к текущей позиции камеры
+    // Вектор от узла к камере
     const dx = currentPos.x - node.x;
     const dy = currentPos.y - node.y;
     const dz = currentPos.z - node.z;
     
-    // Текущее расстояние
     const currentDist = Math.hypot(dx, dy, dz);
 
     let newPos;
 
-    // Если камера слишком близко или координаты сбиты (первая загрузка)
+    // ЗАЩИТА ОТ ДЕЛЕНИЯ НА НОЛЬ И УЛЕТА КАМЕРЫ В БЕСКОНЕЧНОСТЬ
+    // Если камера слишком близко или координаты совпадают (dist ~ 0)
     if (currentDist < 0.1) {
-       const distRatio = 1 + targetDistance / Math.hypot(node.x, node.y, node.z);
-       newPos = { 
-         x: node.x * distRatio, 
-         y: node.y * distRatio, 
-         z: node.z * distRatio 
-       };
+       // Просто отодвигаемся по оси Z, если мы "внутри" узла
+       newPos = { x: node.x, y: node.y, z: node.z + targetDistance };
     } else {
-       // Иначе сохраняем текущий угол обзора, но меняем дистанцию
+       // Сохраняем текущий угол, меняем дистанцию
        const scale = targetDistance / currentDist;
        newPos = {
          x: node.x + dx * scale,
@@ -106,32 +101,37 @@ export const GraphViewer: React.FC<Props> = ({
        };
     }
 
-    fgRef.current.cameraPosition(
-      newPos, // Новая позиция камеры
-      { x: node.x, y: node.y, z: node.z }, // LookAt (точка, куда смотрим - центр экрана)
-      2000 // Длительность анимации (ms)
-    );
+    // Финальная проверка на NaN перед установкой камеры
+    if (!isNaN(newPos.x) && !isNaN(newPos.y) && !isNaN(newPos.z)) {
+        fgRef.current.cameraPosition(
+          newPos, 
+          { x: node.x, y: node.y, z: node.z }, 
+          2000
+        );
+    }
   }, []);
 
   // Эффект для программного выбора узла
   useEffect(() => {
     if (selectedNodeId && fgRef.current && visibleNodes.length > 0) {
       const node = visibleNodes.find(n => n.id === selectedNodeId);
-      if (node && node.x !== undefined && node.y !== undefined) {
-        setTimeout(() => focusOnNode(node), 100);
+      if (node && typeof node.x === 'number') {
+        // Даем небольшую задержку, чтобы физический движок успел присвоить координаты
+        setTimeout(() => focusOnNode(node), 200);
       }
     }
   }, [selectedNodeId, visibleNodes, focusOnNode]);
 
   const handleNodeClick = useCallback((node: GraphNode) => {
     if (!node) return;
-    console.log("Node clicked:", node);
     onNodeClick(node);
-    
-    if (node.x !== undefined) {
-      focusOnNode(node);
-    }
+    focusOnNode(node);
   }, [onNodeClick, focusOnNode]);
+
+  // Если данных нет, не рендерим ForceGraph3D, чтобы не было ошибок
+  if (!nodes || nodes.length === 0) {
+      return <div className="absolute inset-0 flex items-center justify-center text-slate-500">Загрузка графа...</div>;
+  }
 
   return (
     <div ref={containerRef} className="absolute inset-0 z-0">
@@ -167,7 +167,8 @@ export const GraphViewer: React.FC<Props> = ({
         // Sprites for text
         nodeThreeObjectExtend={true}
         nodeThreeObject={(node: any) => {
-          const sprite = new SpriteText(node.label);
+          const label = node.label || 'Node'; // Fallback если label нет
+          const sprite = new SpriteText(label);
           sprite.color = isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)';
           sprite.textHeight = 4;
           sprite.padding = 2;

@@ -1905,6 +1905,7 @@ export const getGraphData = (lang: Language = 'en'): GraphData => {
     return {
       id,
       group: node.group,
+      kind: node.kind,
       val: node.val,
       synonyms: node.synonyms,
       label: content.label,

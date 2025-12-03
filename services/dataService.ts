@@ -1790,9 +1790,13 @@ const RAW_LINKS = [
   { source: 'intuitionistic_logic', target: 'prop_logic', type: LinkType.EXTENDS },
   // Гёделевский перевод: Интуиционистская логика вкладывается в S4
   { source: 'intuitionistic_logic', target: 'modal_S4', type: LinkType.RELATED },
-  
+  // Modal GL как логика доказуемости - ключевая связь!
+  { source: 'modal_GL', target: 'proof_theory', type: LinkType.RELATED, label: 'Provability logic' },
+  { source: 'modal_GL', target: 'godel_incompleteness', type: LinkType.RELATED, label: 'Löb theorem relates to Gödel' },
+  { source: 'modal_GL', target: 'theory_PA', type: LinkType.RELATED, label: 'Arithmetical interpretation' },
+
   // --- Set Theory ---
-  { source: 'zfc', target: 'pred_logic', type: LinkType.EXTENDS },
+  { source: 'zfc', target: 'pred_logic', type: LinkType.EXTENDS, label: 'Provides formal language' },
   { source: 'zfc', target: 'theory_HF', type: LinkType.EXTENDS }, // ZFC добавляет бесконечность
   { source: 'large_cardinals', target: 'zfc', type: LinkType.EXTENDS }, // Большие кардиналы > ZFC
 
@@ -1843,7 +1847,11 @@ const RAW_LINKS = [
   { source: 'aca0', target: 'wkl0', type: LinkType.EXTENDS },
   { source: 'atr0', target: 'aca0', type: LinkType.EXTENDS },
   { source: 'pi11_ca0', target: 'atr0', type: LinkType.EXTENDS },
-
+  // Связи reverse math с другими областями
+  { source: 'wkl0', target: 'topology', type: LinkType.RELATED, label: 'Compactness properties' },
+  { source: 'aca0', target: 'model_theory', type: LinkType.RELATED, label: 'Arithmetic definability' },
+  { source: 'rca0', target: 'comp_theory', type: LinkType.RELATED, label: 'Computable mathematics base' },
+  { source: 'atr0', target: 'ordinal_arithmetic', type: LinkType.RELATED, label: 'Transfinite recursion' },
   // --- Number Systems (Structures) ---
   { source: 'model_Z', target: 'model_N', type: LinkType.EXTENDS },
   { source: 'model_Q', target: 'model_Z', type: LinkType.EXTENDS },
@@ -1932,7 +1940,9 @@ const RAW_LINKS = [
   { source: 'dist_lattice', target: 'priestley_space', type: LinkType.EQUIVALENT }, // Двойственность Пристли
   { source: 'heyting_alg', target: 'esakia_space', type: LinkType.EQUIVALENT }, // Двойственность Эсакиа
   { source: 'bool_alg', target: 'bool_ring', type: LinkType.EQUIVALENT, label: 'Structure isomorphism' }, // Алгебраическая экв.
-  
+  { source: 'stone_space', target: 'ultrafilter', type: LinkType.RELATED, label: 'Points via ultrafilters' },
+  { source: 'bpi', target: 'ultrafilter', type: LinkType.EQUIVALENT, label: 'BPI ⟺ Ultrafilter Theorem' },
+
   // Структуры и теории
   { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT }, // Би-интерпретируемость
   { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT, label: 'Conservative extension' }, // Консервативность
@@ -1947,7 +1957,11 @@ const RAW_LINKS = [
   { source: 'algebra_discipline', target: 'set_theory', type: LinkType.RELATED, label: 'Structures are sets with operations' },
   { source: 'topology', target: 'set_theory', type: LinkType.EXTENDS, label: 'Structure on a set' },
   // ZFC обеспечивает универсум для большинства математических объектов
-  { source: 'set_theory', target: 'math_lang', type: LinkType.RELATED, label: 'Provides foundation' },
+  { source: 'math_lang', target: 'set_theory', type: LinkType.RELATED, label: 'Provides formal language' },
+  { source: 'model_theory', target: 'algebra_discipline', type: LinkType.RELATED, label: 'Studies algebraic structures' },
+  { source: 'proof_theory', target: 'comp_theory', type: LinkType.RELATED, label: 'Via Curry-Howard, decidability' },
+  { source: 'comp_theory', target: 'math_lang', type: LinkType.RELATED, label: 'Computability of logical systems' },
+  
   // Incompleteness cluster
   { source: 'theory_PA', target: 'godel_incompleteness', type: LinkType.RELATED },
   { source: 'godel_incompleteness', target: 'sequence_coding', type: LinkType.RELATED }, // Метод доказательства
@@ -1960,10 +1974,12 @@ const RAW_LINKS = [
   { source: 'continuum_hypothesis', target: 'forcing_method', type: LinkType.RELATED }, // Метод доказательства
   { source: 'axiom_choice', target: 'forcing_method', type: LinkType.RELATED },
   { source: 'forcing_method', target: 'model_L', type: LinkType.RELATED }, // L - ground model
-  
+  // Forcing использует топологические концепции
+  { source: 'forcing_method', target: 'topology', type: LinkType.RELATED, label: 'Dense sets, filters' },
+  { source: 'forcing_method', target: 'bool_alg', type: LinkType.RELATED, label: 'Boolean-valued models' },
+  { source: 'large_cardinals', target: 'model_theory', type: LinkType.RELATED, label: 'Elementary embeddings' },
   // Reverse Math cluster
   { source: 'wkl0', target: 'thm_compactness', type: LinkType.PROVES, label: 'Proves compactness' },
-  { source: 'rca0', target: 'comp_theory', type: LinkType.RELATED }, // Computable math
   { source: 'bpi', target: 'wkl0', type: LinkType.RELATED }, // BPI доказуема в WKL0+
   // Q is essential for undecidability
   { source: 'theory_Q', target: 'comp_theory', type: LinkType.RELATED, label: 'Essential for incompleteness' },
@@ -1983,7 +1999,10 @@ const RAW_LINKS = [
   { source: 'thm_ryll', target: 'type_theory_model', type: LinkType.RELATED },
   { source: 'thm_los_vaught', target: 'thm_morley', type: LinkType.RELATED },
   { source: 'model_random_graph', target: 'thm_ryll', type: LinkType.RELATED }, // Пример
-
+  // Type spaces как обобщение
+  { source: 'stone_space_types', target: 'stone_space', type: LinkType.EXTENDS, label: 'Generalization to model theory' },
+  { source: 'type_theory_model', target: 'topology', type: LinkType.RELATED, label: 'Topological space of types' },
+  
   // Ultraproducts & Non-standard
   { source: 'ultraproduct', target: 'ultrafilter', type: LinkType.CONTAINS },
   { source: 'ultraproduct', target: 'model_nonstd', type: LinkType.RELATED },
@@ -2025,7 +2044,12 @@ const RAW_LINKS = [
   { source: 'thm_knaster', target: 'thm_cbs', type: LinkType.PROVES }, // Используется в доказательстве
   { source: 'modal_GL', target: 'scattered_space', type: LinkType.RELATED },
   { source: 'alexandrov_topology', target: 'poset', type: LinkType.RELATED }, // Связь порядков и топологии
-
+  // Order theory фундаментальна для set theory
+  { source: 'theory_order', target: 'set_theory', type: LinkType.RELATED, label: 'Well-orderings, ordinals' },
+  { source: 'linear_order', target: 'ordinal_arithmetic', type: LinkType.RELATED, label: 'Ordinals are well-orders' },
+  { source: 'lattice', target: 'algebra_discipline', type: LinkType.RELATED, label: 'Algebraic structure' },
+  { source: 'poset', target: 'alexandrov_topology', type: LinkType.EQUIVALENT, label: 'Alexandrov correspondence' },
+  
   // Set Theory Misc
   { source: 'skolem_paradox', target: 'thm_lowenheim', type: LinkType.RELATED, label: 'Derived from' },
   { source: 'skolem_paradox', target: 'model_N', type: LinkType.RELATED },
@@ -2040,6 +2064,40 @@ const RAW_LINKS = [
   { source: 'cylindric_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },
   { source: 'polyadic_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },
   { source: 'cylindric_alg', target: 'bool_alg', type: LinkType.EXTENDS },
+
+  // Расширение связей теорем о неполноте
+{ source: 'godel_incompleteness', target: 'model_nonstd', type: LinkType.RELATED, label: 'Non-standard models demonstrate incompleteness' },
+{ source: 'halting_problem', target: 'godel_incompleteness', type: LinkType.RELATED, label: 'Similar diagonalization' },
+{ source: 'goodstein_theorem', target: 'transfinite_induction', type: LinkType.RELATED, label: 'Proof requires ε₀' },
+{ source: 'thm_tarski_undef', target: 'godel_incompleteness', type: LinkType.RELATED, label: 'Undefinability results' },
+  // BHK и realizability
+{ source: 'bhk_interpretation', target: 'heyting_arithmetic', type: LinkType.RELATED, label: 'Interprets HA' },
+{ source: 'realizability', target: 'comp_theory', type: LinkType.RELATED, label: 'Uses computable functions' },
+{ source: 'realizability', target: 'bhk_interpretation', type: LinkType.RELATED, label: 'Formalizes BHK' },
+{ source: 'markov_principle', target: 'realizability', type: LinkType.RELATED, label: 'Realizability interpretation' },
+  // Game-theoretic методы
+{ source: 'thm_ef_games', target: 'model_theory', type: LinkType.CONTAINS, label: 'Model-theoretic tool' },
+{ source: 'thm_ef_games', target: 'thm_lowenheim', type: LinkType.RELATED, label: 'Alternative proof method' },
+{ source: 'axiom_determinacy', target: 'large_cardinals', type: LinkType.RELATED, label: 'Consistency via Woodin cardinals' },
+
+  // Цилиндрические алгебры
+{ source: 'cylindric_alg', target: 'model_theory', type: LinkType.RELATED, label: 'Algebraic semantics for FOL' },
+{ source: 'lindenbaum_alg', target: 'cylindric_alg', type: LinkType.RELATED, label: 'Lindenbaum-Tarski for FOL' },
+
+// Boolean rings
+{ source: 'bool_ring', target: 'set_theory', type: LinkType.RELATED, label: 'Fields of sets' },
+// Omega и алефы
+{ source: 'ordinal_omega', target: 'cardinal_aleph1', type: LinkType.RELATED, label: 'ω₁ is the first uncountable' },
+{ source: 'continuum_hypothesis', target: 'cardinal_aleph1', type: LinkType.RELATED, label: '2^ℵ₀ = ℵ₁?' },
+{ source: 'cardinal_aleph1', target: 'model_R', type: LinkType.RELATED, label: 'Continuum problem' },
+// Scattered spaces и ординалы
+{ source: 'scattered_space', target: 'ordinal_arithmetic', type: LinkType.RELATED, label: 'Cantor-Bendixson rank' },
+{ source: 'priestley_space', target: 'theory_order', type: LinkType.RELATED, label: 'Ordered topological space' },
+{ source: 'esakia_space', target: 'priestley_space', type: LinkType.EXTENDS, label: 'Priestley + continuity' },
+  // V_α и ординалы
+{ source: 'cumulative_hierarchy', target: 'ordinal_arithmetic', type: LinkType.CONTAINS, label: 'Indexed by ordinals' },
+{ source: 'cumulative_hierarchy', target: 'rank_concept', type: LinkType.CONTAINS, label: 'Defines rank' },
+{ source: 'model_V_omega', target: 'cumulative_hierarchy', type: LinkType.RELATED, label: 'Stage ω' },
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

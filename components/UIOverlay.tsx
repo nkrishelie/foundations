@@ -61,39 +61,32 @@ export const UIOverlay: React.FC<Props> = ({
   const [showDropdown, setShowDropdown] = useState(false);
 
   // --- Draggable Logic State ---
-  const [position, setPosition] = useState({ x: -1, y: 100 }); // -1 indicates "use default right align"
+  const [position, setPosition] = useState({ x: -1, y: 100 }); 
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Сброс позиции при закрытии или первом открытии можно не делать, чтобы сохранять местоположение,
-  // но если узел поменялся, карточка останется там, куда ее утащили.
-  
-  // Вычисляем ширину экрана для начального позиционирования, если нужно
   useEffect(() => {
     if (selectedNode && position.x === -1) {
-       // При первом открытии ставим справа, но вычисляем координату
-       // (window.innerWidth - ширина карточки (500) - отступ (16))
        setPosition({ x: window.innerWidth - 520, y: 100 });
     }
   }, [selectedNode]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (cardRef.current && e.button === 0) { // Left click only
+    if (cardRef.current && e.button === 0) { 
       setIsDragging(true);
       const rect = cardRef.current.getBoundingClientRect();
       dragStartRef.current = {
         x: e.clientX - rect.left,
         y: e.clientY - rect.top
       };
-      e.stopPropagation(); // Prevent text selection or other events
+      e.stopPropagation(); 
     }
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
-        // Ограничиваем движение пределами окна
         const newX = Math.max(0, Math.min(window.innerWidth - 500, e.clientX - dragStartRef.current.x));
         const newY = Math.max(0, Math.min(window.innerHeight - 100, e.clientY - dragStartRef.current.y));
         setPosition({ x: newX, y: newY });
@@ -125,11 +118,11 @@ export const UIOverlay: React.FC<Props> = ({
   }, [nodes]);
 
   // --- Neighbors (Connected Nodes) Calculation ---
-  const relatedNodesGrouped = useMemo(() => {
-    if (!selectedNode) return null;
+  // Фильтруем соседей, исключая скрытые группы и скрытые типы
+  const visibleNeighbors = useMemo(() => {
+    if (!selectedNode) return [];
 
-    const neighbors: GraphNode[] = [];
-    const seenIds = new Set<string>();
+    const neighborIds = new Set<string>();
 
     links.forEach(l => {
       const sourceId = typeof l.source === 'object' ? (l.source as any).id : l.source;
@@ -139,25 +132,19 @@ export const UIOverlay: React.FC<Props> = ({
       if (sourceId === selectedNode.id) otherId = targetId;
       else if (targetId === selectedNode.id) otherId = sourceId;
 
-      if (otherId && !seenIds.has(otherId)) {
-        const node = nodes.find(n => n.id === otherId);
-        if (node) {
-          neighbors.push(node);
-          seenIds.add(otherId);
-        }
-      }
+      if (otherId) neighborIds.add(otherId);
     });
 
-    // Group by Kind
-    const groups: Record<string, GraphNode[]> = {};
-    neighbors.forEach(n => {
-      const k = n.kind || 'OTHER'; // Fallback key
-      if (!groups[k]) groups[k] = [];
-      groups[k].push(n);
-    });
-
-    return groups;
-  }, [selectedNode, links, nodes]);
+    return nodes
+      .filter(n => neighborIds.has(n.id))
+      .filter(n => {
+        // Проверяем, не скрыт ли узел фильтрами
+        const isGroupHidden = hiddenGroups.has(n.group);
+        const isKindHidden = n.kind ? hiddenKinds.has(n.kind) : false;
+        return !isGroupHidden && !isKindHidden;
+      })
+      .sort((a, b) => a.label.localeCompare(b.label)); // Сортировка по алфавиту для аккуратности
+  }, [selectedNode, links, nodes, hiddenGroups, hiddenKinds]);
 
   const handleExport = () => {
     const nodesHeader = ['ID', 'Label', 'Group', 'Kind', 'Description', 'Details'];
@@ -410,10 +397,9 @@ export const UIOverlay: React.FC<Props> = ({
           ref={cardRef}
           className="pointer-events-auto absolute bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl flex flex-col z-40 w-[500px]"
           style={{
-            // Если координаты вычислены, используем их, иначе (первый рендер) используем дефолт
             left: position.x >= 0 ? position.x : undefined,
             top: position.y,
-            right: position.x === -1 ? 16 : undefined, // fallback for initial render
+            right: position.x === -1 ? 16 : undefined,
             maxHeight: '80vh'
           }}
         >
@@ -422,13 +408,13 @@ export const UIOverlay: React.FC<Props> = ({
             className={`p-4 border-b border-slate-700 flex justify-between items-start select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             onMouseDown={handleMouseDown}
           >
-             <h2 className="text-2xl font-bold text-white leading-tight pointer-events-none">
+             <h2 className="text-2xl font-bold text-white leading-tight pointer-events-none select-text">
                 <Latex>{selectedNode.label}</Latex>
               </h2>
               <button 
                 onClick={onCloseSidebar} 
                 className="text-slate-400 hover:text-white transition-colors p-1 ml-4 flex-shrink-0"
-                onMouseDown={(e) => e.stopPropagation()} // Prevent drag when clicking close
+                onMouseDown={(e) => e.stopPropagation()} 
               >
                 ✕
               </button>
@@ -485,39 +471,38 @@ export const UIOverlay: React.FC<Props> = ({
               </div>
             )}
 
-            {/* Connected Nodes (New Block) */}
-            {relatedNodesGrouped && Object.keys(relatedNodesGrouped).length > 0 && (
+            {/* Connected Nodes (Updated Layout) */}
+            {visibleNeighbors.length > 0 && (
               <div className="space-y-3">
                  <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider border-b border-slate-700 pb-1">
                   {currentLang === 'en' ? 'Related Nodes' : 'Связанные узлы'}
                 </h3>
-                <div className="max-h-60 overflow-y-auto custom-scrollbar pr-2 space-y-4">
-                  {Object.entries(relatedNodesGrouped).map(([kindKey, nodesInGroup]) => {
-                     const kind = kindKey as NodeKind | 'OTHER';
-                     const label = kind === 'OTHER' ? 'Other' : KIND_LABELS[kind][currentLang];
-                     
-                     return (
-                       <div key={kindKey}>
-                         <div className="text-[10px] text-slate-500 uppercase font-semibold mb-1">{label}</div>
-                         <div className="grid grid-cols-1 gap-1">
-                           {nodesInGroup.map(n => (
-                             <div 
-                               key={n.id}
-                               onClick={() => handleSelectNode(n)}
-                               className="flex items-center gap-2 px-2 py-1.5 bg-slate-800/30 hover:bg-slate-700 rounded cursor-pointer transition-colors border border-transparent hover:border-slate-600"
-                             >
-                                <span 
-                                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                                  style={{ backgroundColor: DISCIPLINE_COLORS[n.group] }}
-                                />
-                                <span className="text-xs text-slate-300 truncate">
-                                  <Latex>{n.label}</Latex>
-                                </span>
-                             </div>
-                           ))}
+                <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                  {visibleNeighbors.map(node => {
+                    const groupLabel = DISCIPLINE_LABELS[node.group][currentLang];
+                    const kindLabel = node.kind ? KIND_LABELS[node.kind][currentLang] : '';
+                    const metaInfo = `[${groupLabel}${kindLabel ? `, ${kindLabel}` : ''}]`;
+                    
+                    return (
+                      <div 
+                        key={node.id}
+                        onClick={() => handleSelectNode(node)}
+                        className="px-2 py-2 border-b border-slate-800 last:border-0 flex items-center justify-between group transition-all cursor-pointer hover:bg-slate-800"
+                      >
+                         <div className="flex items-center gap-2 overflow-hidden">
+                           <span 
+                             className="w-2 h-2 rounded-full flex-shrink-0"
+                             style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
+                           />
+                           <span className="text-sm truncate text-slate-200 group-hover:text-white transition-colors">
+                             <Latex>{node.label}</Latex>
+                           </span>
                          </div>
-                       </div>
-                     )
+                         <span className="text-[10px] text-slate-500 ml-2 flex-shrink-0 uppercase tracking-wide">
+                           {metaInfo}
+                         </span>
+                      </div>
+                    );
                   })}
                 </div>
               </div>

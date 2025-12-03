@@ -239,22 +239,26 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
           `;
         }}
 
-        // === НОВОЕ: Тултип для связей ===
+        // === НОВОЕ: Тултип для связей (с поддержкой кастомного текста) ===
         linkLabel={(link: any) => {
-          // Получаем локализованное название связи
-          // activeLanguage приводим к типу Language ('en' | 'ru')
-          const label = LINK_LABELS[link.type as LinkType]?.[activeLanguage as Language] || String(link.type);
+          // 1. Пытаемся взять кастомное описание из данных связи
+          const customLabel = link.label;
 
-          // Возвращаем HTML-строку (стиль как у узлов, но чуть компактнее)
+          // 2. Если его нет, берем стандартное название типа
+          const displayLabel = customLabel 
+            ? customLabel 
+            : (LINK_LABELS[link.type as LinkType]?.[activeLanguage as Language] || String(link.type));
+
+          // Возвращаем HTML
           return `
             <div class="px-2 py-1 bg-black/80 border border-slate-700 rounded shadow-sm backdrop-blur-sm pointer-events-none">
-              <div class="text-slate-200 text-[10px] uppercase tracking-wide font-semibold">
-                ${label}
+              <div class="text-slate-200 text-[10px] uppercase tracking-wide font-semibold text-center">
+                ${displayLabel}
               </div>
             </div>
           `;
         }}
-        linkHoverPrecision={4}
+        linkHoverPrecision={5}
 
         // Отрисовка узлов
         nodeThreeObject={(node: any) => {

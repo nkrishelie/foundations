@@ -3,32 +3,26 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { GraphViewer } from './components/GraphViewer';
 import { UIOverlay } from './components/UIOverlay';
 import { getGraphData } from './services/dataService';
-import { GraphNode, GraphData, Language, Discipline } from './types';
+import { GraphNode, GraphData, Language, Discipline, NodeKind } from './types';
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('en');
   
-  // 1. Инициализируем пустым объектом, чтобы первый рендер был мгновенным
   const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
-  
-  // Состояние для отслеживания готовности данных (опционально, если нужно показать спиннер внутри графа)
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showWelcome, setShowWelcome] = useState(true);
 
-  // 2. Переносим "тяжелый" расчет в эффект с задержкой
   useEffect(() => {
     setIsDataLoaded(false);
     
-    // setTimeout переносит выполнение в конец очереди событий (Event Loop).
-    // Это дает браузеру время отрисовать кнопки модального окна ДО начала расчетов.
     const timer = setTimeout(() => {
       const graphData = getGraphData(language);
       setData(graphData);
       setIsDataLoaded(true);
-    }, 50); // 50мс достаточно, чтобы UI "продохнул" и отрисовался
+    }, 50);
 
     return () => clearTimeout(timer);
   }, [language]);
@@ -41,8 +35,9 @@ const App: React.FC = () => {
     if(selectedNode) setSelectedNode(null);
   };
 
-  // === НОВЫЙ КОД: Состояние для скрытых групп ===
+  // === Состояние фильтрации ===
   const [hiddenGroups, setHiddenGroups] = useState<Set<Discipline>>(new Set());
+  const [hiddenKinds, setHiddenKinds] = useState<Set<NodeKind>>(new Set()); // <-- Новое состояние
 
   const toggleGroup = (group: Discipline) => {
     const newHidden = new Set(hiddenGroups);
@@ -54,16 +49,32 @@ const App: React.FC = () => {
     setHiddenGroups(newHidden);
   };
 
-  // Вычисляем видимые данные "на лету"
-  // Это не меняет исходные данные data, а создает "проекцию" для графа
+  // <-- Новая функция переключения Kind
+  const toggleKind = (kind: NodeKind) => {
+    const newHidden = new Set(hiddenKinds);
+    if (newHidden.has(kind)) {
+      newHidden.delete(kind);
+    } else {
+      newHidden.add(kind);
+    }
+    setHiddenKinds(newHidden);
+  };
+
   const visibleData = useMemo(() => {
-    // 1. Фильтруем узлы
-    const visibleNodes = data.nodes.filter(n => !hiddenGroups.has(n.group));
+    // 1. Фильтруем узлы по Группе И по Типу (Kind)
+    const visibleNodes = data.nodes.filter(n => {
+      const groupHidden = hiddenGroups.has(n.group);
+      // Если у узла нет kind, считаем его видимым по этому критерию, либо скрываем, если логика требует строгости
+      // Здесь предполагаем: если kind есть и он в скрытых -> скрыть.
+      const kindHidden = n.kind ? hiddenKinds.has(n.kind) : false; 
+      
+      return !groupHidden && !kindHidden;
+    });
+
     const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
 
-    // 2. Фильтруем связи (чтобы не висели в воздухе)
+    // 2. Фильтруем связи
     const visibleLinks = data.links.filter(l => {
-      // Важно: d3 может превращать source/target в объекты, поэтому нужна проверка
       const sourceId = typeof l.source === 'object' ? (l.source as any).id : l.source;
       const targetId = typeof l.target === 'object' ? (l.target as any).id : l.target;
       
@@ -71,12 +82,10 @@ const App: React.FC = () => {
     });
 
     return { nodes: visibleNodes, links: visibleLinks };
-  }, [data, hiddenGroups]);
-  // ==============================================
+  }, [data, hiddenGroups, hiddenKinds]); // <-- Добавили hiddenKinds в зависимости
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
-      {/* МОДАЛЬНОЕ ОКНО - Грузится первым и не блокируется расчетами */}
       {showWelcome && (
         <WelcomeModal 
           onStart={() => setShowWelcome(false)}
@@ -85,7 +94,6 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* 3D Scene */}
       <div className="absolute inset-0 z-0" onClick={handleBackgroundClick}>
         <GraphViewer 
           data={visibleData}
@@ -95,10 +103,9 @@ const App: React.FC = () => {
         />
       </div>
 
-      {/* UI Layer - Поиск и кнопки (они неактивны для клика, пока висит модалка, благодаря z-index) */}
       <div className="absolute inset-0 z-10 pointer-events-none">
         <UIOverlay 
-          nodes={data.nodes} // В поиске лучше оставить все узлы (data.nodes), или visibleData.nodes, если хотите искать только по видимым
+          nodes={data.nodes} 
           links={data.links}
           selectedNode={selectedNode} 
           onSearch={(query) => {
@@ -106,8 +113,14 @@ const App: React.FC = () => {
             const foundNode = data.nodes.find(n => n.id === query);
             if (foundNode) setSelectedNode(foundNode);
           }}
+          
+          // Props для групп
           hiddenGroups={hiddenGroups}
           onToggleGroup={toggleGroup}
+
+          // Props для видов (Kind) <-- Передаем новые пропсы
+          hiddenKinds={hiddenKinds}
+          onToggleKind={toggleKind}
 
           onCloseSidebar={() => setSelectedNode(null)}
           currentLang={language}

@@ -286,13 +286,13 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
         // Настройки связей
         linkColor={(link: any) => LINK_COLORS[link.type as LinkType] || '#ffffff'}
         linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
-        
-        // Частицы
-        linkDirectionalParticles={(link: any) => link.type === LinkType.RELATED ? 0 : 2}
-        linkDirectionalParticleSpeed={0.005}
-        linkDirectionalParticleWidth={(link: any) => link.type === LinkType.RELATED ? 0 : 1.5}
 
-        // Стрелки
+        // Частицы: Отключаем для EQUIVALENT и RELATED, чтобы убрать направленность
+        linkDirectionalParticles={(link: any) => (link.type === LinkType.RELATED || link.type === LinkType.EQUIVALENT) ? 0 : 2}
+        linkDirectionalParticleSpeed={0.005}
+        linkDirectionalParticleWidth={(link: any) => (link.type === LinkType.RELATED || link.type === LinkType.EQUIVALENT) ? 0 : 1.5}
+
+        // Стрелки: Отключаем для EQUIVALENT и RELATED, чтобы убрать направленность
         linkDirectionalArrowLength={(link: any) => {
           if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
           return 4;

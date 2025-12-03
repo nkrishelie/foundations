@@ -1922,6 +1922,7 @@ const RAW_LINKS = [
   { source: 'dedekind_finite', target: 'axiom_choice', type: LinkType.RELATED }, // Зависимость
   { source: 'ac_omega', target: 'topology', type: LinkType.RELATED }, // Нужна для анализа (мера Лебега)
   { source: 'axiom_determinacy', target: 'large_cardinals', type: LinkType.RELATED }, // Связь с Woodin cardinals
+  { source: 'ordinal_arithmetic', target: 'cardinal_arithmetic', type: LinkType.RELATED, label: 'Uses Alephs'},
   
   // Algebra & Logic (Algebraic Logic)
   { source: 'cylindric_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },

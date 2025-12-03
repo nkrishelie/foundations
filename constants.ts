@@ -2,26 +2,27 @@ import { Discipline, LinkType, Language, NodeKind } from './types';
 
 // Цвета для дисциплин (групп) - Насыщенная палитра
 export const DISCIPLINE_COLORS: Record<Discipline, string> = {
-  [Discipline.SET_THEORY]: '#EF4444',   // Red (Vibrant)
-  [Discipline.MODEL_THEORY]: '#22C55E', // Green (Vibrant)
-  [Discipline.LOGIC]: '#3B82F6',        // Blue (Vibrant)
-  [Discipline.ALGEBRA]: '#EAB308',      // Yellow (Vibrant, but readable)
-  [Discipline.TOPOLOGY]: '#F97316',     // Orange (Vibrant)
-  [Discipline.PROOF_THEORY]: '#A855F7', // Violet/Purple (Vibrant)
+  [Discipline.SET_THEORY]: '#EF4444',   // Red
+  [Discipline.MODEL_THEORY]: '#22C55E', // Green
+  [Discipline.LOGIC]: '#3B82F6',        // Blue
+  [Discipline.ALGEBRA]: '#EAB308',      // Yellow
+  [Discipline.TOPOLOGY]: '#F97316',     // Orange
+  [Discipline.PROOF_THEORY]: '#A855F7', // Violet
   [Discipline.COMPUTABILITY]: '#FFFFFF',// White
-  [Discipline.ORDER_THEORY]: '#84CC16', // Lime (Yellow-Green)
+  [Discipline.ORDER_THEORY]: '#84CC16', // Lime
   
-  [Discipline.FOUNDATIONS]: '#94A3B8',  // Slate/Grey (Основания)
+  [Discipline.FOUNDATIONS]: '#94A3B8',  // Slate
 };
 
-// Цвета для связей
+// Цвета для связей (согласованные с дисциплинами)
 export const LINK_COLORS: Record<LinkType, string> = {
-  [LinkType.EXTENDS]: '#60A5FA',    // Blue Light
-  [LinkType.PROVES]: '#4ADE80',     // Green Light
-  [LinkType.MODELS]: '#FACC15',     // Yellow Light
-  [LinkType.CONTAINS]: '#94A3B8',   // Slate
-  [LinkType.EQUIVALENT]: '#E879F9', // Fuchsia
-  [LinkType.RELATED]: '#A3A3A3',    // Gray
+  [LinkType.PROVES]: '#3B82F6',     // Blue (Logic: Доказательство)
+  [LinkType.EXTENDS]: '#EF4444',    // Red (Sets: Расширение)
+  [LinkType.MODELS]: '#22C55E',     // Green (Models: Моделирование)
+  [LinkType.EQUIVALENT]: '#EAB308', // Yellow (Algebra: Изоморфизм)
+  [LinkType.CONTAINS]: '#A855F7',   // Violet (Включение / Состав)
+  
+  [LinkType.RELATED]: '#64748B',    // Slate (Нейтральная связь)
 };
 
 // Локализация дисциплин

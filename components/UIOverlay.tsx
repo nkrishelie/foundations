@@ -171,34 +171,52 @@ export const UIOverlay: React.FC<Props> = ({
               placeholder={currentLang === 'en' ? "Search..." : "Поиск..."}
               className="w-full px-4 py-2 bg-slate-800/90 text-white border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400 backdrop-blur-md shadow-xl"
             />
+            {/* Dropdown Results - МОДИФИЦИРОВАННАЯ ЧАСТЬ */}
             {showDropdown && filteredNodes.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-y-auto custom-scrollbar">
                 {filteredNodes.map((node) => {
-                  const displaySynonym = node.synonyms?.find(s => {
-                    const isCyrillic = /[а-яА-ЯёЁ]/.test(s);
-                    return currentLang === 'ru' ? isCyrillic : !isCyrillic;
-                  }) || node.synonyms?.[0];
+                  // 1. Проверяем, скрыт ли узел фильтрами
+                  const isGroupHidden = hiddenGroups.has(node.group);
+                  const isKindHidden = node.kind ? hiddenKinds.has(node.kind) : false;
+                  const isHidden = isGroupHidden || isKindHidden;
+
+                  // 2. Формируем инфо-строку [Дисциплина, Тип]
+                  const groupLabel = DISCIPLINE_LABELS[node.group][currentLang];
+                  const kindLabel = node.kind ? KIND_LABELS[node.kind][currentLang] : '';
+                  // Собираем строку, например: "[Algebra, Theorem]"
+                  const metaInfo = `[${groupLabel}${kindLabel ? `, ${kindLabel}` : ''}]`;
 
                   return (
                     <div
                       key={node.id}
-                      onClick={() => handleSelectNode(node)}
-                      className="px-4 py-2 hover:bg-slate-700 cursor-pointer border-b border-slate-800 last:border-0 flex items-center justify-between group"
+                      onClick={() => {
+                        // Блокируем клик, если узел скрыт
+                        if (!isHidden) handleSelectNode(node);
+                      }}
+                      className={`
+                        px-4 py-2 border-b border-slate-800 last:border-0 flex items-center justify-between group transition-all
+                        ${isHidden 
+                          ? 'opacity-50 cursor-not-allowed grayscale' // Стиль для скрытого: бледный, серый, курсор запрета
+                          : 'cursor-pointer hover:bg-slate-700'       // Стиль для активного
+                        }
+                      `}
                     >
                       <div className="flex items-center gap-2 overflow-hidden">
+                        {/* Цветной индикатор (будет серым из-за grayscale, если скрыт, что логично) */}
                         <span 
                           className="w-2 h-2 rounded-full flex-shrink-0"
                           style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
                         />
-                        <span className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">
+                        {/* Название узла */}
+                        <span className={`text-sm truncate transition-colors ${isHidden ? 'text-slate-500' : 'text-slate-200 group-hover:text-white'}`}>
                           <Latex>{node.label}</Latex>
                         </span>
                       </div>
-                      {displaySynonym && (
-                        <span className="text-xs text-slate-500 ml-2 hidden sm:block truncate max-w-[100px] text-right">
-                          {displaySynonym}
-                        </span>
-                      )}
+
+                      {/* Мета-информация справа (Дисциплина, Тип) */}
+                      <span className="text-[10px] text-slate-500 ml-2 flex-shrink-0 uppercase tracking-wide">
+                        {metaInfo}
+                      </span>
                     </div>
                   );
                 })}

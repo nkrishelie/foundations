@@ -1,24 +1,24 @@
 import { Discipline, LinkType, Language, NodeKind } from './types';
 
-// Цвета для дисциплин (групп) - Пастельная палитра
+// Цвета для дисциплин (групп) - Насыщенная палитра
 export const DISCIPLINE_COLORS: Record<Discipline, string> = {
-  [Discipline.SET_THEORY]: '#FCA5A5',   // Pastel Red (Теория множеств)
-  [Discipline.MODEL_THEORY]: '#86EFAC', // Pastel Green (Теория моделей)
-  [Discipline.LOGIC]: '#93C5FD',        // Pastel Blue (Логика)
-  [Discipline.ALGEBRA]: '#FDE047',      // Pastel Yellow (Алгебра)
-  [Discipline.TOPOLOGY]: '#FDBA74',     // Pastel Orange (Топология)
-  [Discipline.PROOF_THEORY]: '#C4B5FD', // Pastel Violet (Теория доказательств)
-  [Discipline.COMPUTABILITY]: '#FFFFFF',// White (Вычислимость)
-  [Discipline.ORDER_THEORY]: '#BEF264', // Pastel Lime/Yellow-Green (Теория порядков)
+  [Discipline.SET_THEORY]: '#EF4444',   // Red (Vibrant)
+  [Discipline.MODEL_THEORY]: '#22C55E', // Green (Vibrant)
+  [Discipline.LOGIC]: '#3B82F6',        // Blue (Vibrant)
+  [Discipline.ALGEBRA]: '#EAB308',      // Yellow (Vibrant, but readable)
+  [Discipline.TOPOLOGY]: '#F97316',     // Orange (Vibrant)
+  [Discipline.PROOF_THEORY]: '#A855F7', // Violet/Purple (Vibrant)
+  [Discipline.COMPUTABILITY]: '#FFFFFF',// White
+  [Discipline.ORDER_THEORY]: '#84CC16', // Lime (Yellow-Green)
   
-  [Discipline.FOUNDATIONS]: '#CBD5E1',  // Pastel Slate/Grey (Основания)
+  [Discipline.FOUNDATIONS]: '#94A3B8',  // Slate/Grey (Основания)
 };
 
-// Цвета для связей (можно оставить прежними или тоже смягчить)
+// Цвета для связей
 export const LINK_COLORS: Record<LinkType, string> = {
-  [LinkType.EXTENDS]: '#60A5FA',    // Blue
-  [LinkType.PROVES]: '#4ADE80',     // Green
-  [LinkType.MODELS]: '#FACC15',     // Yellow
+  [LinkType.EXTENDS]: '#60A5FA',    // Blue Light
+  [LinkType.PROVES]: '#4ADE80',     // Green Light
+  [LinkType.MODELS]: '#FACC15',     // Yellow Light
   [LinkType.CONTAINS]: '#94A3B8',   // Slate
   [LinkType.EQUIVALENT]: '#E879F9', // Fuchsia
   [LinkType.RELATED]: '#A3A3A3',    // Gray

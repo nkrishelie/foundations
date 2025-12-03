@@ -1674,8 +1674,15 @@ const RAW_LINKS = [
   { source: 'modal_GL', target: 'modal_K4', type: LinkType.EXTENDS }, // GL транзитивна + Лёб
   { source: 'modal_logic', target: 'topology', type: LinkType.RELATED },
   { source: 'theory_PA', target: 'pred_logic', type: LinkType.EXTENDS },
-
+  { source: 'heyting_arithmetic', target: 'intuitionistic_logic', type: LinkType.EXTENDS }, // Арифметика Гейтинга строится НА БАЗЕ Интуиционистской логики
+  // Интуиционистская логика базируется на логике высказываний (как и классическая)
+  // Но является альтернативой классической логике предикатов
+  { source: 'intuitionistic_logic', target: 'prop_logic', type: LinkType.EXTENDS },
+  // Гёделевский перевод: Интуиционистская логика вкладывается в S4
+  { source: 'intuitionistic_logic', target: 'modal_S4', type: LinkType.RELATED },
+  
   // --- Set Theory ---
+  { source: 'zfc', target: 'pred_logic', type: LinkType.EXTENDS },
   { source: 'zfc', target: 'theory_HF', type: LinkType.EXTENDS }, // ZFC добавляет бесконечность
   { source: 'large_cardinals', target: 'zfc', type: LinkType.EXTENDS }, // Большие кардиналы > ZFC
   { source: 'ordinal_arithmetic', target: 'transitive_set', type: LinkType.EXTENDS }, // Ординал есть транзитивное мн-во

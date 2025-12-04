@@ -125,7 +125,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     group: Discipline.SET_THEORY,
     kind: NodeKind.THEORY,
     val: 40,
-    synonyms: ['ZFC', 'ЗФЦ', 'Zermelo-Fraenkel Choice'],
+    synonyms: ['ZFC', 'ZFC', 'Zermelo-Fraenkel Choice'],
     content: {
       en: { label: 'ZFC', description: 'The standard axiomatic set theory with Choice.', details: ['Extensionality', 'Infinity', 'Replacement'] },
       ru: { label: 'ZFC', description: 'Стандартная аксиоматическая теория множеств с Выбором.', details: ['Объемность', 'Бесконечность', 'Подстановка'] }

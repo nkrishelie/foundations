@@ -2312,6 +2312,7 @@ const RAW_LINKS = [
   { source: 'model_A', target: 'model_Q', type: LinkType.EXTENDS }, // Алгебраические расширяют Q
   { source: 'surreal_numbers', target: 'model_R', type: LinkType.EXTENDS },
   { source: 'surreal_numbers', target: 'ordinal_arithmetic', type: LinkType.EXTENDS },
+  { source: 'transitive_set', target: 'ordinal_arithmetic', type: LinkType.EXTENDS },
 
   // ==============================================================================
   // 3. MODELS (Structure -> Theory)

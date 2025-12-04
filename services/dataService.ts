@@ -1268,6 +1268,24 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: 'Y-комбинатор', description: 'Обеспечивает рекурсию в лямбда-исчислении.', details: [] }
     }
   },
+  'combinators': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 14,
+  synonyms: ['Combinator Calculus', 'Комбинаторная логика'],
+  content: {
+    en: { 
+      label: 'Combinator Calculus', 
+      description: 'Variable-free notation for functions.',
+      details: ['S, K, I combinators', 'Curry', 'Church encoding']
+    },
+    ru: { 
+      label: 'Комбинаторная логика', 
+      description: 'Безпеременная нотация для функций.',
+      details: ['Комбинаторы S, K, I', 'Карри', 'Кодирование Чёрча']
+    }
+  }
+},
   'ski_combinators': {
     group: Discipline.COMPUTABILITY,
     kind: NodeKind.CONCEPT,
@@ -1765,7 +1783,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     ru: { 
       label: '$\\omega_₁^{CK}$', 
       description: 'Супремум вычислимых ординалов. Первый невычислимый ординал.',
-      details: ['Гипераритметическая иерархия', 'Kleene O', 'Допустимый ординал']
+      details: ['Гиперарифметическая иерархия', 'Kleene O', 'Допустимый ординал']
     }
   }
 },
@@ -2454,9 +2472,7 @@ const RAW_LINKS = [
   { source: 'bpi', target: 'prime_ideal', type: LinkType.RELATED }, // Теорема о простом идеале
 
   // Proof Theory & Ordinals
-  { source: 'epsilon_0', target: 'theory_PA', type: LinkType.RELATED },
   { source: 'epsilon_0', target: 'goodstein_theorem', type: LinkType.RELATED },
-  { source: 'gamma_0', target: 'atr0', type: LinkType.RELATED },
   { source: 'cut_elimination', target: 'sequent_calculus', type: LinkType.RELATED },
   { source: 'gamma_0', target: 'epsilon_0', type: LinkType.EXTENDS, label: 'Extends Veblen hierarchy' },
   
@@ -2655,7 +2671,101 @@ const RAW_LINKS = [
   // DLO extends general Order Theory
   { source: 'theory_DLO', target: 'theory_order', type: LinkType.EXTENDS, label: 'Adds density and no endpoints' },
   // Discrete Linear Order extends general Order Theory
-  { source: 'theory_DisLO', target: 'theory_order', type: LinkType.EXTENDS, label: 'Adds discreteness' }
+  { source: 'theory_DisLO', target: 'theory_order', type: LinkType.EXTENDS, label: 'Adds discreteness' },
+  // ==============================================================================
+// PROOF-THEORETIC ORDINALS CLUSTER
+// ==============================================================================
+{ source: 'epsilon_0', target: 'ordinal_arithmetic', type: LinkType.MODELS },
+{ source: 'church_kleene', target: 'gamma_0', type: LinkType.EXTENDS, label: 'Supremum of hyperarithmetic' },
+{ source: 'ordinal_bachmann_howard', target: 'church_kleene', type: LinkType.EXTENDS },
+{ source: 'ordinal_takeuti_feferman_buchholz', target: 'ordinal_bachmann_howard', type: LinkType.EXTENDS },
+
+// Связи с теориями
+{ source: 'epsilon_0', target: 'theory_PA', type: LinkType.RELATED, label: 'Proof-theoretic ordinal of PA' },
+{ source: 'gamma_0', target: 'atr0', type: LinkType.RELATED, label: 'Proof-theoretic ordinal of ATR₀' },
+{ source: 'church_kleene', target: 'pi11_ca0', type: LinkType.RELATED, label: 'Related to Π¹₁-CA₀' },
+{ source: 'ordinal_takeuti_feferman_buchholz', target: 'pi11_ca0', type: LinkType.RELATED, label: 'Proof-theoretic ordinal of Π¹₁-CA₀' },
+
+// Computability связи
+{ source: 'church_kleene', target: 'comp_theory', type: LinkType.RELATED, label: 'First non-computable ordinal' },
+{ source: 'church_kleene', target: 'computable_function', type: LinkType.RELATED, label: 'Supremum of computable ordinals' },
+
+// ==============================================================================
+// KRIPKE FRAMES & MODAL LOGIC
+// ==============================================================================
+{ source: 'kripke_model', target: 'modal_logic', type: LinkType.MODELS, label: 'Semantics for modal logic' },
+{ source: 'kripke_model', target: 'modal_K', type: LinkType.MODELS, label: 'Any frame validates K' },
+{ source: 'kripke_model', target: 'modal_K4', type: LinkType.MODELS, label: 'Transitive frames' },
+{ source: 'kripke_model', target: 'modal_S4', type: LinkType.MODELS, label: 'Reflexive + transitive' },
+{ source: 'kripke_model', target: 'modal_S5', type: LinkType.MODELS, label: 'Equivalence relations' },
+{ source: 'kripke_model', target: 'modal_GL', type: LinkType.MODELS, label: 'Transitive + irreflexive + well-founded' },
+
+// Kripke и топология
+{ source: 'kripke_model', target: 'poset', type: LinkType.EXTENDS, label: 'Preorder structure' },
+{ source: 'kripke_model', target: 'alexandrov_topology', type: LinkType.MODELS, label: 'Alexandrov space from preorder' },
+
+// ==============================================================================
+// ORDER THEORY ADDITIONS
+// ==============================================================================
+{ source: 'well_order', target: 'linear_order', type: LinkType.EXTENDS, label: 'Linear order + well-founded' },
+{ source: 'ordinal_arithmetic', target: 'well_order', type: LinkType.MODELS, label: 'Ordinals are order types of well-orders' },
+{ source: 'transfinite_induction', target: 'well_order', type: LinkType.RELATED, label: 'Induction on well-orders' },
+{ source: 'thm_zermelo_wo', target: 'well_order', type: LinkType.RELATED, label: 'Every set can be well-ordered' },
+{ source: 'thm_zermelo_wo', target: 'thm_zorn', type: LinkType.EQUIVALENT },
+// Chains and antichains
+{ source: 'poset', target: 'chain_order', type: LinkType.CONTAINS, label: 'Totally ordered subset' },
+{ source: 'poset', target: 'antichain', type: LinkType.CONTAINS, label: 'Pairwise incomparable subset' },
+{ source: 'chain_order', target: 'thm_zorn', type: LinkType.RELATED, label: 'Every chain has upper bound' },
+{ source: 'narrow_order', target: 'chain_order', type: LinkType.RELATED, label: 'No uncountable chains' },
+{ source: 'narrow_order', target: 'antichain', type: LinkType.RELATED, label: 'No uncountable antichains' },
+
+// Narrow orders и континуум-гипотеза
+{ source: 'narrow_order', target: 'continuum_hypothesis', type: LinkType.RELATED, label: 'Suslin hypothesis' },
+{ source: 'narrow_order', target: 'poset', type: LinkType.EXTENDS, label: 'Aronszajn trees' },
+{ source: 'narrow_order', target: 'antichain', type: LinkType.RELATED },
+
+// ==============================================================================
+// REDUCTS
+// ==============================================================================
+{ source: 'model_theory', target: 'reduct', type: LinkType.CONTAINS },
+{ source: 'reduct', target: 'algebraic_structure', type: LinkType.RELATED, label: 'Signature restriction' },
+// ==============================================================================
+// COMPUTABILITY: EQUIVALENCES OF COMPUTABLE FUNCTIONS
+// ==============================================================================
+{ source: 'comp_theory', target: 'computable_function', type: LinkType.CONTAINS },
+{ source: 'partial_recursive', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Church-Turing equivalence' },
+{ source: 'turing_machine', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Turing-computable' },
+{ source: 'lambda_calc', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'λ-computable' },
+{ source: 'markov_algorithm', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Markov-computable' },
+{ source: 'universal_pl', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Turing-complete languages' },
+{ source: 'sigma1_definable', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Graph is r.e.' },
+{ source: 'combinators', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Combinator-computable' },
+{ source: 'ski_combinators', target: 'combinators', type: LinkType.RELATED, label: 'Basis {S,K,I}' },
+
+// Primitive recursive - подмножество
+{ source: 'partial_recursive', target: 'primitive_recursive', type: LinkType.CONTAINS, label: 'Subset: no μ-operator' },
+
+// Bounded complexity
+{ source: 'computable_function', target: 'polytime_function', type: LinkType.CONTAINS, label: 'Time-bounded subset' },
+{ source: 'computable_function', target: 'polyspace_function', type: LinkType.CONTAINS, label: 'Space-bounded subset' },
+
+// Связь с теориями
+{ source: 'theory_PA', target: 'partial_recursive', type: LinkType.CONTAINS, label: 'Representable in PA' },
+{ source: 'theory_PA', target: 'sigma1_definable', type: LinkType.CONTAINS, label: 'Arithmetical hierarchy' },
+{ source: 'theory_Q', target: 'primitive_recursive', type: LinkType.RELATED, label: 'Representable in Q' },
+
+// Church-Turing thesis
+{ source: 'church_turing', target: 'computable_function', type: LinkType.RELATED, label: 'Informal = Formal' },
+
+// ==============================================================================
+// ZF⁻ AND V_{ω+ω}
+// ==============================================================================
+{ source: 'zfc', target: 'zf_minus', type: LinkType.PROVES, label: 'ZFC without Replacement' },
+{ source: 'zf_minus', target: 'pred_logic', type: LinkType.EXTENDS, label: 'Formulated in FOL' },
+{ source: 'model_V_omega_omega', target: 'zf_minus', type: LinkType.MODELS, label: 'Model of ZF⁻' },
+{ source: 'cumulative_hierarchy', target: 'model_V_omega_omega', type: LinkType.CONTAINS, label: 'Stage ω+ω' },
+
+// ZF
   
 ];
 

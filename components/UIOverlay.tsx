@@ -477,7 +477,7 @@ export const UIOverlay: React.FC<Props> = ({
                  <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider border-b border-slate-700 pb-1">
                   {currentLang === 'en' ? 'Related Nodes' : 'Связанные узлы'}
                 </h3>
-                <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                <div className="">
                   {visibleNeighbors.map(node => {
                     const groupLabel = DISCIPLINE_LABELS[node.group][currentLang];
                     const kindLabel = node.kind ? KIND_LABELS[node.kind][currentLang] : '';

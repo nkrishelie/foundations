@@ -78,11 +78,11 @@ const STEPS = [
     content: {
       ru: {
         title: 'Навигация',
-        text: 'Кнопки для управления масштабом (+) (-) и быстрого возврата камеры в центр графа.'
+        text: 'Стрелки для вращения камеры, кнопки масштаба (+/-) и кнопка возврата в центр.'
       },
       en: {
         title: 'Navigation',
-        text: 'Buttons to control zoom (+) (-) and quickly recenter the camera on the graph.'
+        text: 'Arrows to rotate the camera, zoom buttons (+/-), and a button to recenter.'
       }
     }
   },
@@ -142,24 +142,23 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
       return { ...base, bottom: '20px', left: '50%', transform: 'translateX(-50%)', width: '90vw' };
     }
 
-    // Увеличил ширину плашек (width) с 350px до 420px, чтобы русский текст влезал комфортно
+    // Увеличил ширину для боковых плашек до 460px, чтобы кнопки точно влезали
     switch (pos) {
       case 'center':
         return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '480px' };
       case 'bottom-left-of-target':
-        return { ...base, top: '140px', left: '20px', width: '420px' };
+        return { ...base, top: '150px', left: '20px', width: '460px' };
       case 'bottom-right-of-target':
-        return { ...base, top: '100px', right: '20px', width: '420px' };
+        return { ...base, top: '120px', right: '20px', width: '460px' };
       case 'left-of-target':
-        // Сдвигаем саму плашку левее, так как прожектор легенды тоже сдвинулся
-        return { ...base, top: '150px', right: '340px', width: '420px' };
+        return { ...base, top: '150px', right: '340px', width: '460px' };
       case 'right-of-target':
-        // Плашка справа от навигации
-        return { ...base, bottom: '40px', left: '200px', width: '420px' };
+        return { ...base, bottom: '40px', left: '200px', width: '460px' };
       case 'bottom-left-corner':
-        return { ...base, bottom: '40px', left: '40px', width: '420px' };
+        return { ...base, bottom: '40px', left: '40px', width: '460px' };
       case 'left-of-card':
-        return { ...base, bottom: '100px', right: '520px', width: '420px' };
+        // Финальный шаг
+        return { ...base, bottom: '100px', right: '520px', width: '460px' };
       default:
         return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
@@ -181,18 +180,18 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
         return { ...base, top: '50%', left: '50%', width: '0px', height: '0px', boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)' };
       
       case 'search-bar':
-        return { ...base, top: '10px', left: '10px', width: '320px', height: '110px', borderRadius: '12px' };
+        // Опустил ниже (20px)
+        return { ...base, top: '20px', left: '10px', width: '320px', height: '110px', borderRadius: '12px' };
       
       case 'top-controls':
-        // Опустили ниже (top: 20px) и чуть увеличили высоту (height: 70px)
-        return { ...base, top: '20px', right: '10px', width: '220px', height: '70px', borderRadius: '30px' };
+        // Опустил ниже (40px)
+        return { ...base, top: '40px', right: '10px', width: '220px', height: '70px', borderRadius: '30px' };
       
       case 'legend-sidebar':
-        // Сдвиг влево (right: 60px) и увеличение высоты (75vh)
-        return { ...base, top: '90px', right: '60px', width: '240px', height: '75vh', borderRadius: '12px' };
+        // Опустил ниже (110px)
+        return { ...base, top: '110px', right: '60px', width: '240px', height: '75vh', borderRadius: '12px' };
       
       case 'bottom-left-nav':
-        // Сдвиг вправо (left: 60px) и увеличение высоты в 1.5 раза (270px)
         return { ...base, bottom: '10px', left: '60px', width: '120px', height: '270px', borderRadius: '12px' };
       
       case 'center-glow':

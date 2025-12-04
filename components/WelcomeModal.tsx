@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Language } from '../types';
+import Latex from 'react-latex-next';
 
 interface Props {
   onClose: () => void;
   currentLang: Language;
-  // Делаем опциональным, чтобы не ломать App.tsx, если проп не передан
   onToggleLang?: (lang: Language) => void; 
 }
 
@@ -12,91 +12,107 @@ interface Props {
 const STEPS = [
   {
     id: 'intro',
-    position: 'center', // Логическая позиция
-    highlight: 'center',
+    position: 'center',
+    highlight: 'none',
     content: {
       ru: {
         title: 'Добро пожаловать в MathLogic Nexus',
-        text: 'Это интерактивная карта оснований математики. Давайте я быстро покажу вам, как здесь всё устроено.'
+        text: 'Это интерактивная 3D-карта оснований математики. Давайте я быстро покажу вам основные инструменты управления.'
       },
       en: {
         title: 'Welcome to MathLogic Nexus',
-        text: 'This is an interactive map of mathematical foundations. Let me quickly show you how it works.'
+        text: 'This is an interactive 3D map of mathematical foundations. Let me quickly show you the main controls.'
       }
     }
   },
   {
     id: 'search',
-    position: 'top-left',
-    highlight: 'top-left',
+    position: 'bottom-left-of-target', // Плашка будет ниже и правее цели
+    highlight: 'search-bar',
     content: {
       ru: {
-        title: 'Поиск и Навигация',
-        text: 'Введите название теоремы или понятия здесь. Используйте выпадающий список для быстрого перехода к узлу.'
+        title: 'Поиск (Search)',
+        text: 'Введите название теоремы или понятия. Выпадающий список позволит мгновенно сфокусироваться на нужном узле.'
       },
       en: {
-        title: 'Search & Navigation',
-        text: 'Type a theorem or concept name here. Use the dropdown list to quickly jump to a specific node.'
+        title: 'Search',
+        text: 'Type a theorem or concept name. The dropdown list lets you instantly focus on the desired node.'
       }
     }
   },
   {
     id: 'controls',
-    position: 'top-right',
-    highlight: 'top-right',
+    position: 'bottom-right-of-target', // Плашка ниже и левее цели
+    highlight: 'top-controls',
     content: {
       ru: {
-        title: 'Настройки и Экспорт',
-        text: 'Переключайте язык (RU/EN), тему (Dark/Light) и скачивайте данные графа в CSV формате.'
+        title: 'Настройки (Settings)',
+        text: 'Здесь можно переключить язык, сменить тему (День/Ночь) или открыть это обучение заново.'
       },
       en: {
-        title: 'Settings & Export',
-        text: 'Switch languages (RU/EN), themes (Dark/Light), and download graph data in CSV format.'
+        title: 'Settings',
+        text: 'Here you can switch languages, toggle the theme (Day/Night), or reopen this tutorial.'
       }
     }
   },
   {
     id: 'legend',
-    position: 'right', // Чуть ниже
-    highlight: 'right-sidebar',
+    position: 'left-of-target', // Плашка слева от цели
+    highlight: 'legend-sidebar',
     content: {
       ru: {
         title: 'Легенда и Фильтры',
-        text: 'Кликайте по элементам легенды, чтобы скрывать или показывать целые разделы математики или типы узлов (теоремы, аксиомы).'
+        text: 'Это интерактивная легенда. Кликайте по цветным кружкам или названиям типов, чтобы скрывать/показывать целые разделы на графе.'
       },
       en: {
         title: 'Legend & Filters',
-        text: 'Click on legend items to hide or show entire mathematical disciplines or node types (theorems, axioms).'
+        text: 'This is an interactive legend. Click on colored circles or type names to hide/show entire sections on the graph.'
+      }
+    }
+  },
+  {
+    id: 'nav-controls',
+    position: 'right-of-target', // Плашка справа от цели
+    highlight: 'bottom-left-nav',
+    content: {
+      ru: {
+        title: 'Навигация',
+        text: 'Используйте эти кнопки для управления масштабом, центрирования камеры или переключения режимов просмотра (2D/3D).'
+      },
+      en: {
+        title: 'Navigation',
+        text: 'Use these buttons to control zoom, recenter the camera, or switch viewing modes (2D/3D).'
       }
     }
   },
   {
     id: 'graph',
-    position: 'center',
+    position: 'bottom-left-corner', // Плашка в углу, чтобы не закрывать центр
     highlight: 'center-glow',
     content: {
       ru: {
-        title: 'Интерактивный Граф',
-        text: 'Вращайте граф (ЛКМ), перемещайте (ПКМ) и приближайте (Колесо). Кликните по любому узлу, чтобы сфокусироваться на нем.'
+        title: 'Граф (Graph View)',
+        text: 'Вращайте (ЛКМ), двигайте (ПКМ) и приближайте (Колесо). Названия узлов видны всегда. Кликните по узлу, чтобы узнать детали.'
       },
       en: {
-        title: 'Interactive Graph',
-        text: 'Rotate (LMB), pan (RMB), and zoom (Wheel) the graph. Click on any node to focus and see details.'
+        title: 'Graph View',
+        text: 'Rotate (LMB), pan (RMB), and zoom (Wheel). Node labels are always visible. Click a node to see details.'
       }
     }
   },
   {
     id: 'details',
-    position: 'bottom-right',
-    highlight: 'bottom-card',
+    position: 'left-of-card', // Плашка слева от демо-карточки
+    highlight: 'mock-card-area', // Подсвечиваем зону, где появится карточка
+    showMockCard: true, // Флаг для рендера муляжа
     content: {
       ru: {
         title: 'Карточка Узла',
-        text: 'Здесь появится подробная информация: описание, формулы и список связанных понятий. Карточку можно перетаскивать!'
+        text: 'Она появляется при клике на узел. Здесь есть описание, LaTeX-формулы и список связей. Карточку можно перетаскивать за заголовок!'
       },
       en: {
         title: 'Node Details',
-        text: 'Detailed info appears here: description, formulas, and related concepts. You can drag this card around!'
+        text: 'Appears when you click a node. Contains descriptions, LaTeX formulas, and links. You can drag the card by its header!'
       }
     }
   }
@@ -104,10 +120,8 @@ const STEPS = [
 
 export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLang, onToggleLang }) => {
   const [stepIndex, setStepIndex] = useState(0);
-  // Локальное состояние языка для демо, если функция переключения не передана сверху
   const [localLang, setLocalLang] = useState<Language>(initialLang);
 
-  // Используем переданный переключатель или локальный
   const activeLang = localLang;
   const toggleLang = (lang: Language) => {
     setLocalLang(lang);
@@ -117,59 +131,95 @@ export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLan
   const currentStep = STEPS[stepIndex];
   const isLastStep = stepIndex === STEPS.length - 1;
 
-  // Функция вычисления классов позиционирования
-  const getPositionClasses = (pos: string) => {
+  // --- Логика позиционирования плашки туториала ---
+  const getModalPositionStyles = (pos: string): React.CSSProperties => {
+    const isMobile = window.innerWidth < 768;
+    const base: React.CSSProperties = { position: 'absolute', zIndex: 70 };
+
+    if (isMobile) {
+      // На мобильном всегда внизу или в центре, чтобы не перекрывать важное сверху
+      return { ...base, bottom: '20px', left: '50%', transform: 'translateX(-50%)', width: '90vw' };
+    }
+
     switch (pos) {
       case 'center':
-        return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
-      case 'top-left':
-        return 'top-20 left-4 md:left-10 md:top-24';
-      case 'top-right':
-        return 'top-20 right-4 md:right-32 md:top-20';
-      case 'right':
-        return 'top-40 right-4 md:right-10';
-      case 'bottom-right':
-        return 'bottom-20 right-4 md:right-10 md:bottom-10';
+        return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '400px' };
+      case 'bottom-left-of-target': // Для поиска (слева сверху) -> ставим ниже
+        return { ...base, top: '140px', left: '20px', width: '350px' };
+      case 'bottom-right-of-target': // Для кнопок (справа сверху) -> ставим ниже и левее
+        return { ...base, top: '80px', right: '20px', width: '350px' };
+      case 'left-of-target': // Для легенды (справа) -> ставим левее
+        return { ...base, top: '150px', right: '280px', width: '350px' }; // 280px отступ от легенды
+      case 'right-of-target': // Для навигации (слева снизу) -> ставим правее
+        return { ...base, bottom: '40px', left: '140px', width: '350px' };
+      case 'bottom-left-corner': // Для графа -> в угол
+        return { ...base, bottom: '40px', left: '40px', width: '350px' };
+      case 'left-of-card': // Для карточки (справа снизу) -> ставим левее
+        return { ...base, bottom: '100px', right: '520px', width: '350px' };
       default:
-        return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+        return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
   };
 
-  // Функция вычисления позиции "прожектора" (подсветки)
+  // --- Логика "Прожектора" ---
   const getHighlightStyle = (highlight: string): React.CSSProperties => {
     const base: React.CSSProperties = {
       position: 'absolute',
-      borderRadius: '50%',
-      boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.75)', // Затемнение всего остального
+      borderRadius: '8px',
+      boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.75)', // Затемнение
       transition: 'all 0.5s ease-in-out',
       pointerEvents: 'none',
       zIndex: 40,
     };
 
     switch (highlight) {
-      case 'top-left':
-        return { ...base, top: '60px', left: '20px', width: '300px', height: '60px', borderRadius: '10px' };
-      case 'top-right':
-        return { ...base, top: '10px', right: '10px', width: '200px', height: '60px', borderRadius: '10px' };
-      case 'right-sidebar':
-        return { ...base, top: '100px', right: '10px', width: '220px', height: '400px', borderRadius: '10px' };
+      case 'none':
+        // Начальный экран - просто затемнение всего (точка в центре)
+        return { ...base, top: '50%', left: '50%', width: '0px', height: '0px', boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)' };
+      
+      case 'search-bar':
+        // Поиск (input) + Заголовок
+        return { ...base, top: '10px', left: '10px', width: '320px', height: '110px', borderRadius: '12px' };
+      
+      case 'top-controls':
+        // Кнопки справа сверху (учитываем их отступы)
+        return { ...base, top: '10px', right: '10px', width: '220px', height: '60px', borderRadius: '30px' };
+      
+      case 'legend-sidebar':
+        // Легенда справа (с отступом сверху)
+        return { ...base, top: '90px', right: '10px', width: '240px', height: '50vh', borderRadius: '12px' };
+      
+      case 'bottom-left-nav':
+        // Кнопки навигации слева внизу
+        return { ...base, bottom: '10px', left: '10px', width: '120px', height: '180px', borderRadius: '12px' };
+      
       case 'center-glow':
-         // Просто свечение в центре
-         return { ...base, top: '50%', left: '50%', width: '0px', height: '0px', boxShadow: '0 0 100px 100px rgba(59, 130, 246, 0.2), 0 0 0 9999px rgba(0,0,0,0.6)' }; 
-      case 'bottom-card':
-         // Имитация позиции карточки
-         return { ...base, bottom: '20px', right: '20px', width: '350px', height: '400px', borderRadius: '12px' };
-      default: // center
-         return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '1px', height: '1px', boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)' };
+        // Граф (мягкое свечение в центре)
+        return { 
+          ...base, 
+          top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          width: '200px', height: '200px', borderRadius: '50%',
+          boxShadow: '0 0 150px 100px rgba(59, 130, 246, 0.1), 0 0 0 9999px rgba(0,0,0,0.6)' 
+        };
+      
+      case 'mock-card-area':
+        // Место для демо-карточки (справа внизу)
+        return { 
+          ...base, 
+          bottom: '20px', right: '20px', 
+          width: '500px', height: '400px', 
+          borderRadius: '12px',
+          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.8)' // Сильнее затемняем фон, чтобы выделить карточку
+        };
+        
+      default:
+        return base;
     }
   };
 
   const handleNext = () => {
-    if (isLastStep) {
-      onClose();
-    } else {
-      setStepIndex(prev => prev + 1);
-    }
+    if (isLastStep) onClose();
+    else setStepIndex(prev => prev + 1);
   };
 
   const handleBack = () => {
@@ -177,37 +227,61 @@ export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLan
   };
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-hidden">
-      {/* 1. Highlight / Backdrop Layer */}
+    <div className="fixed inset-0 z-[60] overflow-hidden font-sans">
+      {/* 1. Слой подсветки */}
       <div style={getHighlightStyle(currentStep.highlight)}></div>
 
-      {/* 2. Skip Button (Always visible, high z-index) */}
-      <button 
-        onClick={onClose}
-        className="absolute top-4 left-4 z-[70] px-4 py-2 bg-slate-800/90 text-slate-400 hover:text-white rounded-full text-sm font-bold border border-slate-700 backdrop-blur-md transition-colors"
-      >
-        {activeLang === 'en' ? 'Skip Tutorial' : 'Пропустить'}
-      </button>
+      {/* 2. ДЕМО-КАРТОЧКА (Показывается только на шаге 'details') */}
+      {currentStep.showMockCard && (
+        <div 
+          className="absolute z-50 w-[95vw] md:w-[500px] bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl flex flex-col overflow-hidden animate-fade-in-up"
+          style={{ bottom: '20px', right: '20px', height: '400px' }}
+        >
+          {/* Mock Header */}
+          <div className="p-4 border-b border-slate-700 flex justify-between items-start">
+            <h2 className="text-2xl font-bold text-white leading-tight">
+              {activeLang === 'en' ? 'Set Theory' : 'Теория множеств'}
+            </h2>
+            <button className="text-slate-400">✕</button>
+          </div>
+          {/* Mock Content */}
+          <div className="p-6 overflow-y-auto custom-scrollbar">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,1)]" />
+              <span className="text-xs uppercase tracking-wide text-slate-400">
+                {activeLang === 'en' ? 'Foundations' : 'Основания'} / {activeLang === 'en' ? 'Discipline' : 'Раздел'}
+              </span>
+            </div>
+            <div className="text-slate-300 text-sm leading-relaxed mb-4">
+              {activeLang === 'en' 
+                ? 'Set theory is the branch of mathematical logic that studies sets, which can be informally described as collections of objects.' 
+                : 'Теория множеств — раздел математической логики, изучающий множества, которые в общем смысле можно понимать как совокупности объектов.'}
+            </div>
+            <div className="p-3 bg-slate-800/50 rounded border border-slate-700/50 text-center mb-4 text-slate-200">
+               <Latex>{`$A \\cup B = \\{x : x \\in A \\lor x \\in B\\}$`}</Latex>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* 3. Main Content Card (Floating) */}
+      {/* 3. Плашка Туториала */}
       <div 
-        className={`absolute z-[70] w-[90vw] md:w-[400px] bg-slate-900 border border-blue-500/30 rounded-xl shadow-2xl p-6 transition-all duration-500 ease-in-out flex flex-col`}
-        style={{}} // Позиция управляется классами Tailwind ниже
-        className={getPositionClasses(currentStep.position) + " absolute z-[70] w-[90vw] md:w-[400px] bg-slate-900 border border-blue-500/30 rounded-xl shadow-2xl p-6 transition-all duration-500 ease-in-out flex flex-col"}
+        className="bg-slate-900 border border-blue-500/50 rounded-xl shadow-2xl p-6 flex flex-col transition-all duration-500 ease-in-out"
+        style={getModalPositionStyles(currentStep.position)}
       >
         {/* Header: Title + Lang Switch */}
-        <div className="flex justify-between items-start mb-4">
-          <h2 className="text-xl font-bold text-white leading-tight">
+        <div className="flex justify-between items-start mb-3">
+          <h2 className="text-lg font-bold text-white leading-tight pr-4">
             {currentStep.content[activeLang].title}
           </h2>
-          <div className="flex gap-1 ml-2 shrink-0">
+          <div className="flex gap-1 shrink-0">
              <button 
                onClick={() => toggleLang('ru')}
-               className={`text-xs px-2 py-1 rounded transition-colors ${activeLang === 'ru' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'}`}
+               className={`text-[10px] px-2 py-1 rounded border ${activeLang === 'ru' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-transparent border-slate-600 text-slate-400 hover:text-white'}`}
              >RU</button>
              <button 
                onClick={() => toggleLang('en')}
-               className={`text-xs px-2 py-1 rounded transition-colors ${activeLang === 'en' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'}`}
+               className={`text-[10px] px-2 py-1 rounded border ${activeLang === 'en' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-transparent border-slate-600 text-slate-400 hover:text-white'}`}
              >EN</button>
           </div>
         </div>
@@ -217,39 +291,48 @@ export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLan
           {currentStep.content[activeLang].text}
         </p>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between items-center mt-auto">
-          {/* Back Button (Hidden on step 0) */}
-          <div className="w-20">
+        {/* Footer: Controls */}
+        <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
+          
+          {/* Skip Button (Теперь здесь, хорошо видна) */}
+          <button 
+            onClick={onClose}
+            className="text-xs font-bold text-slate-500 hover:text-slate-300 transition-colors uppercase tracking-wider px-2 py-1"
+          >
+            {activeLang === 'en' ? 'Skip' : 'Пропустить'}
+          </button>
+
+          <div className="flex items-center gap-3">
+             {/* Dots */}
+             <div className="flex gap-1 hidden sm:flex">
+              {STEPS.map((_, idx) => (
+                <div 
+                  key={idx}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === stepIndex ? 'bg-blue-500' : 'bg-slate-700'}`}
+                />
+              ))}
+            </div>
+
+            {/* Back */}
             {stepIndex > 0 && (
               <button 
                 onClick={handleBack}
-                className="text-slate-400 hover:text-white text-sm transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
               >
-                {activeLang === 'en' ? '← Back' : '← Назад'}
+                ←
               </button>
             )}
-          </div>
 
-          {/* Dots Indicator */}
-          <div className="flex gap-1.5">
-            {STEPS.map((_, idx) => (
-              <div 
-                key={idx}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === stepIndex ? 'bg-blue-500 scale-125' : 'bg-slate-700'}`}
-              />
-            ))}
+            {/* Next */}
+            <button 
+              onClick={handleNext}
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-blue-900/20 transition-all active:scale-95 whitespace-nowrap"
+            >
+              {isLastStep 
+                ? (activeLang === 'en' ? 'Start Exploring!' : 'Начать!') 
+                : (activeLang === 'en' ? 'Next' : 'Далее')}
+            </button>
           </div>
-
-          {/* Next/Finish Button */}
-          <button 
-            onClick={handleNext}
-            className="w-24 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-blue-900/20 transition-all active:scale-95"
-          >
-            {isLastStep 
-              ? (activeLang === 'en' ? 'Start!' : 'Начать!') 
-              : (activeLang === 'en' ? 'Next →' : 'Далее →')}
-          </button>
         </div>
       </div>
     </div>

@@ -2389,7 +2389,6 @@ const RAW_LINKS = [
   { source: 'bpi', target: 'thm_stone', type: LinkType.EQUIVALENT },
   
   // Двойственности
-  { source: 'bool_alg', target: 'stone_space', type: LinkType.EQUIVALENT }, // Двойственность Стоуна
   { source: 'dist_lattice', target: 'priestley_space', type: LinkType.EQUIVALENT }, // Двойственность Пристли
   { source: 'heyting_alg', target: 'esakia_space', type: LinkType.EQUIVALENT }, // Двойственность Эсакиа
   { source: 'bool_alg', target: 'bool_ring', type: LinkType.EQUIVALENT, label: 'Structure isomorphism' }, // Алгебраическая экв.
@@ -2421,7 +2420,6 @@ const RAW_LINKS = [
   { source: 'theory_PA', target: 'godel_incompleteness', type: LinkType.RELATED },
   { source: 'godel_incompleteness', target: 'sequence_coding', type: LinkType.RELATED }, // Метод доказательства
   { source: 'godel_incompleteness', target: 'recursion_concept', type: LinkType.RELATED }, // Самореференция
-  { source: 'godel_incompleteness', target: 'halting_problem', type: LinkType.RELATED }, // Связь
   { source: 'diophantine_set', target: 'godel_incompleteness', type: LinkType.RELATED }, // MRDP теорема
   // MRDP Theorem connects Diophantine sets to Computability
   { source: 'diophantine_set', target: 'comp_theory', type: LinkType.RELATED, label: 'MRDP Theorem / Enumerable sets' },
@@ -2439,7 +2437,6 @@ const RAW_LINKS = [
   // Q is essential for undecidability
   { source: 'theory_Q', target: 'comp_theory', type: LinkType.RELATED, label: 'Essential for incompleteness' },
   // Model Theory cluster
-  { source: 'model_theory', target: 'ultraproduct', type: LinkType.CONTAINS },
   { source: 'model_theory', target: 'type_theory_model', type: LinkType.CONTAINS, label: 'Core concept' },
   { source: 'model_theory', target: 'saturated_model', type: LinkType.CONTAINS, label:'Model property' },
   { source: 'model_theory', target: 'prime_model', type: LinkType.CONTAINS, label: 'Model property' },
@@ -2453,21 +2450,17 @@ const RAW_LINKS = [
   { source: 'stone_space_types', target: 'isolated_type', type: LinkType.CONTAINS },
   { source: 'thm_ryll', target: 'type_theory_model', type: LinkType.RELATED },
   { source: 'thm_los_vaught', target: 'thm_morley', type: LinkType.RELATED },
-  { source: 'model_random_graph', target: 'thm_ryll', type: LinkType.RELATED }, // Пример
   // Type spaces как обобщение
   { source: 'stone_space_types', target: 'stone_space', type: LinkType.EXTENDS, label: 'Generalization to model theory' },
   { source: 'type_theory_model', target: 'topology', type: LinkType.RELATED, label: 'Topological space of types' },
   
   // Ultraproducts & Non-standard
   { source: 'ultraproduct', target: 'ultrafilter', type: LinkType.CONTAINS },
-  { source: 'ultraproduct', target: 'model_nonstd', type: LinkType.RELATED },
   { source: 'ultraproduct', target: 'thm_compactness', type: LinkType.RELATED }, // Метод доказательства
   { source: 'model_nonstd', target: 'surreal_numbers', type: LinkType.RELATED },
   
   // Algebra & Ideals
   { source: 'theory_rings', target: 'ideal_concept', type: LinkType.CONTAINS },
-  { source: 'ideal_concept', target: 'prime_ideal', type: LinkType.CONTAINS },
-  { source: 'ideal_concept', target: 'maximal_ideal', type: LinkType.CONTAINS },
   { source: 'prime_ideal', target: 'integral_domain', type: LinkType.RELATED }, // Фактор - область целостности
   { source: 'maximal_ideal', target: 'theory_fields', type: LinkType.RELATED }, // Фактор - поле
   { source: 'bpi', target: 'prime_ideal', type: LinkType.RELATED }, // Теорема о простом идеале
@@ -2510,7 +2503,6 @@ const RAW_LINKS = [
   { source: 'axiom_choice', target: 'cardinal_arithmetic', type: LinkType.RELATED }, // Нужна для арифметики кардиналов
   { source: 'dedekind_finite', target: 'axiom_choice', type: LinkType.RELATED }, // Зависимость
   { source: 'ac_omega', target: 'topology', type: LinkType.RELATED }, // Нужна для анализа (мера Лебега)
-  { source: 'axiom_determinacy', target: 'large_cardinals', type: LinkType.RELATED }, // Связь с Woodin cardinals
   { source: 'ordinal_arithmetic', target: 'cardinal_arithmetic', type: LinkType.RELATED, label: 'Uses Alephs'},
   
   // Algebra & Logic (Algebraic Logic)
@@ -2529,7 +2521,6 @@ const RAW_LINKS = [
 { source: 'realizability', target: 'bhk_interpretation', type: LinkType.RELATED, label: 'Formalizes BHK' },
 { source: 'markov_principle', target: 'realizability', type: LinkType.RELATED, label: 'Realizability interpretation' },
   // Game-theoretic методы
-{ source: 'thm_ef_games', target: 'model_theory', type: LinkType.CONTAINS, label: 'Model-theoretic tool' },
 { source: 'thm_ef_games', target: 'thm_lowenheim', type: LinkType.RELATED, label: 'Alternative proof method' },
 { source: 'axiom_determinacy', target: 'large_cardinals', type: LinkType.RELATED, label: 'Consistency via Woodin cardinals' },
 
@@ -2549,7 +2540,6 @@ const RAW_LINKS = [
 { source: 'esakia_space', target: 'priestley_space', type: LinkType.EXTENDS, label: 'Priestley + continuity' },
   // V_α и ординалы
 { source: 'cumulative_hierarchy', target: 'ordinal_arithmetic', type: LinkType.CONTAINS, label: 'Indexed by ordinals' },
-{ source: 'cumulative_hierarchy', target: 'rank_concept', type: LinkType.CONTAINS, label: 'Defines rank' },
 { source: 'model_V_omega', target: 'cumulative_hierarchy', type: LinkType.RELATED, label: 'Stage ω' },
 
 // --- Automorphism Group ---
@@ -2723,7 +2713,6 @@ const RAW_LINKS = [
 // Narrow orders и континуум-гипотеза
 { source: 'narrow_order', target: 'continuum_hypothesis', type: LinkType.RELATED, label: 'Suslin hypothesis' },
 { source: 'narrow_order', target: 'poset', type: LinkType.EXTENDS, label: 'Aronszajn trees' },
-{ source: 'narrow_order', target: 'antichain', type: LinkType.RELATED },
 
 // ==============================================================================
 // REDUCTS

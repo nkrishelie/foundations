@@ -16,22 +16,22 @@ const STEPS = [
     highlight: 'none',
     content: {
       ru: {
-        title: 'Добро пожаловать в MathLogic Nexus',
-        text: 'Это интерактивная 3D-карта оснований математики. Давайте я быстро покажу вам основные инструменты управления.'
+        title: 'Добро пожаловать!',
+        text: 'Это MathLogic Nexus — интерактивная 3D-карта оснований математики. Давайте быстро настроим интерфейс под вас.'
       },
       en: {
-        title: 'Welcome to MathLogic Nexus',
-        text: 'This is an interactive 3D map of mathematical foundations. Let me quickly show you the main controls.'
+        title: 'Welcome!',
+        text: 'This is MathLogic Nexus — an interactive 3D map of mathematical foundations. Let\'s quickly set up the interface for you.'
       }
     }
   },
   {
     id: 'search',
-    position: 'bottom-left-of-target', // Плашка будет ниже и правее цели
+    position: 'bottom-left-of-target', 
     highlight: 'search-bar',
     content: {
       ru: {
-        title: 'Поиск (Search)',
+        title: 'Поиск',
         text: 'Введите название теоремы или понятия. Выпадающий список позволит мгновенно сфокусироваться на нужном узле.'
       },
       en: {
@@ -42,77 +42,77 @@ const STEPS = [
   },
   {
     id: 'controls',
-    position: 'bottom-right-of-target', // Плашка ниже и левее цели
+    position: 'bottom-right-of-target',
     highlight: 'top-controls',
     content: {
       ru: {
-        title: 'Настройки (Settings)',
-        text: 'Здесь можно переключить язык, сменить тему (День/Ночь) или открыть это обучение заново.'
+        title: 'Настройки',
+        text: 'Переключение языка (RU/EN), темы (День/Ночь) и кнопка повторного запуска этого обучения.'
       },
       en: {
         title: 'Settings',
-        text: 'Here you can switch languages, toggle the theme (Day/Night), or reopen this tutorial.'
+        text: 'Switch languages (RU/EN), toggle theme (Day/Night), or restart this tutorial.'
       }
     }
   },
   {
     id: 'legend',
-    position: 'left-of-target', // Плашка слева от цели
+    position: 'left-of-target',
     highlight: 'legend-sidebar',
     content: {
       ru: {
         title: 'Легенда и Фильтры',
-        text: 'Это интерактивная легенда. Кликайте по цветным кружкам или названиям типов, чтобы скрывать/показывать целые разделы на графе.'
+        text: 'Кликайте по элементам легенды, чтобы скрывать или показывать целые разделы математики на графе.'
       },
       en: {
         title: 'Legend & Filters',
-        text: 'This is an interactive legend. Click on colored circles or type names to hide/show entire sections on the graph.'
+        text: 'Click on legend items to hide or show entire mathematical disciplines on the graph.'
       }
     }
   },
   {
     id: 'nav-controls',
-    position: 'right-of-target', // Плашка справа от цели
+    position: 'right-of-target',
     highlight: 'bottom-left-nav',
     content: {
       ru: {
-        title: 'Навигация',
-        text: 'Используйте эти кнопки для управления масштабом, центрирования камеры или переключения режимов просмотра (2D/3D).'
+        title: 'Управление',
+        text: 'Кнопки для быстрого масштабирования, возврата камеры в центр и переключения режимов (2D/3D).'
       },
       en: {
-        title: 'Navigation',
-        text: 'Use these buttons to control zoom, recenter the camera, or switch viewing modes (2D/3D).'
+        title: 'Controls',
+        text: 'Buttons for quick zoom, resetting the camera to center, and switching viewing modes (2D/3D).'
       }
     }
   },
   {
     id: 'graph',
-    position: 'bottom-left-corner', // Плашка в углу, чтобы не закрывать центр
+    position: 'bottom-left-corner',
     highlight: 'center-glow',
     content: {
       ru: {
-        title: 'Граф (Graph View)',
-        text: 'Вращайте (ЛКМ), двигайте (ПКМ) и приближайте (Колесо). Названия узлов видны всегда. Кликните по узлу, чтобы узнать детали.'
+        title: 'Граф',
+        text: 'Вращайте (ЛКМ), двигайте (ПКМ), приближайте (Колесо). Кликните по узлу для деталей.'
       },
       en: {
-        title: 'Graph View',
-        text: 'Rotate (LMB), pan (RMB), and zoom (Wheel). Node labels are always visible. Click a node to see details.'
+        title: 'The Graph',
+        text: 'Rotate (LMB), pan (RMB), zoom (Wheel). Click on any node to see details.'
       }
     }
   },
   {
     id: 'details',
-    position: 'left-of-card', // Плашка слева от демо-карточки
-    highlight: 'mock-card-area', // Подсвечиваем зону, где появится карточка
-    showMockCard: true, // Флаг для рендера муляжа
+    position: 'left-of-card',
+    highlight: 'mock-card-area',
+    showMockCard: true,
     content: {
       ru: {
         title: 'Карточка Узла',
-        text: 'Она появляется при клике на узел. Здесь есть описание, LaTeX-формулы и список связей. Карточку можно перетаскивать за заголовок!'
+        text: 'Появляется при клике. Содержит формулы и связи. Попробуйте перетащить её за заголовок!'
       },
       en: {
         title: 'Node Details',
-        text: 'Appears when you click a node. Contains descriptions, LaTeX formulas, and links. You can drag the card by its header!'
+        text: 'Appears on click. Contains formulas and links. Try dragging it by the header!'
       }
     }
   }
@@ -131,41 +131,46 @@ export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLan
   const currentStep = STEPS[stepIndex];
   const isLastStep = stepIndex === STEPS.length - 1;
 
-  // --- Логика позиционирования плашки туториала ---
+  // --- Позиционирование плашки (Modal) ---
   const getModalPositionStyles = (pos: string): React.CSSProperties => {
     const isMobile = window.innerWidth < 768;
     const base: React.CSSProperties = { position: 'absolute', zIndex: 70 };
 
     if (isMobile) {
-      // На мобильном всегда внизу или в центре, чтобы не перекрывать важное сверху
+      // На мобильном всегда внизу/центре, чтобы не перекрывать подсвечиваемый верх
+      // Если подсвечиваем низ (nav), поднимаем плашку выше
+      if (pos === 'right-of-target' || pos === 'bottom-left-corner' || pos === 'left-of-card') {
+          return { ...base, top: '100px', left: '50%', transform: 'translateX(-50%)', width: '90vw' };
+      }
       return { ...base, bottom: '20px', left: '50%', transform: 'translateX(-50%)', width: '90vw' };
     }
 
     switch (pos) {
       case 'center':
         return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '400px' };
-      case 'bottom-left-of-target': // Для поиска (слева сверху) -> ставим ниже
+      case 'bottom-left-of-target': // Поиск
         return { ...base, top: '140px', left: '20px', width: '350px' };
-      case 'bottom-right-of-target': // Для кнопок (справа сверху) -> ставим ниже и левее
-        return { ...base, top: '80px', right: '20px', width: '350px' };
-      case 'left-of-target': // Для легенды (справа) -> ставим левее
-        return { ...base, top: '150px', right: '280px', width: '350px' }; // 280px отступ от легенды
-      case 'right-of-target': // Для навигации (слева снизу) -> ставим правее
+      case 'bottom-right-of-target': // Настройки
+        return { ...base, top: '100px', right: '20px', width: '350px' };
+      case 'left-of-target': // Легенда (сдвигаем левее, чтобы не наехать)
+        return { ...base, top: '120px', right: '320px', width: '350px' }; 
+      case 'right-of-target': // Навигация
         return { ...base, bottom: '40px', left: '140px', width: '350px' };
-      case 'bottom-left-corner': // Для графа -> в угол
+      case 'bottom-left-corner': // Граф
         return { ...base, bottom: '40px', left: '40px', width: '350px' };
-      case 'left-of-card': // Для карточки (справа снизу) -> ставим левее
-        return { ...base, bottom: '100px', right: '520px', width: '350px' };
+      case 'left-of-card': // Карточка
+        return { ...base, bottom: '100px', right: '540px', width: '350px' };
       default:
         return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
   };
 
-  // --- Логика "Прожектора" ---
+  // --- Позиционирование Подсветки (Highlight) ---
+  // Исправил координаты на 20px (вместо 10px), чтобы совпадать с p-4 (16px) + зазор
   const getHighlightStyle = (highlight: string): React.CSSProperties => {
     const base: React.CSSProperties = {
       position: 'absolute',
-      borderRadius: '8px',
+      borderRadius: '12px',
       boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.75)', // Затемнение
       transition: 'all 0.5s ease-in-out',
       pointerEvents: 'none',
@@ -174,27 +179,28 @@ export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLan
 
     switch (highlight) {
       case 'none':
-        // Начальный экран - просто затемнение всего (точка в центре)
         return { ...base, top: '50%', left: '50%', width: '0px', height: '0px', boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)' };
       
       case 'search-bar':
-        // Поиск (input) + Заголовок
-        return { ...base, top: '10px', left: '10px', width: '320px', height: '110px', borderRadius: '12px' };
+        // UIOverlay padding=4 (16px). Input height ~42px. Title ~40px.
+        // Ставим top: 16px, left: 16px
+        return { ...base, top: '16px', left: '16px', width: '350px', height: '100px' };
       
       case 'top-controls':
-        // Кнопки справа сверху (учитываем их отступы)
-        return { ...base, top: '10px', right: '10px', width: '220px', height: '60px', borderRadius: '30px' };
+        // Кнопки справа вверху. top: 16px, right: 16px.
+        // Ширина блока кнопок + Info примерно 150px
+        return { ...base, top: '16px', right: '16px', width: '180px', height: '60px', borderRadius: '30px' };
       
       case 'legend-sidebar':
-        // Легенда справа (с отступом сверху)
-        return { ...base, top: '90px', right: '10px', width: '240px', height: '50vh', borderRadius: '12px' };
+        // Легенда top-24 (96px). right-4 (16px).
+        // Подсвечиваем всю высоту
+        return { ...base, top: '96px', right: '16px', width: '250px', height: 'calc(100vh - 120px)', borderRadius: '12px' };
       
       case 'bottom-left-nav':
-        // Кнопки навигации слева внизу
-        return { ...base, bottom: '10px', left: '10px', width: '120px', height: '180px', borderRadius: '12px' };
+        // Навигация (предполагаем bottom-4 left-4)
+        return { ...base, bottom: '16px', left: '16px', width: '100px', height: '120px' };
       
       case 'center-glow':
-        // Граф (мягкое свечение в центре)
         return { 
           ...base, 
           top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
@@ -203,13 +209,13 @@ export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLan
         };
       
       case 'mock-card-area':
-        // Место для демо-карточки (справа внизу)
+        // Карточка справа внизу. bottom-4 right-4.
         return { 
           ...base, 
-          bottom: '20px', right: '20px', 
+          bottom: '16px', right: '16px', 
           width: '500px', height: '400px', 
           borderRadius: '12px',
-          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.8)' // Сильнее затемняем фон, чтобы выделить карточку
+          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.8)' 
         };
         
       default:
@@ -231,34 +237,32 @@ export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLan
       {/* 1. Слой подсветки */}
       <div style={getHighlightStyle(currentStep.highlight)}></div>
 
-      {/* 2. ДЕМО-КАРТОЧКА (Показывается только на шаге 'details') */}
+      {/* 2. ДЕМО-КАРТОЧКА (Только на шаге details) */}
       {currentStep.showMockCard && (
         <div 
-          className="absolute z-50 w-[95vw] md:w-[500px] bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl flex flex-col overflow-hidden animate-fade-in-up"
+          className="absolute z-50 w-[90vw] md:w-[500px] bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl flex flex-col overflow-hidden animate-fade-in-up"
           style={{ bottom: '20px', right: '20px', height: '400px' }}
         >
-          {/* Mock Header */}
           <div className="p-4 border-b border-slate-700 flex justify-between items-start">
             <h2 className="text-2xl font-bold text-white leading-tight">
               {activeLang === 'en' ? 'Set Theory' : 'Теория множеств'}
             </h2>
             <button className="text-slate-400">✕</button>
           </div>
-          {/* Mock Content */}
           <div className="p-6 overflow-y-auto custom-scrollbar">
             <div className="flex items-center gap-2 mb-4">
               <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,1)]" />
               <span className="text-xs uppercase tracking-wide text-slate-400">
-                {activeLang === 'en' ? 'Foundations' : 'Основания'} / {activeLang === 'en' ? 'Discipline' : 'Раздел'}
+                {activeLang === 'en' ? 'Foundations' : 'Основания'}
               </span>
             </div>
             <div className="text-slate-300 text-sm leading-relaxed mb-4">
               {activeLang === 'en' 
-                ? 'Set theory is the branch of mathematical logic that studies sets, which can be informally described as collections of objects.' 
-                : 'Теория множеств — раздел математической логики, изучающий множества, которые в общем смысле можно понимать как совокупности объектов.'}
+                ? 'Set theory is the branch of mathematical logic that studies sets.' 
+                : 'Раздел математики, изучающий общие свойства множеств.'}
             </div>
             <div className="p-3 bg-slate-800/50 rounded border border-slate-700/50 text-center mb-4 text-slate-200">
-               <Latex>{`$A \\cup B = \\{x : x \\in A \\lor x \\in B\\}$`}</Latex>
+               <Latex>{`$x \\in A$`}</Latex>
             </div>
           </div>
         </div>
@@ -266,73 +270,77 @@ export const WelcomeModal: React.FC<Props> = ({ onClose, currentLang: initialLan
 
       {/* 3. Плашка Туториала */}
       <div 
-        className="bg-slate-900 border border-blue-500/50 rounded-xl shadow-2xl p-6 flex flex-col transition-all duration-500 ease-in-out"
+        className="bg-slate-900 border border-blue-500/50 rounded-xl shadow-2xl p-5 flex flex-col transition-all duration-500 ease-in-out"
         style={getModalPositionStyles(currentStep.position)}
       >
-        {/* Header: Title + Lang Switch */}
-        <div className="flex justify-between items-start mb-3">
-          <h2 className="text-lg font-bold text-white leading-tight pr-4">
+        {/* Header Row: Title + Controls (Skip + Lang) */}
+        <div className="flex justify-between items-start mb-2">
+          <h2 className="text-lg font-bold text-white leading-tight pr-2">
             {currentStep.content[activeLang].title}
           </h2>
-          <div className="flex gap-1 shrink-0">
-             <button 
-               onClick={() => toggleLang('ru')}
-               className={`text-[10px] px-2 py-1 rounded border ${activeLang === 'ru' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-transparent border-slate-600 text-slate-400 hover:text-white'}`}
-             >RU</button>
-             <button 
-               onClick={() => toggleLang('en')}
-               className={`text-[10px] px-2 py-1 rounded border ${activeLang === 'en' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-transparent border-slate-600 text-slate-400 hover:text-white'}`}
-             >EN</button>
+          
+          <div className="flex flex-col items-end gap-2">
+            {/* Skip Button - Moved Here for Visibility */}
+            <button 
+                onClick={onClose}
+                className="text-[10px] font-bold text-slate-500 hover:text-white uppercase tracking-wider transition-colors"
+            >
+                {activeLang === 'en' ? 'Skip ✕' : 'Пропустить ✕'}
+            </button>
+
+            {/* Lang Switch */}
+            <div className="flex gap-1">
+               <button 
+                 onClick={() => toggleLang('ru')}
+                 className={`text-[10px] px-1.5 py-0.5 rounded border ${activeLang === 'ru' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-transparent border-slate-600 text-slate-400 hover:text-white'}`}
+               >RU</button>
+               <button 
+                 onClick={() => toggleLang('en')}
+                 className={`text-[10px] px-1.5 py-0.5 rounded border ${activeLang === 'en' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-transparent border-slate-600 text-slate-400 hover:text-white'}`}
+               >EN</button>
+            </div>
           </div>
         </div>
 
         {/* Text Body */}
-        <p className="text-slate-300 text-sm leading-relaxed mb-6">
+        <p className="text-slate-300 text-sm leading-relaxed mb-4 min-h-[40px]">
           {currentStep.content[activeLang].text}
         </p>
 
-        {/* Footer: Controls */}
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
+        {/* Footer: Navigation */}
+        <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-800">
           
-          {/* Skip Button (Теперь здесь, хорошо видна) */}
-          <button 
-            onClick={onClose}
-            className="text-xs font-bold text-slate-500 hover:text-slate-300 transition-colors uppercase tracking-wider px-2 py-1"
-          >
-            {activeLang === 'en' ? 'Skip' : 'Пропустить'}
-          </button>
-
-          <div className="flex items-center gap-3">
-             {/* Dots */}
-             <div className="flex gap-1 hidden sm:flex">
-              {STEPS.map((_, idx) => (
-                <div 
-                  key={idx}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === stepIndex ? 'bg-blue-500' : 'bg-slate-700'}`}
-                />
-              ))}
-            </div>
-
-            {/* Back */}
+          {/* Back Button */}
+          <div className="w-8">
             {stepIndex > 0 && (
               <button 
                 onClick={handleBack}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors text-lg pb-1"
               >
                 ←
               </button>
             )}
-
-            {/* Next */}
-            <button 
-              onClick={handleNext}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-blue-900/20 transition-all active:scale-95 whitespace-nowrap"
-            >
-              {isLastStep 
-                ? (activeLang === 'en' ? 'Start Exploring!' : 'Начать!') 
-                : (activeLang === 'en' ? 'Next' : 'Далее')}
-            </button>
           </div>
+
+          {/* Dots */}
+          <div className="flex gap-1.5">
+            {STEPS.map((_, idx) => (
+              <div 
+                key={idx}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === stepIndex ? 'bg-blue-500 scale-125' : 'bg-slate-700'}`}
+              />
+            ))}
+          </div>
+
+          {/* Next Button */}
+          <button 
+            onClick={handleNext}
+            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg shadow-lg shadow-blue-900/20 transition-all active:scale-95"
+          >
+            {isLastStep 
+              ? (activeLang === 'en' ? 'Finish' : 'Готово') 
+              : (activeLang === 'en' ? 'Next' : 'Далее')}
+          </button>
         </div>
       </div>
     </div>

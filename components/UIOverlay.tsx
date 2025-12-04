@@ -300,7 +300,7 @@ export const UIOverlay: React.FC<Props> = ({
       </div>
       
       {/* Legend */}
-      <div className="pointer-events-auto absolute top-24 right-4 max-h-[70vh] overflow-y-auto custom-scrollbar z-20">
+      <div className="pointer-events-auto absolute top-24 right-4 max-h-[90vh] overflow-y-auto custom-scrollbar z-20">
         <div className={`bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-lg transition-all duration-300 ${isLegendOpen ? 'p-4' : 'p-2'}`}>
           <div className="flex items-center justify-between cursor-pointer gap-4" onClick={() => setIsLegendOpen(!isLegendOpen)}>
             <h3 className={`font-semibold text-slate-200 ${!isLegendOpen && 'hidden'}`}>{currentLang === 'en' ? 'Legend' : 'Легенда'}</h3>
@@ -395,7 +395,7 @@ export const UIOverlay: React.FC<Props> = ({
       {selectedNode && (
         <div 
           ref={cardRef}
-          className="pointer-events-auto absolute bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl flex flex-col z-40 w-[500px]"
+          className="pointer-events-auto absolute bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl flex flex-col z-40 w-[95vw] md:w-[500px]"
           style={{
             left: position.x >= 0 ? position.x : undefined,
             top: position.y,

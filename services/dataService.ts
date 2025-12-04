@@ -1748,6 +1748,404 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       }
     }
   },
+  // ==============================================================================
+// PROOF-THEORETIC ORDINALS (Доказательные ординалы)
+// ==============================================================================
+'church_kleene': {
+  group: Discipline.PROOF_THEORY,
+  kind: NodeKind.STRUCTURE,
+  val: 14,
+  synonyms: ['ω₁^CK', 'Church-Kleene ordinal', 'Ординал Чёрча-Клини'],
+  content: {
+    en: { 
+      label: '$\\omega_₁^{CK}$', 
+      description: 'The supremum of computable ordinals. First non-computable ordinal.',
+      details: ['Hyperarithmetical hierarchy', 'Kleene\'s O', 'Admissible ordinal']
+    },
+    ru: { 
+      label: '$\\omega_₁^{CK}$', 
+      description: 'Супремум вычислимых ординалов. Первый невычислимый ординал.',
+      details: ['Гипераритметическая иерархия', 'Kleene O', 'Допустимый ординал']
+    }
+  }
+},
+
+'ordinal_bachmann_howard': {
+  group: Discipline.PROOF_THEORY,
+  kind: NodeKind.STRUCTURE,
+  val: 12,
+  synonyms: ['Bachmann-Howard ordinal', 'Ординал Бахмана-Ховарда'],
+  content: {
+    en: { 
+      label: 'Bachmann-Howard Ordinal', 
+      description: 'Proof-theoretic ordinal of Kripke-Platek set theory with infinity.',
+      details: ['KP + Infinity', 'Collapsing functions']
+    },
+    ru: { 
+      label: 'Ординал Бахмана-Ховарда', 
+      description: 'Доказательный ординал теории множеств Крипке-Платека с бесконечностью.',
+      details: ['KP + Inf', 'Коллапсирующие функции']
+    }
+  }
+},
+
+'ordinal_takeuti_feferman_buchholz': {
+  group: Discipline.PROOF_THEORY,
+  kind: NodeKind.STRUCTURE,
+  val: 12,
+  synonyms: ['ψ₀(Ω_ω)', 'TFB ordinal'],
+  content: {
+    en: { 
+      label: 'Takeuti-Feferman-Buchholz', 
+      description: 'Proof-theoretic ordinal of $\\Pi^1_1-CA_0$ and related systems.',
+      details: ['Extended Veblen', 'Ordinal collapsing']
+    },
+    ru: { 
+      label: 'Ординал Такеути-Феферман-Бухгольц', 
+      description: 'Доказательный ординал $\\Pi^1_1-CA_0$ и связанных систем.',
+      details: ['Расширенный Веблен', 'Коллапс ординалов']
+    }
+  }
+},
+
+// ==============================================================================
+// MODEL THEORY ADDITIONS
+// ==============================================================================
+'reduct': {
+  group: Discipline.MODEL_THEORY,
+  kind: NodeKind.CONCEPT,
+  val: 12,
+  synonyms: ['Reduct', 'Редукт', 'Restriction'],
+  content: {
+    en: { 
+      label: 'Reduct', 
+      description: 'Structure obtained by forgetting part of the signature.',
+      details: ['Signature restriction', 'Definability', 'Induced structure']
+    },
+    ru: { 
+      label: 'Редукт', 
+      description: 'Структура, полученная забыванием части сигнатуры.',
+      details: ['Ограничение сигнатуры', 'Определимость', 'Индуцированная структура']
+    }
+  }
+},
+
+'kripke_model': {
+  group: Discipline.LOGIC,
+  kind: NodeKind.CONCEPT,
+  val: 14,
+  synonyms: ['Kripke Model', 'Модель Крипке'],
+  content: {
+    en: { 
+      label: 'Kripke Model', 
+      description: 'Frame with valuation function. (W, R, V)',
+      details: ['Truth at worlds', 'Forcing relation']
+    },
+    ru: { 
+      label: 'Модель Крипке', 
+      description: 'Шкала с функцией оценки. (W, R, V)',
+      details: ['Истинность в мирах', 'Отношение вынуждения']
+    }
+  }
+},
+
+// ==============================================================================
+// ORDER THEORY ADDITIONS
+// ==============================================================================
+'well_order': {
+  group: Discipline.ORDER_THEORY,
+  kind: NodeKind.CONCEPT,
+  val: 16,
+  synonyms: ['Well-order', 'Вполне упорядоченное множество', 'Well-ordering'],
+  content: {
+    en: { 
+      label: 'Well-Order', 
+      description: 'Total order where every non-empty subset has a least element.',
+      details: ['Foundation', 'Transfinite induction', 'Order type']
+    },
+    ru: { 
+      label: 'Вполне упорядоченное множество', 
+      description: 'Линейный порядок, в котором каждое непустое подмножество имеет наименьший элемент.',
+      details: ['Фундированность', 'Трансфинитная индукция', 'Тип порядка']
+    }
+  }
+},
+
+'chain_order': {
+  group: Discipline.ORDER_THEORY,
+  kind: NodeKind.CONCEPT,
+  val: 12,
+  synonyms: ['Chain', 'Цепь', 'Totally ordered subset'],
+  content: {
+    en: { 
+      label: 'Chain', 
+      description: 'Totally ordered subset of a poset.',
+      details: ['Maximal chains', 'Zorn\'s Lemma']
+    },
+    ru: { 
+      label: 'Цепь', 
+      description: 'Линейно упорядоченное подмножество частично упорядоченного множества.',
+      details: ['Максимальные цепи', 'Лемма Цорна']
+    }
+  }
+},
+
+'antichain': {
+  group: Discipline.ORDER_THEORY,
+  kind: NodeKind.CONCEPT,
+  val: 12,
+  synonyms: ['Antichain', 'Антицепь'],
+  content: {
+    en: { 
+      label: 'Antichain', 
+      description: 'Subset with no comparable elements.',
+      details: ['Sperner\'s theorem', 'Width', 'Dilworth\'s theorem']
+    },
+    ru: { 
+      label: 'Антицепь', 
+      description: 'Подмножество без сравнимых элементов.',
+      details: ['Теорема Шпернера', 'Ширина', 'Теорема Дилворта']
+    }
+  }
+},
+
+'narrow_order': {
+  group: Discipline.ORDER_THEORY,
+  kind: NodeKind.CONCEPT,
+  val: 10,
+  synonyms: ['Narrow Order', 'Стройный порядок', 'Slim Order'],
+  content: {
+    en: { 
+      label: 'Narrow Order', 
+      description: 'Order with no uncountable chains or antichains.',
+      details: ['Aronszajn trees', 'Suslin hypothesis']
+    },
+    ru: { 
+      label: 'Стройный порядок', 
+      description: 'Порядок без несчётных цепей и антицепей.',
+      details: ['Деревья Аронсзайна', 'Гипотеза Суслина']
+    }
+  }
+},
+
+// ==============================================================================
+// COMPUTABILITY THEORY EXTENSIONS
+// ==============================================================================
+'computable_function': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 18,
+  synonyms: ['Computable Function', 'Вычислимая функция', 'Recursive'],
+  content: {
+    en: { 
+      label: 'Computable Function', 
+      description: 'Function computable by Turing machine or equivalent model.',
+      details: ['Church-Turing equivalence', 'Partial/Total', 'Enumeration']
+    },
+    ru: { 
+      label: 'Вычислимая функция', 
+      description: 'Функция, вычислимая машиной Тьюринга или эквивалентной моделью.',
+      details: ['Эквивалентность Чёрча-Тьюринга', 'Частичная/Полная', 'Нумерация']
+    }
+  }
+},
+
+'partial_recursive': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 16,
+  synonyms: ['Partial Recursive Function', 'Частично рекурсивная функция', 'μ-recursive'],
+  content: {
+    en: { 
+      label: 'Partial Recursive', 
+      description: 'Function defined by primitive recursion and unbounded search.',
+      details: ['μ-operator', 'Kleene normal form', 'Halting problem']
+    },
+    ru: { 
+      label: 'Частично рекурсивная', 
+      description: 'Функция, определённая примитивной рекурсией и неограниченным поиском.',
+      details: ['μ-оператор', 'Нормальная форма Клини', 'Проблема остановки']
+    }
+  }
+},
+
+'sigma1_definable': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 14,
+  synonyms: ['Σ₁-definable', 'Σ₁-определимые функции', 'Recursively enumerable'],
+  content: {
+    en: { 
+      label: '$\\Sigma_1$-definable', 
+      description: 'Functions whose graph is recursively enumerable.',
+      details: ['Arithmetical hierarchy', 'Post\'s theorem', 'Turing reducibility']
+    },
+    ru: { 
+      label: '$\\Sigma_1$-определимые', 
+      description: 'Функции, чей график перечислим.',
+      details: ['Арифметическая иерархия', 'Теорема Поста', 'Тьюринг-сводимость']
+    }
+  }
+},
+
+'markov_algorithm': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 14,
+  synonyms: ['Markov Algorithm', 'Нормальный алгорифм Маркова', 'String rewriting'],
+  content: {
+    en: { 
+      label: 'Markov Algorithm', 
+      description: 'String rewriting system equivalent to Turing machines.',
+      details: ['Production rules', 'Normal algorithms', 'Completeness']
+    },
+    ru: { 
+      label: 'Алгорифм Маркова', 
+      description: 'Система переписывания строк, эквивалентная машинам Тьюринга.',
+      details: ['Подстановки', 'Нормальные алгорифмы', 'Полнота']
+    }
+  }
+},
+
+'universal_pl': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 14,
+  synonyms: ['Universal Programming Language', 'Универсальный язык программирования', 'Turing-complete'],
+  content: {
+    en: { 
+      label: 'Universal PL', 
+      description: 'Programming language capable of computing all computable functions.',
+      details: ['Turing completeness', 'Simulation', 'Undecidability']
+    },
+    ru: { 
+      label: 'Универсальный ЯП', 
+      description: 'Язык программирования, способный вычислить все вычислимые функции.',
+      details: ['Тьюринг-полнота', 'Симуляция', 'Неразрешимость']
+    }
+  }
+},
+
+'polytime_function': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 14,
+  synonyms: ['Polynomial Time', 'Полиномиальное время', 'P-time', 'PTIME'],
+  content: {
+    en: { 
+      label: 'Polynomial Time', 
+      description: 'Functions computable in time polynomial in input size.',
+      details: ['Complexity class P', 'Efficient computation', 'P vs NP']
+    },
+    ru: { 
+      label: 'Полиномиальное время', 
+      description: 'Функции, вычислимые за полиномиальное от размера входа время.',
+      details: ['Класс сложности P', 'Эффективные вычисления', 'P vs NP']
+    }
+  }
+},
+
+'polyspace_function': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 12,
+  synonyms: ['Polynomial Space', 'Полиномиальная память', 'PSPACE'],
+  content: {
+    en: { 
+      label: 'Polynomial Space', 
+      description: 'Functions computable using polynomial space.',
+      details: ['Complexity class PSPACE', 'Savitch\'s theorem', 'PSPACE-complete']
+    },
+    ru: { 
+      label: 'Полиномиальная память', 
+      description: 'Функции, вычислимые с использованием полиномиальной памяти.',
+      details: ['Класс PSPACE', 'Теорема Савича', 'PSPACE-полнота']
+    }
+  }
+},
+
+'primitive_recursive': {
+  group: Discipline.COMPUTABILITY,
+  kind: NodeKind.CONCEPT,
+  val: 14,
+  synonyms: ['Primitive Recursive', 'Примитивно рекурсивные', 'PR'],
+  content: {
+    en: { 
+      label: 'Primitive Recursive', 
+      description: 'Functions defined without unbounded search.',
+      details: ['Bounded recursion', 'Provably total', 'Ackermann function']
+    },
+    ru: { 
+      label: 'Примитивно рекурсивные', 
+      description: 'Функции без неограниченного поиска.',
+      details: ['Ограниченная рекурсия', 'Доказуемо тотальные', 'Функция Аккермана']
+    }
+  }
+},
+
+// ==============================================================================
+// SET THEORY: ZF^- and V_{ω+ω}
+// ==============================================================================
+'zf_minus': {
+  group: Discipline.SET_THEORY,
+  kind: NodeKind.THEORY,
+  val: 28,
+  synonyms: ['ZF⁻', 'ZF without Replacement', 'ZF минус подстановка'],
+  content: {
+    en: { 
+      label: '$\\mathsf{ZF}^-$', 
+      description: 'ZF without the Axiom Schema of Replacement.',
+      details: ['Separation only', 'Weaker than ZF', 'Models $V_{\\omega+\\omega}$']
+    },
+    ru: { 
+      label: '$\\mathsf{ZF}^-$', 
+      description: 'ZF без схемы аксиом подстановки.',
+      details: ['Только выделение', 'Слабее ZF', 'Моделируется $V_{\\omega+\\omega}$']
+    }
+  }
+},
+
+'model_V_omega_omega': {
+  group: Discipline.SET_THEORY,
+  kind: NodeKind.STRUCTURE,
+  val: 14,
+  synonyms: ['V_{ω+ω}', 'Model up to ω+ω'],
+  content: {
+    en: { 
+      label: '$V_{\\omega+\\omega}$', 
+      description: 'Cumulative hierarchy up to ordinal $\\omega+\\omega$.',
+      details: ['Model of $\\mathsf{ZF}^-$', 'Countable stages', 'Without Replacement']
+    },
+    ru: { 
+      label: '$V_{\\omega+\\omega}$', 
+      description: 'Кумулятивная иерархия до ординала $\\omega+\\omega$.',
+      details: ['Модель $\\mathsf{ZF}^-$', 'Счётные этапы', 'Без подстановки']
+    }
+  }
+},
+
+// ==============================================================================
+// HELPER CONCEPTS
+// ==============================================================================
+'transitive_set': {
+  group: Discipline.SET_THEORY,
+  kind: NodeKind.CONCEPT,
+  val: 12,
+  synonyms: ['Transitive Set', 'Транзитивное множество'],
+  content: {
+    en: { 
+      label: 'Transitive Set', 
+      description: 'Set where x ∈ A implies x ⊆ A.',
+      details: ['Ordinals are transitive', 'von Neumann construction']
+    },
+    ru: { 
+      label: 'Транзитивное множество', 
+      description: 'Множество, где x ∈ A влечёт x ⊆ A.',
+      details: ['Ординалы транзитивны', 'Конструкция фон Неймана']
+    }
+  }
+},
+
 };
 
 // ==============================================================================

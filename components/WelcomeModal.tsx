@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Language } from '../types';
 import Latex from 'react-latex-next';
-import 'katex/dist/katex.min.css'; // На всякий случай, если стили не подгружены глобально
+import 'katex/dist/katex.min.css';
 
 interface Props {
-  onStart: () => void; // Вернул имя onStart для совместимости с App.tsx
+  onStart: () => void;
   currentLang: Language;
   onToggleLang: (lang: Language) => void; 
 }
@@ -47,12 +47,12 @@ const STEPS = [
     highlight: 'top-controls',
     content: {
       ru: {
-        title: 'Настройки (Settings)',
-        text: 'Здесь можно переключить язык, сменить тему (День/Ночь) или открыть это обучение заново.'
+        title: 'Настройки и Данные',
+        text: 'Здесь можно переключить язык интерфейса (RU/EN) или скачать текущие данные графа в формате CSV.'
       },
       en: {
-        title: 'Settings',
-        text: 'Here you can switch languages, toggle the theme (Day/Night), or reopen this tutorial.'
+        title: 'Settings & Data',
+        text: 'Here you can switch the interface language (RU/EN) or download the current graph data as CSV.'
       }
     }
   },
@@ -63,11 +63,11 @@ const STEPS = [
     content: {
       ru: {
         title: 'Легенда и Фильтры',
-        text: 'Это интерактивная легенда. Кликайте по цветным кружкам или названиям типов, чтобы скрывать/показывать целые разделы на графе.'
+        text: 'Интерактивная легенда. Кликайте по кружкам или названиям, чтобы скрывать/показывать разделы. Цвета соответствуют дисциплинам.'
       },
       en: {
         title: 'Legend & Filters',
-        text: 'This is an interactive legend. Click on colored circles or type names to hide/show entire sections on the graph.'
+        text: 'Interactive legend. Click circles or names to hide/show sections. Colors correspond to disciplines.'
       }
     }
   },
@@ -78,11 +78,11 @@ const STEPS = [
     content: {
       ru: {
         title: 'Навигация',
-        text: 'Используйте эти кнопки для управления масштабом, центрирования камеры или переключения режимов просмотра (2D/3D).'
+        text: 'Кнопки для управления масштабом (+) (-) и быстрого возврата камеры в центр графа.'
       },
       en: {
         title: 'Navigation',
-        text: 'Use these buttons to control zoom, recenter the camera, or switch viewing modes (2D/3D).'
+        text: 'Buttons to control zoom (+) (-) and quickly recenter the camera on the graph.'
       }
     }
   },
@@ -93,11 +93,11 @@ const STEPS = [
     content: {
       ru: {
         title: 'Граф (Graph View)',
-        text: 'Вращайте (ЛКМ), двигайте (ПКМ) и приближайте (Колесо). Названия узлов видны всегда. Кликните по узлу, чтобы узнать детали.'
+        text: 'Вращение (ЛКМ), перемещение (ПКМ), зум (Колесо). Наведите мышь на узел или связь, чтобы увидеть название во всплывающей подсказке.'
       },
       en: {
         title: 'Graph View',
-        text: 'Rotate (LMB), pan (RMB), and zoom (Wheel). Node labels are always visible. Click a node to see details.'
+        text: 'Rotate (LMB), pan (RMB), zoom (Wheel). Hover over a node or a link to see its label in a tooltip.'
       }
     }
   },
@@ -109,11 +109,11 @@ const STEPS = [
     content: {
       ru: {
         title: 'Карточка Узла',
-        text: 'Она появляется при клике на узел. Здесь есть описание, LaTeX-формулы и список связей. Карточку можно перетаскивать за заголовок!'
+        text: 'Появляется при клике на узел. Содержит описание, формулы и связи. Карточку можно перетаскивать за заголовок.'
       },
       en: {
         title: 'Node Details',
-        text: 'Appears when you click a node. Contains descriptions, LaTeX formulas, and links. You can drag the card by its header!'
+        text: 'Appears when you click a node. Contains descriptions, formulas, and links. You can drag the card by its header.'
       }
     }
   }
@@ -136,27 +136,30 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
   // --- Логика позиционирования плашки туториала ---
   const getModalPositionStyles = (pos: string): React.CSSProperties => {
     const isMobile = window.innerWidth < 768;
-    const base: React.CSSProperties = { position: 'absolute', zIndex: 110 }; // z-index выше wrapper
+    const base: React.CSSProperties = { position: 'absolute', zIndex: 110 };
 
     if (isMobile) {
       return { ...base, bottom: '20px', left: '50%', transform: 'translateX(-50%)', width: '90vw' };
     }
 
+    // Увеличил ширину плашек (width) с 350px до 420px, чтобы русский текст влезал комфортно
     switch (pos) {
       case 'center':
-        return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '400px' };
+        return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '480px' };
       case 'bottom-left-of-target':
-        return { ...base, top: '140px', left: '20px', width: '350px' };
+        return { ...base, top: '140px', left: '20px', width: '420px' };
       case 'bottom-right-of-target':
-        return { ...base, top: '80px', right: '20px', width: '350px' };
+        return { ...base, top: '100px', right: '20px', width: '420px' };
       case 'left-of-target':
-        return { ...base, top: '150px', right: '280px', width: '350px' };
+        // Сдвигаем саму плашку левее, так как прожектор легенды тоже сдвинулся
+        return { ...base, top: '150px', right: '340px', width: '420px' };
       case 'right-of-target':
-        return { ...base, bottom: '40px', left: '140px', width: '350px' };
+        // Плашка справа от навигации
+        return { ...base, bottom: '40px', left: '200px', width: '420px' };
       case 'bottom-left-corner':
-        return { ...base, bottom: '40px', left: '40px', width: '350px' };
+        return { ...base, bottom: '40px', left: '40px', width: '420px' };
       case 'left-of-card':
-        return { ...base, bottom: '100px', right: '520px', width: '350px' };
+        return { ...base, bottom: '100px', right: '520px', width: '420px' };
       default:
         return { ...base, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
@@ -170,7 +173,7 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
       boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.75)',
       transition: 'all 0.5s ease-in-out',
       pointerEvents: 'none',
-      zIndex: 100, // Под модалкой, но над всем остальным
+      zIndex: 100, 
     };
 
     switch (highlight) {
@@ -181,13 +184,16 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
         return { ...base, top: '10px', left: '10px', width: '320px', height: '110px', borderRadius: '12px' };
       
       case 'top-controls':
-        return { ...base, top: '10px', right: '10px', width: '220px', height: '60px', borderRadius: '30px' };
+        // Опустили ниже (top: 20px) и чуть увеличили высоту (height: 70px)
+        return { ...base, top: '20px', right: '10px', width: '220px', height: '70px', borderRadius: '30px' };
       
       case 'legend-sidebar':
-        return { ...base, top: '90px', right: '10px', width: '240px', height: '50vh', borderRadius: '12px' };
+        // Сдвиг влево (right: 60px) и увеличение высоты (75vh)
+        return { ...base, top: '90px', right: '60px', width: '240px', height: '75vh', borderRadius: '12px' };
       
       case 'bottom-left-nav':
-        return { ...base, bottom: '10px', left: '10px', width: '120px', height: '180px', borderRadius: '12px' };
+        // Сдвиг вправо (left: 60px) и увеличение высоты в 1.5 раза (270px)
+        return { ...base, bottom: '10px', left: '60px', width: '120px', height: '270px', borderRadius: '12px' };
       
       case 'center-glow':
         return { 
@@ -223,7 +229,6 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
     setStepIndex(prev => Math.max(0, prev - 1));
   };
 
-  // Обработчик кнопки Skip
   const handleSkip = () => {
       if (onStart) onStart();
   };
@@ -233,7 +238,7 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
       {/* 1. Слой подсветки */}
       <div style={getHighlightStyle(currentStep.highlight)}></div>
 
-      {/* 2. ДЕМО-КАРТОЧКА (Показывается только на шаге 'details') */}
+      {/* 2. ДЕМО-КАРТОЧКА */}
       {currentStep.showMockCard && (
         <div 
           className="absolute z-[105] w-[95vw] md:w-[500px] bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl flex flex-col overflow-hidden animate-fade-in-up"
@@ -250,10 +255,10 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
           {/* Mock Content */}
           <div className="p-6 overflow-y-auto custom-scrollbar">
             <div className="flex items-center gap-2 mb-4">
-              {/* Logic Color usually Red/Pink/Purple in common schemes, sticking to a distinct color */}
-              <span className="w-2 h-2 rounded-full bg-pink-500 shadow-[0_0_6px_rgba(236,72,153,1)]" />
+              {/* Blue color for PA */}
+              <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,1)]" />
               <span className="text-xs uppercase tracking-wide text-slate-400">
-                {activeLang === 'en' ? 'Theory' : 'Теория'} / {activeLang === 'en' ? 'Logic' : 'Логика'}
+                {activeLang === 'en' ? 'Logic / Formal Theory' : 'Логика / Формальная Теория'}
               </span>
             </div>
             
@@ -272,7 +277,7 @@ export const WelcomeModal: React.FC<Props> = ({ onStart, currentLang: initialLan
             </div>
             
             <div className="p-3 bg-slate-800/50 rounded border border-slate-700/50 text-center mb-4 text-slate-200">
-               {/* Формула индукции для PA */}
+               {/* Формула индукции */}
                <Latex>{`$\\varphi(0) \\land \\forall x (\\varphi(x) \\to \\varphi(S(x))) \\to \\forall x \\varphi(x)$`}</Latex>
             </div>
           </div>

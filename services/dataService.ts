@@ -2757,7 +2757,8 @@ const RAW_LINKS = [
 
 { source: 'model_theory', target: 'algebraic_structure', type: LinkType.RELATED },
 { source: 'vector_space', target: 'theory_tf_groups', type: LinkType.CONTAINS, label: 'Torsion-free group one can interpret as a Vector space' },
-   
+{ source: 'model_Z', target: 'diophantine_set', type: LinkType.CONTAINS },
+
 ];
 
 export const getGraphData = (lang: Language = 'en'): GraphData => {

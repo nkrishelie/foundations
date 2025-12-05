@@ -2755,7 +2755,8 @@ const RAW_LINKS = [
 { source: 'model_V_omega_omega', target: 'zf_minus', type: LinkType.MODELS, label: 'Model of ZF⁻' },
 { source: 'cumulative_hierarchy', target: 'model_V_omega_omega', type: LinkType.CONTAINS, label: 'Stage ω+ω' },
 
-// ZF
+{ source: 'model_theory', target: 'algebraic_structure', type: LinkType.RELATED },
+
   
 ];
 

@@ -190,12 +190,12 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     en: {
       label: 'Theory of Divisible Torsion-Free Abelian Groups',
       description: 'Theory of vector spaces over Q. It is uncountably categorical but not countably categorical.',
-      [cite_start]details: ['Complete theory', 'Quantifier Elimination [cite: 568]', 'Uncountably categorical']
+      details: ['Complete theory', 'Quantifier Elimination', 'Uncountably categorical']
     },
     ru: {
       label: 'Теория делимых абелевых групп без кручения',
       description: 'Теория векторных пространств над Q. Категорична в несчетных мощностях, но не в счетной.',
-      [cite_start]details: ['Полная теория', 'Элиминация кванторов [cite: 568]', 'Несчетно категорична']
+      details: ['Полная теория', 'Элиминация кванторов', 'Несчетно категорична']
     }
   }
 },
@@ -347,7 +347,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
         label: 'System K', 
         description: 'The minimal normal modal logic.', 
         details: [
-          'Distributivity: $\\Box(p \\to q) \\to (\\Box p \\to \\Box q)$', // [cite: 1004]
+          'Distributivity: $\\Box(p \\to q) \\to (\\Box p \\to \\Box q)$', 
           'Rule of Necessitation: $p \\vdash \\Box p$' 
         ] 
       },
@@ -371,7 +371,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
         label: 'System K4', 
         description: 'Transitive modal logic.', 
         details: [
-          'Transitivity: $\\Box p \\to \\Box\\Box p$', // [cite: 1006]
+          'Transitivity: $\\Box p \\to \\Box\\Box p$', 
           'Frame property: Transitive' 
         ] 
       },
@@ -395,7 +395,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
         label: 'System S4', 
         description: 'Reflexive and transitive modal logic (Logic of Knowledge/Topology).', 
         details: [
-          'Reflexivity (T): $\\Box p \\to p$', // [cite: 1006]
+          'Reflexivity (T): $\\Box p \\to p$', 
           'Transitivity (4): $\\Box p \\to \\Box\\Box p$',
           'Topological Interior'
         ] 
@@ -421,7 +421,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
         label: 'System S5', 
         description: 'Logic of equivalence relations.', 
         details: [
-          'Euclidean: $\\Diamond p \\to \\Box\\Diamond p$', // [cite: 1006]
+          'Euclidean: $\\Diamond p \\to \\Box\\Diamond p$', 
           'Symmetry: $p \\to \\Box\\Diamond p$',
           'Frame property: Equivalence'
         ] 
@@ -447,7 +447,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
         label: 'Gödel-Löb (GL)', 
         description: 'Logic of provability in Peano Arithmetic.', 
         details: [
-          'Löb Axiom: $\\Box(\\Box p \\to p) \\to \\Box p$', // [cite: 1004]
+          'Löb Axiom: $\\Box(\\Box p \\to p) \\to \\Box p$',
           'No infinite ascent',
           'Arithmetical Completeness'
         ] 
@@ -1527,12 +1527,12 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     en: {
       label: "Morley's Categoricity Theorem",
       description: 'If a countable theory is categorical in one uncountable cardinality, it is categorical in all uncountable cardinalities.',
-      [cite_start]details: ['Major result of model theory', 'Introduced Morley Rank', 'Baldwin-Lachlan proof']
+      details: ['Major result of model theory', 'Introduced Morley Rank', 'Baldwin-Lachlan proof']
     },
     ru: {
       label: 'Теорема Морли о категоричности',
       description: 'Если счетная теория категорична в одной несчетной мощности, то она категорична во всех несчетных мощностях.',
-      [cite_start]details: ['Фундаментальный результат', 'Вводит ранг Морли', 'Доказательство Болдуина-Лахлана']
+      details: ['Фундаментальный результат', 'Вводит ранг Морли', 'Доказательство Болдуина-Лахлана']
     }
   }
 },
@@ -1556,12 +1556,12 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     en: {
       label: 'Ryll-Nardzewski Theorem',
       description: 'Characterizes ω-categorical theories via the finiteness of Boolean algebras of formulas (types).',
-      [cite_start]details: ['Concerns countable models', 'Isolated types', 'Oligomorphic permutation groups']
+      details: ['Concerns countable models', 'Isolated types', 'Oligomorphic permutation groups']
     },
     ru: {
       label: 'Теорема Рылль-Нардзевского',
       description: 'Характеризует ω-категоричные теории через конечность булевых алгебр формул (типов).',
-      [cite_start]details: ['Относится к счетным моделям', 'Изолированные типы', 'Олигоморфные группы']
+      details: ['Относится к счетным моделям', 'Изолированные типы', 'Олигоморфные группы']
     }
   }
 },
@@ -2217,7 +2217,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     },
     ru: {
       label: 'Метод «туда-сюда»',
-      description: 'Метод построения изоморфизма между счетными структурами путем пошагового продления частичных отображений[cite: 332, 496].',
+      description: 'Метод построения изоморфизма между счетными структурами путем пошагового продления частичных отображений.',
       details: ['Ключевой метод в теории моделей', 'Используется для доказательства элементарной эквивалентности']
     }
   }
@@ -2255,7 +2255,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     },
     ru: {
       label: 'ω-Категоричность',
-      description: 'Свойство теории иметь (с точностью до изоморфизма) ровно одну счетную модель[cite: 634].',
+      description: 'Свойство теории иметь (с точностью до изоморфизма) ровно одну счетную модель.',
       details: ['Критерий Лося-Воота', 'Свойство DLO']
     }
   }

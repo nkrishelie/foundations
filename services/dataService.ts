@@ -181,16 +181,43 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: 'Теория групп', description: 'Аксиомы групп: замкнутость, ассоциативность, единица, обратный.', details: ['Неабелевы', 'Подгруппы', 'Нормальные подгруппы'] }
     }
   },
-  'theory_tf_groups': {
-    group: Discipline.ALGEBRA,
-    kind: NodeKind.THEORY,
-    val: 12,
-    synonyms: ['Группы без кручения', 'Torsion-Free Groups'],
-    content: {
-      en: { label: 'Torsion-Free Groups', description: 'Groups with no non-identity elements of finite order.', details: ['Uncountably Categorical', 'Vector Spaces over Q'] },
-      ru: { label: 'Группы без кручения', description: 'Группы без неединичных элементов конечного порядка.', details: ['Несчетно категоричны', 'Векторные пространства над Q'] }
+'theory_tf_groups': {
+  group: Discipline.MODEL_THEORY,
+  kind: NodeKind.THEORY,
+  val: 22,
+  synonyms: ['DAG', 'Divisible Torsion-Free Abelian Groups'],
+  content: {
+    en: {
+      label: 'Theory of Divisible Torsion-Free Abelian Groups',
+      description: 'Theory of vector spaces over Q. It is uncountably categorical but not countably categorical.',
+      [cite_start]details: ['Complete theory', 'Quantifier Elimination [cite: 568]', 'Uncountably categorical']
+    },
+    ru: {
+      label: 'Теория делимых абелевых групп без кручения',
+      description: 'Теория векторных пространств над Q. Категорична в несчетных мощностях, но не в счетной.',
+      [cite_start]details: ['Полная теория', 'Элиминация кванторов [cite: 568]', 'Несчетно категорична']
     }
-  },
+  }
+},
+// 1. Несчетная категоричность (свойство)
+'concept_uncountable_categoricity': {
+  group: Discipline.MODEL_THEORY,
+  kind: NodeKind.CONCEPT,
+  val: 20,
+  synonyms: ['Uncountable categoricity', 'Категоричность в несчетных мощностях'],
+  content: {
+    en: {
+      label: 'Uncountable Categoricity',
+      description: 'Property of a theory to have exactly one model (up to isomorphism) in some uncountable cardinality.',
+      details: ['Implies categoricity in all uncountable powers (Morley)', 'Example: ACF_0, Vector Spaces']
+    },
+    ru: {
+      label: 'Несчетная категоричность',
+      description: 'Свойство теории иметь (с точностью до изоморфизма) ровно одну модель в некоторой несчетной мощности.',
+      details: ['Влечет категоричность во всех несчетных мощностях (Морли)', 'Пример: ACF_0, Векторные пространства']
+    }
+  }
+},
   'theory_rings': {
     group: Discipline.ALGEBRA,
     kind: NodeKind.THEORY,
@@ -1490,16 +1517,25 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: 'Теорема Цермело', description: 'Любое множество может быть вполне упорядочено.', details: ['Эквивалентна AC'] }
     }
   },
-  'thm_morley': {
-    group: Discipline.MODEL_THEORY,
-    kind: NodeKind.THEOREM,
-    val: 14,
-    synonyms: ['Morley Categoricity', 'Теорема Морли'],
-    content: {
-      en: { label: 'Morley Categoricity', description: 'Categoricity in one uncountable cardinal implies it for all.', details: [] },
-      ru: { label: 'Теорема Морли', description: 'Категоричность в одной несчетной мощности влечет во всех.', details: [] }
+// 3. Теорема Морли (Главная теорема о несчетной категоричности)
+'thm_morley': {
+  group: Discipline.MODEL_THEORY,
+  kind: NodeKind.THEOREM,
+  val: 25,
+  synonyms: ['Morley Categoricity Theorem', 'Теорема Морли'],
+  content: {
+    en: {
+      label: "Morley's Categoricity Theorem",
+      description: 'If a countable theory is categorical in one uncountable cardinality, it is categorical in all uncountable cardinalities.',
+      [cite_start]details: ['Major result of model theory', 'Introduced Morley Rank', 'Baldwin-Lachlan proof']
+    },
+    ru: {
+      label: 'Теорема Морли о категоричности',
+      description: 'Если счетная теория категорична в одной несчетной мощности, то она категорична во всех несчетных мощностях.',
+      [cite_start]details: ['Фундаментальный результат', 'Вводит ранг Морли', 'Доказательство Болдуина-Лахлана']
     }
-  },
+  }
+},
   'thm_los_vaught': {
     group: Discipline.MODEL_THEORY,
     kind: NodeKind.THEOREM,
@@ -1510,16 +1546,25 @@ const RAW_NODES: Record<string, NodeDefinition> = {
       ru: { label: 'Тест Воота', description: 'Категоричность + Нет конечных моделей влечет Полноту.', details: [] }
     }
   },
-  'thm_ryll': {
-    group: Discipline.MODEL_THEORY,
-    kind: NodeKind.THEOREM,
-    val: 12,
-    synonyms: ['Ryll-Nardzewski', 'Рылль-Нардзевский'],
-    content: {
-      en: { label: 'Ryll-Nardzewski', description: 'Characterization of omega-categoricity via types.', details: [] },
-      ru: { label: 'Рылль-Нардзевский', description: 'Характеризация омега-категоричности через типы.', details: [] }
+// 4. Теорема Рылль-Нардзевского (Главная теорема о СЧЕТНОЙ категоричности)
+'thm_ryll': {
+  group: Discipline.MODEL_THEORY,
+  kind: NodeKind.THEOREM,
+  val: 25,
+  synonyms: ['Ryll-Nardzewski Theorem', 'Теорема Рылль-Нардзевского'],
+  content: {
+    en: {
+      label: 'Ryll-Nardzewski Theorem',
+      description: 'Characterizes ω-categorical theories via the finiteness of Boolean algebras of formulas (types).',
+      [cite_start]details: ['Concerns countable models', 'Isolated types', 'Oligomorphic permutation groups']
+    },
+    ru: {
+      label: 'Теорема Рылль-Нардзевского',
+      description: 'Характеризует ω-категоричные теории через конечность булевых алгебр формул (типов).',
+      [cite_start]details: ['Относится к счетным моделям', 'Изолированные типы', 'Олигоморфные группы']
     }
-  },
+  }
+},
   'thm_tarski_seidenberg': {
     group: Discipline.MODEL_THEORY,
     kind: NodeKind.THEOREM,
@@ -2626,6 +2671,7 @@ const RAW_LINKS = [
 { source: 'markov_principle', target: 'realizability', type: LinkType.RELATED, label: 'Realizability interpretation' },
   // Game-theoretic методы
 { source: 'thm_ef_games', target: 'thm_lowenheim', type: LinkType.RELATED, label: 'Alternative proof method' },
+{ source: 'thm_ef_games', target: 'concept_back_and_forth', type: LinkType.RELATED, label: 'Proof method' },
 { source: 'axiom_determinacy', target: 'large_cardinals', type: LinkType.RELATED, label: 'Consistency via Woodin cardinals' },
 
   // Цилиндрические алгебры
@@ -2862,6 +2908,22 @@ const RAW_LINKS = [
 { source: 'model_theory', target: 'algebraic_structure', type: LinkType.RELATED },
 { source: 'vector_space', target: 'theory_tf_groups', type: LinkType.CONTAINS, label: 'Torsion-free group one can interpret as a Vector space' },
 { source: 'model_Z', target: 'diophantine_set', type: LinkType.CONTAINS },
+
+// Связь DLO и Теоремы Кантора (через RELATED, как мета-теорема о моделях)
+{ source: 'theory_DLO', target: 'thm_cantor_iso', type: LinkType.RELATED, label: 'Characterized by models' },
+// Связь DLO и Омега-категоричности (DLO обладает этим свойством)
+{ source: 'concept_aleph0_categorical', target: 'theory_DLO', type: LinkType.RELATED, label: 'Prime example' },
+// Теория делимых абелевых групп без кручения (DAG) обладает несчетной категоричностью (Это классический пример)
+{ source: 'theory_tf_groups', target: 'concept_uncountable_categoricity', type: LinkType.RELATED, label: 'Prime example' },
+// Теорема Морли характеризует несчетную категоричность (Источник [700])
+{ source: 'thm_morley', target: 'concept_uncountable_categoricity', type: LinkType.RELATED, label: 'Characterizes' },
+// Теорема Рылль-Нардзевского характеризует СЧЕТНУЮ категоричность
+// (Связываем с concept_aleph0_categorical, который мы создали ранее)
+{ source: 'thm_ryll', target: 'concept_aleph0_categorical', type: LinkType.RELATED, label: 'Characterizes' },
+// Дополнительно: связываем две теоремы как "пару" результатов о категоричности
+{ source: 'thm_morley', target: 'thm_ryll', type: LinkType.RELATED, label: 'Counterpart theorem' },
+// Связь теории групп с элиминацией кванторов
+{ source: 'theory_tf_groups', target: 'qe', type: LinkType.RELATED, label: 'Admits QE' },
 
 ];
 

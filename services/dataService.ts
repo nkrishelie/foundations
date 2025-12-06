@@ -2141,7 +2141,98 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     }
   }
 },
+'thm_cantor_iso': {
+    group: Discipline.MODEL_THEORY, // Или Discipline.LOGIC, если MODEL_THEORY нет
+    kind: NodeKind.THEOREM,
+    val: 25,
+    synonyms: ['Cantor Theorem on DLO', 'Теорема Кантора о DLO', 'Back-and-forth theorem'],
+    content: {
+      en: {
+        label: "Cantor's Isomorphism Theorem",
+        description: 'Any two countable dense linear orders without endpoints are isomorphic.',
+        details: ['Back-and-forth method', 'Countable models', 'Aleph-0 categoricity']
+      },
+      ru: {
+        label: 'Теорема Кантора об изоморфизме',
+        description: 'Любые два счетных плотных линейных порядка без концов изоморфны.',
+        details: ['Метод "туда-сюда"', 'Счетные модели', 'Aleph-0 категоричность']
+      }
+    }
+  },
+'concept_back_and_forth': {
+  group: Discipline.MODEL_THEORY,
+  kind: NodeKind.CONCEPT, // Или NodeKind.METHOD, если есть
+  val: 20,
+  synonyms: ['Back-and-forth method', 'Метод подбора изоморфизма'],
+  content: {
+    en: {
+      label: 'Back-and-forth method',
+      description: 'A method for constructing isomorphisms between countably infinite structures by extending partial isomorphisms.',
+      details: ['Used in Cantor theorem', 'Fraïssé limits']
+    },
+    ru: {
+      label: 'Метод «туда-сюда»',
+      [cite_start]description: 'Метод построения изоморфизма между счетными структурами путем пошагового продления частичных отображений[cite: 332, 496].',
+      details: ['Ключевой метод в теории моделей', 'Используется для доказательства элементарной эквивалентности']
+    }
+  }
+},
+  'concept_ramsey_theory': {
+    group: Discipline.LOGIC, // Теория Рамсея находится на стыке логики и комбинаторики
+    kind: NodeKind.CONCEPT,
+    val: 22,
+    synonyms: ['Теория Рамсея', 'Partition Calculus', 'Ramsey Theory'],
+    content: {
+      en: {
+        label: 'Ramsey Theory',
+        description: 'A branch of mathematics studying the conditions under which order must appear in large structures ("Complete disorder is impossible").',
+        details: ['Pigeonhole principle', 'Ramsey Theorem', 'Partition relations']
+      },
+      ru: {
+        label: 'Теория Рамсея',
+        description: 'Раздел математики, изучающий условия, при которых в больших структурах неизбежно появляется порядок («Полный беспорядок невозможен»).',
+        details: ['Принцип Дирихле', 'Теорема Рамсея', 'Свойство разбиения']
+      }
+    }
+  },
 
+// 3. Недостающий концепт: Алеф-0 категоричность (важное свойство DLO)
+'concept_aleph0_categorical': {
+  group: Discipline.MODEL_THEORY,
+  kind: NodeKind.CONCEPT,
+  val: 20,
+  synonyms: ['Countable categoricity', 'Счетная категоричность'],
+  content: {
+    en: {
+      label: 'ω-Categoricity',
+      description: 'A theory is ω-categorical if all its countable models are isomorphic.',
+      details: ['Ryll-Nardzewski theorem', 'Vaught test']
+    },
+    ru: {
+      label: 'ω-Категоричность',
+      [cite_start]description: 'Свойство теории иметь (с точностью до изоморфизма) ровно одну счетную модель[cite: 634].',
+      details: ['Критерий Лося-Воота', 'Свойство DLO']
+    }
+  }
+},
+  'thm_kanamori_mcaloon': {
+    group: Discipline.LOGIC,
+    kind: NodeKind.THEOREM,
+    val: 20,
+    synonyms: ['Kanamori-McAloon', 'KM Theorem'],
+    content: {
+      en: {
+        label: 'Kanamori-McAloon Theorem',
+        description: 'A combinatorial principle in Ramsey theory unprovable in Peano Arithmetic.',
+        details: ['Unprovability in PA', 'Ramsey Theory', 'Independent statements']
+      },
+      ru: {
+        label: 'Теорема Канамори-Макалуна',
+        description: 'Комбинаторный принцип теории Рамсея, недоказуемый в арифметике Пеано.',
+        details: ['Недоказуемость в PA', 'Теория Рамсея', 'Независимые утверждения']
+      }
+    }
+  },
 // ==============================================================================
 // HELPER CONCEPTS
 // ==============================================================================
@@ -2179,6 +2270,19 @@ const RAW_NODES: Record<string, NodeDefinition> = {
 // ==============================================================================
 
 const RAW_LINKS = [
+// DLO "связана" с теоремой (Теорема описывает свойства моделей DLO)
+{ source: 'theory_DLO', target: 'thm_cantor_iso', type: LinkType.RELATED, label: 'Characterized by' },
+// Теорема "использует" метод туда-сюда (это корректно, так как это метод доказательства)
+{ source: 'concept_back_and_forth', target: 'thm_cantor_iso', type: LinkType.PROVES, label: 'Proof method' },
+// Теорема "устанавливает" категоричность
+{ source: 'thm_cantor_iso', target: 'concept_aleph0_categorical', type: LinkType.RELATED, label: 'Implies' },
+// Если у вас есть узел ZFC (мета-теория), то корректная связь PROVES была бы оттуда:
+{ source: 'zfc', target: 'thm_cantor_iso', type: LinkType.PROVES, label: 'Meta-proof' },
+  // Связи для теоремы Канамори-Макалуна
+{ source: 'theory_PA', target: 'thm_kanamori_mcaloon', type: LinkType.RELATED, label: 'Independence' },
+{ source: 'theory_PA', target: 'goodstein_theorem', type: LinkType.RELATED, label: 'Independence' },
+{ source: 'thm_kanamori_mcaloon', target: 'goodstein_theorem', type: LinkType.RELATED, label: 'Similar unprovability' },
+{ source: 'concept_ramsey_theory', target: 'thm_kanamori_mcaloon', type: LinkType.CONTAINS },
   // ==============================================================================
   // 1. DISCIPLINES (ROOTS) -> CONTAINS
   // ==============================================================================

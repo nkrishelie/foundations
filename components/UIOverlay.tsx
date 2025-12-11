@@ -287,7 +287,7 @@ export const UIOverlay: React.FC<Props> = ({
           </div>
         </div>
         <div className="flex gap-2 pointer-events-auto">
-          {/* Telegram Link */}
+          {/* Telegram Link (Fixed Icon) */}
           <a 
             href="https://t.me/mathreisender_geschwaetz" 
             target="_blank" 
@@ -300,7 +300,7 @@ export const UIOverlay: React.FC<Props> = ({
               fill="currentColor" 
               className="w-5 h-5 transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform"
             >
-              <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201.2.91-.81 1.042-2.021 3.333-2.922 3.966-2.528-.896.551-1.38 1.326-2.154 2.154 1.348-1.348 2.082-2.083 4.297-4.297.241-.241.458-.506.298-.681-.19-.209-1.329.666-3.731 2.272-3.414 2.282-4.067 2.132-5.992 1.545-1.127-.344-1.635-.688-1.579-1.291.03-.321.492-.663 1.303-.981 5.106-2.22 8.496-3.69 10.174-4.41 4.04-1.737 4.88-2.043 5.319-2.052z"/>
+               <path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42l10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001l-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15l4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/>
             </svg>
           </a>
           <button onClick={handleExport} className="flex items-center justify-center px-3 py-1.5 bg-slate-800/80 border border-slate-600 rounded-lg hover:bg-blue-600 text-slate-300 hover:text-white transition-all backdrop-blur-md" title={currentLang === 'en' ? "Export CSV" : "Экспорт CSV"}>

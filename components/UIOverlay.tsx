@@ -535,7 +535,7 @@ export const UIOverlay: React.FC<Props> = ({
           href="https://mathem.at"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[11px] text-slate-500 hover:text-slate-300 transition-colors tracking-wide"
+          className="text-sm text-slate-400 hover:text-slate-200 transition-colors tracking-wide"
         >© mathem.at</a>
       </div>
     </div>

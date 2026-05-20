@@ -528,6 +528,18 @@ export const UIOverlay: React.FC<Props> = ({
           </div>
         </div>
       )}
+
+      {/* Copyright */}
+      <div className="pointer-events-auto absolute bottom-4 right-4 z-20">
+        <a
+          href="https://mathem.at"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[11px] text-slate-500 hover:text-slate-300 transition-colors tracking-wide"
+        >
+          © mathem.at
+        </a>
+      </div>
     </div>
   );
 };

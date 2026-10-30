@@ -536,7 +536,9 @@ export const UIOverlay: React.FC<Props> = ({
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-slate-400 hover:text-slate-200 transition-colors tracking-wide"
-        >© mathem.at</a>
+        >
+          © mathem.at
+        </a>
       </div>
     </div>
   );

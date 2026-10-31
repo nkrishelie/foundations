@@ -1,20 +1,43 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# MathLogic Nexus
 
-# Run and deploy your AI Studio app
+Интерактивная 3D-карта оснований математики: логика, теория множеств, теория моделей, теория доказательств, вычислимость, алгебра, порядки, топология и язык математики. Цифровой компаньон книги «Математика как иностранный» (*Mathematics as a Foreign Language*, Springer, 2026).
 
-This contains everything you need to run your app locally.
+Сайт: https://nexus.mathem.at · материалы: https://mathem.at
 
-View your app in AI Studio: https://ai.studio/apps/drive/1xyN5_9lh1_TBBmCnVfit4T9d5uMRa9Cy
+## Запуск
 
-## Run Locally
+```bash
+npm install
+npm run dev      # локальный сервер Vite
+npm run check    # проверка данных графа
+npm run build    # tsc + проверка данных + сборка в dist/
+```
 
-**Prerequisites:**  Node.js
+Ветка `main` автоматически публикуется на Vercel (`nexus.mathem.at`).
 
+## Данные
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+| Файл | Содержимое |
+|---|---|
+| `services/dataService.ts` | базовый граф (узлы `RAW_NODES`, связи `RAW_LINKS`), сборка модулей, `getGraphData(lang)` |
+| `services/data/modelTheory.ts` | теория моделей по курсу и эталонные структуры с явной сигнатурой |
+| `services/data/maglish.ts` | раздел «Язык математики» и понятия книги из логики, арифметики и теории множеств |
+| `services/data/linkLabelsRu.ts` | русские подписи связей (ключ — английская подпись) |
+| `services/data/refs.ts` | ссылки узлов: разделы книги, материалы mathem.at, лекции |
+| `types.ts` | форматы `NodeDefinition`, `RawLink`, `NodeRefs` |
+
+Соглашения:
+
+- Каждый узел имеет тексты `en` и `ru`: метку, описание и детали; формулы — в `$…$` (KaTeX).
+- Связь `EXTENDS` записывается «расширение → база» (`{ source: 'theory_PA', target: 'theory_Q' }`); на экране стрелка идёт от базы к расширению языка или аксиоматики.
+- `PROVES`, `MODELS`, `CONTAINS` читаются как «источник доказывает / моделирует / включает цель»; `EQUIVALENT` и `RELATED` симметричны.
+- Структура указывается с сигнатурой, когда от неё зависят свойства: `⟨ℚ;<⟩` и поле `ℚ` — разные узлы.
+- Разделы книги в `NODE_REFS` задаются номерами вида `A1.2`, `D2.2.4`.
+
+## Адреса узлов
+
+`https://nexus.mathem.at/?node=<id>&lang=<ru|en>` открывает граф с выбранным узлом, без приветствия. Кнопка со значком ссылки в карточке копирует такой адрес.
+
+## Проверки (`scripts/check-data.mjs`)
+
+Уникальность id между модулями; существование концов связей; отсутствие петель и повторных связей; тексты на обоих языках, описание не короче 25 знаков, хотя бы одна деталь; разбор всех формул KaTeX; перевод каждой подписи связи; корневой узел у каждого раздела; фокусировка камеры по id попадает в тот же узел; корректность ссылок на материалы, лекции и разделы книги; адреса материалов и узлов.

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "check": "node scripts/check-data.mjs",
+    "build": "tsc && node scripts/check-data.mjs && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -14,7 +15,7 @@
     "react-force-graph-3d": "^1.24.2",
     "three": "^0.179.0",
     "three-spritetext": "^1.8.2",
-    "katex": "^0.16.9",           
+    "katex": "^0.16.9",
     "react-latex-next": "^3.0.0"
   },
   "devDependencies": {
@@ -23,6 +24,7 @@
     "@types/three": "^0.179.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
+    "esbuild": "^0.21.5",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.2.2",

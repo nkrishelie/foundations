@@ -1,18 +1,10 @@
-import { GraphData, Discipline, LinkType, Language, NodeKind } from '../types';
+import { GraphData, Discipline, LinkType, Language, NodeKind, NodeDefinition, RawLink } from '../types';
+import { LINK_LABELS_RU } from './data/linkLabelsRu';
+import { NODE_REFS } from './data/refs';
+import { MODEL_THEORY_NODES, MODEL_THEORY_LINKS } from './data/modelTheory';
+import { MAGLISH_NODES, MAGLISH_LINKS } from './data/maglish';
 
-interface LocalizedContent {
-  label: string;
-  description: string;
-  details: string[];
-}
-
-interface NodeDefinition {
-  group: Discipline;
-  kind: NodeKind; // <-- Added Kind
-  val: number;
-  synonyms?: string[];
-  content: Record<Language, LocalizedContent>;
-}
+export { LINK_LABELS_RU };
 
 const RAW_NODES: Record<string, NodeDefinition> = {
   // ==========================================
@@ -22,10 +14,10 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     group: Discipline.LOGIC,
     kind: NodeKind.DISCIPLINE,
     val: 30,
-    synonyms: ['Язык математики', 'Маглиш', 'Math Language', 'Syntax'],
+    synonyms: ['Логика', 'Logic', 'Mathematical Logic', 'Математическая логика'],
     content: {
-      en: { label: 'Logic', description: 'The syntactic and semantic framework used to express mathematical concepts.', details: ['Syntax vs. Semantics', 'Matryoshka Principle', 'First-order Languages'] },
-      ru: { label: 'Логика', description: 'Синтаксический и семантический каркас для выражения математических понятий.', details: ['Синтаксис и Семантика', 'Принцип Матрешки', 'Языки первого порядка'] }
+      en: { label: 'Logic', description: 'The study of formal languages, inference and truth: propositional and predicate calculi, their semantics, and the metatheorems connecting derivability with truth.', details: ['Propositional and predicate logic', 'Syntax and semantics', 'Calculi and models'] },
+      ru: { label: 'Логика', description: 'Изучение формальных языков, вывода и истинности: исчисления высказываний и предикатов, их семантика и метатеоремы, связывающие выводимость с истинностью.', details: ['Логика высказываний и предикатов', 'Синтаксис и семантика', 'Исчисления и модели'] }
     }
   },
   'set_theory': {
@@ -84,8 +76,18 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 30,
     synonyms: ['Топология', 'Topology', 'General Topology'],
     content: {
-      en: { label: 'General Topology', description: 'The study of properties preserved through deformations, twisting, and stretching.', details: ['Open Sets', 'Continuity', 'Compactness'] },
-      ru: { label: 'Общая топология', description: 'Изучение свойств, сохраняющихся при деформациях.', details: ['Открытые множества', 'Непрерывность', 'Компактность'] }
+      en: { label: 'General Topology', description: 'The study of topological spaces and continuous maps: open sets, convergence, compactness, separation axioms.', details: ['Open Sets', 'Continuity', 'Compactness'] },
+      ru: { label: 'Общая топология', description: 'Изучение топологических пространств и непрерывных отображений: открытые множества, сходимость, компактность, аксиомы отделимости.', details: ['Открытые множества', 'Непрерывность', 'Компактность'] }
+    }
+  },
+  'order_theory': {
+    group: Discipline.ORDER_THEORY,
+    kind: NodeKind.DISCIPLINE,
+    val: 30,
+    synonyms: ['Теория порядков', 'Order Theory', 'Lattice Theory', 'Теория решёток'],
+    content: {
+      en: { label: 'Order Theory', description: 'The study of ordered sets and lattices: partial and linear orders, well-orders, lattices and their algebraic and topological representations.', details: ['Partial and linear orders', 'Lattices and Boolean algebras', 'Fixed point theorems', 'Stone and Priestley dualities'] },
+      ru: { label: 'Теория порядков', description: 'Изучение упорядоченных множеств и решёток: частичные и линейные порядки, полные порядки, решётки и их алгебраические и топологические представления.', details: ['Частичные и линейные порядки', 'Решётки и булевы алгебры', 'Теоремы о неподвижной точке', 'Двойственности Стоуна и Пристли'] }
     }
   },
   // ==========================================
@@ -125,7 +127,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     group: Discipline.SET_THEORY,
     kind: NodeKind.THEORY,
     val: 40,
-    synonyms: ['ZFC', 'ZFC', 'Zermelo-Fraenkel Choice'],
+    synonyms: ['ZFC', 'Zermelo-Fraenkel Choice', 'Цермело–Френкель'],
     content: {
       en: { label: 'ZFC', description: 'The standard axiomatic set theory with Choice.', details: ['Extensionality', 'Infinity', 'Replacement'] },
       ru: { label: 'ZFC', description: 'Стандартная аксиоматическая теория множеств с Выбором.', details: ['Объемность', 'Бесконечность', 'Подстановка'] }
@@ -137,8 +139,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 15,
     synonyms: ['Наследственно конечные', 'HF', 'Hereditarily Finite'],
     content: {
-      en: { label: 'HF Theory', description: 'Set theory without the Axiom of Infinity. Equivalent to PA.', details: ['Finite Sets', 'Ackermann Coding'] },
-      ru: { label: 'Теория HF', description: 'Теория множеств без аксиомы бесконечности. Эквивалентна PA.', details: ['Конечные множества', 'Кодировка Аккермана'] }
+      en: { label: 'HF Theory', description: 'Theory of hereditarily finite sets: extensionality, separation, pairing, union, power set and regularity together with the negation of the Axiom of Infinity. Its standard model is $V_\\omega$; mutually interpretable with PA via Ackermann coding.', details: ['Negation of the Axiom of Infinity', 'Standard model $V_\\omega$', 'Ackermann coding', 'Mutually interpretable with PA'] },
+      ru: { label: 'Теория HF', description: 'Теория наследственно конечных множеств: экстенсиональность, выделение, пара, объединение, степень и регулярность вместе с отрицанием аксиомы бесконечности. Стандартная модель — $V_\\omega$; взаимно интерпретируема с PA через кодирование Аккермана.', details: ['Отрицание аксиомы бесконечности', 'Стандартная модель $V_\\omega$', 'Кодирование Аккермана', 'Взаимная интерпретируемость с PA'] }
     }
   },
   'theory_PA': {
@@ -157,8 +159,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Арифметика Робинсона', 'Robinson\'s Q', 'Q'],
     content: {
-      en: { label: 'Robinson\'s Q', description: 'Peano Arithmetic without the induction schema.', details: ['Finitely Axiomatizable', 'Incomplete'] },
-      ru: { label: 'Арифметика Робинсона (Q)', description: 'Арифметика Пеано без схемы индукции.', details: ['Конечно аксиоматизируема', 'Неполна'] }
+      en: { label: 'Robinson\'s Q', description: 'Robinson arithmetic: finitely many axioms about $0, S, +, \\cdot$ without induction, including $\\forall x\\,(x\\neq 0\\to\\exists y\\,x=Sy)$. Essentially undecidable: every consistent extension is undecidable.', details: ['Finitely axiomatizable', 'Represents all computable functions', 'Essentially undecidable', 'Incompleteness theorems apply'] },
+      ru: { label: 'Арифметика Робинсона (Q)', description: 'Арифметика Робинсона: конечный список аксиом о $0, S, +, \\cdot$ без индукции, включая $\\forall x\\,(x\\neq 0\\to\\exists y\\,x=Sy)$. Существенно неразрешима: всякое её непротиворечивое расширение неразрешимо.', details: ['Конечно аксиоматизируема', 'Представляет все вычислимые функции', 'Существенно неразрешима', 'Теоремы о неполноте применимы'] }
     }
   },
   'theory_Presburger': {
@@ -274,8 +276,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 10,
     synonyms: ['DisLO', 'Дискретный порядок'],
     content: {
-      en: { label: 'Discrete Linear Order', description: 'Orders where every element has a successor/predecessor.', details: ['Models like Z', 'Not categorical'] },
-      ru: { label: 'Дискретный порядок', description: 'Порядки, где у каждого элемента есть сосед.', details: ['Модели типа Z', 'Не категорична'] }
+      en: { label: 'Discrete Linear Orders', description: 'Linear orders in which every element except a greatest one has an immediate successor and every element except a least one has an immediate predecessor. Models: $\\mathbb{N}$, $\\mathbb{Z}$, $\\mathbb{Z}+\\mathbb{Z}$.', details: ['Models: $\\langle\\mathbb{N};<\\rangle$, $\\langle\\mathbb{Z};<\\rangle$', 'Without endpoints: the complete theory $\\mathrm{Th}(\\mathbb{Z};<)$', 'Not $\\aleph_0$-categorical'] },
+      ru: { label: 'Дискретные линейные порядки', description: 'Линейные порядки, в которых у каждого элемента, кроме наибольшего, есть непосредственно следующий, а у каждого элемента, кроме наименьшего, — непосредственно предшествующий. Модели: $\\mathbb{N}$, $\\mathbb{Z}$, $\\mathbb{Z}+\\mathbb{Z}$.', details: ['Модели: $\\langle\\mathbb{N};<\\rangle$, $\\langle\\mathbb{Z};<\\rangle$', 'Без концевых точек: полная теория $\\mathrm{Th}(\\mathbb{Z};<)$', 'Не $\\aleph_0$-категорична'] }
     }
   },
   'rca0': {
@@ -284,8 +286,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['RCA0', 'Recursive Comprehension'],
     content: {
-      en: { label: 'RCA_0', description: 'Recursive Comprehension Axiom system.', details: ['Base for Reverse Math', 'Constructive'] },
-      ru: { label: 'RCA_0', description: 'Система с аксиомой рекурсивного свертывания.', details: ['База обратной математики', 'Конструктивность'] }
+      en: { label: '$\\mathsf{RCA}_0$', description: 'Base system of reverse mathematics: comprehension for $\\Delta^0_1$ formulas and $\\Sigma^0_1$ induction. Its minimal ω-model consists of the computable sets; its first-order part is $\\mathrm{I}\\Sigma_1$.', details: ['Base of reverse mathematics', 'Computable mathematics', '$\\Delta^0_1$ comprehension, $\\Sigma^0_1$ induction', 'Ordinal $\\omega^\\omega$'] },
+      ru: { label: '$\\mathsf{RCA}_0$', description: 'Базовая система обратной математики: свёртывание для $\\Delta^0_1$-формул и индукция для $\\Sigma^0_1$-формул. Её минимальная ω-модель состоит из вычислимых множеств; арифметическая часть — $\\mathrm{I}\\Sigma_1$.', details: ['База обратной математики', 'Вычислимая математика', '$\\Delta^0_1$-свёртывание, $\\Sigma^0_1$-индукция', 'Ординал $\\omega^\\omega$'] }
     }
   },
   'wkl0': {
@@ -294,8 +296,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['WKL0', 'Weak Konig Lemma'],
     content: {
-      en: { label: 'WKL_0', description: 'Weak Konig Lemma system.', details: ['Compactness', 'Heine-Borel'] },
-      ru: { label: 'WKL_0', description: 'Система со слабой леммой Кенига.', details: ['Компактность', 'Гейне-Борель'] }
+      en: { label: '$\\mathsf{WKL}_0$', description: '$\\mathsf{RCA}_0$ plus Weak Kőnig\'s Lemma: every infinite binary tree has an infinite path. $\\Pi^1_1$-conservative over $\\mathsf{RCA}_0$; proof-theoretic ordinal $\\omega^\\omega$.', details: ['Weak Kőnig\'s Lemma', 'Heine–Borel covering lemma for $[0,1]$', 'Compactness theorem for countable languages', 'Gödel completeness theorem'] },
+      ru: { label: '$\\mathsf{WKL}_0$', description: '$\\mathsf{RCA}_0$ вместе со слабой леммой Кёнига: всякое бесконечное двоичное дерево имеет бесконечную ветвь. $\\Pi^1_1$-консервативна над $\\mathsf{RCA}_0$; доказательный ординал $\\omega^\\omega$.', details: ['Слабая лемма Кёнига', 'Лемма Гейне–Бореля о покрытиях $[0,1]$', 'Теорема компактности для счётных языков', 'Теорема Гёделя о полноте'] }
     }
   },
 'aca0': {
@@ -333,8 +335,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Pi-1-1 CA0', 'Strong Comprehension'],
     content: {
-      en: { label: '$\\Pi^1_1-CA_0$', description: 'Strongest of the Big Five systems.', details: ['Hyperarithmetic', 'Kruskal\'s Theorem'] },
-      ru: { label: '$\\Pi^1_1-CA_0$', description: 'Сильнейшая из "Большой пятерки".', details: ['Гиперарифметика', 'Теорема Крускала'] }
+      en: { label: '$\\Pi^1_1\\text{-}\\mathsf{CA}_0$', description: 'The strongest of the Big Five systems of reverse mathematics: comprehension for $\\Pi^1_1$ formulas. Proof-theoretic ordinal $\\psi_0(\\Omega_\\omega)$; it proves Kruskal’s tree theorem.', details: ['$\\Pi^1_1$ comprehension', 'Hyperarithmetic sets and $\\omega_1^{\\mathrm{CK}}$', 'Kruskal’s theorem', 'Cantor–Bendixson theorem'] },
+      ru: { label: '$\\Pi^1_1\\text{-}\\mathsf{CA}_0$', description: 'Сильнейшая из пяти основных систем обратной математики: свёртывание для $\\Pi^1_1$-формул. Доказательный ординал $\\psi_0(\\Omega_\\omega)$; доказывает теорему Крускала о деревьях.', details: ['$\\Pi^1_1$-свёртывание', 'Гиперарифметические множества и $\\omega_1^{\\mathrm{CK}}$', 'Теорема Крускала', 'Теорема Кантора–Бендиксона'] }
     }
   },
   'modal_K': {
@@ -367,22 +369,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 10,
     synonyms: ['System K4', 'Система K4'],
     content: {
-      en: { 
-        label: 'System K4', 
-        description: 'Transitive modal logic.', 
-        details: [
-          'Transitivity: $\\Box p \\to \\Box\\Box p$', 
-          'Frame property: Transitive' 
-        ] 
-      },
-      ru: { 
-        label: 'Система K4', 
-        description: 'Транзитивная модальная логика.', 
-        details: [
-          'Транзитивность: $\\Box p \\to \\Box\\Box p$', 
-          'Свойство шкалы: Транзитивность' 
-        ] 
-      }
+      en: { label: 'System K4', description: 'The normal modal logic K extended by axiom 4: $\\Box p \\to \\Box\\Box p$. Complete with respect to the class of transitive Kripke frames.', details: ['Transitivity: $\\Box p \\to \\Box\\Box p$', 'Frame property: transitive'] },
+      ru: { label: 'Система K4', description: 'Нормальная модальная логика K с аксиомой 4: $\\Box p \\to \\Box\\Box p$. Полна относительно класса транзитивных шкал Крипке.', details: ['Транзитивность: $\\Box p \\to \\Box\\Box p$', 'Свойство шкалы: транзитивность'] }
     }
   },
   'modal_S4': {
@@ -527,30 +515,14 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   // ==========================================
   // 3. STRUCTURES (Модели, пространства, алгебры)
   // ==========================================
-  'model_quine': {
+  'theory_NF': {
     group: Discipline.SET_THEORY,
-    kind: NodeKind.STRUCTURE,
+    kind: NodeKind.THEORY,
     val: 14,
-    synonyms: ['NF Model', 'Модель NF', 'New Foundations', 'Universum V in V'],
+    synonyms: ['NF', 'New Foundations', 'Quine', 'Куайн'],
     content: {
-      en: { 
-        label: 'Quine\'s Model (NF)', 
-        description: 'A model of New Foundations set theory, allowing a universal set.', 
-        details: [
-          'Universal Set: $V \\in V$', 
-          'Stratified formulas', 
-          'Disproves Choice (Specker)' // Теорема Шпеккера: в NF аксиома выбора ложна
-        ] 
-      },
-      ru: { 
-        label: 'Модель Куайна (NF)', 
-        description: 'Модель теории множеств New Foundations, допускающая универсальное множество.', 
-        details: [
-          'Универсальное множество: $V \\in V$', 
-          'Стратификация формул', 
-          'Опровергает Выбор (Шпеккер)' 
-        ] 
-      }
+      en: { label: 'New Foundations (NF)', description: 'Quine\'s set theory: extensionality and comprehension for stratified formulas. It proves the existence of a universal set and refutes the Axiom of Choice (Specker, 1953).', details: ['Stratified comprehension', 'Universal set $V\\in V$', 'Refutes AC (Specker)', 'Consistency: Holmes; Lean formalization (2024)'] },
+      ru: { label: 'New Foundations (NF)', description: 'Теория множеств Куайна: экстенсиональность и схема свёртывания для стратифицированных формул. Доказывает существование универсального множества и опровергает аксиому выбора (Шпеккер, 1953).', details: ['Стратифицированное свёртывание', 'Универсальное множество $V\\in V$', 'Опровергает AC (Шпеккер)', 'Непротиворечивость: Холмс; формализация в Lean (2024)'] }
     }
   },
   'ordinal_arithmetic': {
@@ -569,8 +541,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 15,
     synonyms: ['Cardinals', 'Кардиналы', 'Мощность'],
     content: {
-      en: { label: 'Cardinals', description: 'Measures of set size.', details: ['Alephs', 'Cardinal Arithmetic'] },
-      ru: { label: 'Кардиналы', description: 'Меры размера множеств.', details: ['Алефы', 'Кардинальная арифметика'] }
+      en: { label: 'Cardinals', description: 'Cardinal numbers measure the size of sets; under AC every set is equinumerous to a unique initial ordinal (an aleph). Cardinal arithmetic studies $\\kappa+\\lambda$, $\\kappa\\cdot\\lambda$, $\\kappa^\\lambda$.', details: ['Alephs $\\aleph_\\alpha$', 'Cardinal arithmetic', 'Kőnig\'s theorem: $\\kappa^{\\mathrm{cf}\\,\\kappa}>\\kappa$'] },
+      ru: { label: 'Кардиналы', description: 'Кардинальные числа измеряют мощность множеств; при AC всякое множество равномощно единственному начальному ординалу (алефу). Кардинальная арифметика изучает $\\kappa+\\lambda$, $\\kappa\\cdot\\lambda$, $\\kappa^\\lambda$.', details: ['Алефы $\\aleph_\\alpha$', 'Кардинальная арифметика', 'Теорема Кёнига: $\\kappa^{\\mathrm{cf}\\,\\kappa}>\\kappa$'] }
     }
   },
   'model_N': {
@@ -589,8 +561,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 16,
     synonyms: ['Z', 'Integers', 'Целые числа'],
     content: {
-      en: { label: '$\\mathbb{Z}$', description: 'The ring of integers.', details: ['Euclidean Domain', 'Discrete Order'] },
-      ru: { label: '$\\mathbb{Z}$', description: 'Кольцо целых чисел.', details: ['Евклидово кольцо', 'Дискретный порядок'] }
+      en: { label: '$\\mathbb{Z}$', description: 'The ring of integers $\\langle\\mathbb{Z};0,1,+,\\cdot\\rangle$: a Euclidean domain. Its first-order theory is undecidable, since $\\mathbb{N}$ is definable in it.', details: ['Euclidean domain', 'Discrete order', 'Undecidable theory ($\\mathbb{N}$ is definable via sums of four squares)'] },
+      ru: { label: '$\\mathbb{Z}$', description: 'Кольцо целых чисел $\\langle\\mathbb{Z};0,1,+,\\cdot\\rangle$: евклидово кольцо. Его элементарная теория неразрешима, поскольку в нём определимо $\\mathbb{N}$.', details: ['Евклидово кольцо', 'Дискретный порядок', 'Неразрешимая теория ($\\mathbb{N}$ определимо через суммы четырёх квадратов)'] }
     }
   },
   'model_Q': {
@@ -599,8 +571,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 16,
     synonyms: ['Q', 'Rationals', 'Рациональные числа'],
     content: {
-      en: { label: '$\\mathbb{Q}$', description: 'The field of rational numbers.', details: ['Prime Field', 'Dense Order'] },
-      ru: { label: '$\\mathbb{Q}$', description: 'Поле рациональных чисел.', details: ['Простое поле', 'Плотный порядок'] }
+      en: { label: '$\\mathbb{Q}$', description: 'The field of rational numbers $\\langle\\mathbb{Q};0,1,+,\\cdot\\rangle$, the prime field of characteristic 0. Its theory is undecidable: $\\mathbb{Z}$ is definable in $\\mathbb{Q}$ (J. Robinson).', details: ['Prime field', 'Field of fractions of $\\mathbb{Z}$', 'Undecidable theory (J. Robinson)'] },
+      ru: { label: '$\\mathbb{Q}$', description: 'Поле рациональных чисел $\\langle\\mathbb{Q};0,1,+,\\cdot\\rangle$ — простое поле характеристики 0. Его теория неразрешима: $\\mathbb{Z}$ определимо в $\\mathbb{Q}$ (Дж. Робинсон).', details: ['Простое поле', 'Поле частных $\\mathbb{Z}$', 'Неразрешимая теория (Дж. Робинсон)'] }
     }
   },
   'model_R': {
@@ -609,8 +581,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 18,
     synonyms: ['R', 'Reals', 'Вещественные числа'],
     content: {
-      en: { label: '$\\mathbb{R}$', description: 'The field of real numbers.', details: ['Complete', 'Continuum', 'Archimedean'] },
-      ru: { label: '$\\mathbb{R}$', description: 'Поле вещественных чисел.', details: ['Полнота', 'Континуум', 'Архимедово'] }
+      en: { label: '$\\mathbb{R}$', description: 'The ordered field of real numbers $\\langle\\mathbb{R};0,1,+,\\cdot,<\\rangle$: the unique complete ordered field; a model of RCF, whose theory is decidable (Tarski).', details: ['Complete ordered field', 'Archimedean', 'Model of RCF', 'Decidable theory (Tarski)'] },
+      ru: { label: '$\\mathbb{R}$', description: 'Упорядоченное поле вещественных чисел $\\langle\\mathbb{R};0,1,+,\\cdot,<\\rangle$ — единственное полное упорядоченное поле; модель RCF, теория которой разрешима (Тарский).', details: ['Полное упорядоченное поле', 'Архимедово', 'Модель RCF', 'Разрешимая теория (Тарский)'] }
     }
   },
   'model_C': {
@@ -619,8 +591,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 16,
     synonyms: ['C', 'Complex Numbers', 'Комплексные числа'],
     content: {
-      en: { label: '$\\mathbb{C}$', description: 'The field of complex numbers.', details: ['Algebraically Closed', 'Unordered'] },
-      ru: { label: '$\\mathbb{C}$', description: 'Поле комплексных чисел.', details: ['Алгебраически замкнуто', 'Неупорядочено'] }
+      en: { label: '$\\mathbb{C}$', description: 'The field of complex numbers: an algebraically closed field of characteristic 0 and cardinality $2^{\\aleph_0}$; a saturated model of $\\mathsf{ACF}_0$.', details: ['Algebraically closed', 'Admits no field order', 'Saturated model of $\\mathsf{ACF}_0$', 'Uncountably categorical theory'] },
+      ru: { label: '$\\mathbb{C}$', description: 'Поле комплексных чисел: алгебраически замкнутое поле характеристики 0 мощности $2^{\\aleph_0}$; насыщенная модель $\\mathsf{ACF}_0$.', details: ['Алгебраически замкнуто', 'Не допускает порядка поля', 'Насыщенная модель $\\mathsf{ACF}_0$', 'Теория несчётно категорична'] }
     }
   },
   'model_A': {
@@ -659,8 +631,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['No', 'Surreal Numbers', 'Сюрреальные числа'],
     content: {
-      en: { label: 'Surreal Numbers (No)', description: 'A proper class field containing reals and ordinals.', details: ['Conway', 'Games', 'Largest Field'] },
-      ru: { label: 'Сюрреальные числа (No)', description: 'Собственный класс-поле, содержащий R и ординалы.', details: ['Конвей', 'Игры', 'Крупнейшее поле'] }
+      en: { label: 'Surreal Numbers (No)', description: 'Conway’s ordered field No, a proper class containing the reals and the ordinals; every ordered field whose universe is a set embeds into No.', details: ['Conway', 'Games', 'Universal ordered field', 'Model of RCF'] },
+      ru: { label: 'Сюрреальные числа (No)', description: 'Упорядоченное поле Конвея No — собственный класс, содержащий вещественные числа и ординалы; всякое упорядоченное поле, носитель которого — множество, вкладывается в No.', details: ['Конвей', 'Игры', 'Универсальное упорядоченное поле', 'Модель RCF'] }
     }
   },
   'bool_alg': {
@@ -767,8 +739,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Non-standard Models', 'Нестандартные модели'],
     content: {
-      en: { label: 'Non-standard Model', description: 'Model elementarily equivalent but not isomorphic to standard.', details: ['Hyperreals', 'Infinitesimals'] },
-      ru: { label: 'Нестандартная модель', description: 'Элементарно эквивалентна, но не изоморфна стандартной.', details: ['Гипервещественные', 'Бесконечно малые'] }
+      en: { label: 'Non-standard Model of Arithmetic', description: 'A model of PA (or of $\\mathrm{Th}(\\mathbb{N})$) not isomorphic to $\\mathbb{N}$: above the standard initial segment it contains infinite elements. Such models exist by compactness; no countable one is recursive (Tennenbaum).', details: ['Exists by compactness', 'Standard part is an initial segment', 'Order type $\\omega+\\zeta\\eta$ when countable', 'Tennenbaum theorem'] },
+      ru: { label: 'Нестандартная модель арифметики', description: 'Модель PA (или $\\mathrm{Th}(\\mathbb{N})$), не изоморфная $\\mathbb{N}$: над стандартным начальным отрезком она содержит бесконечно большие элементы. Такие модели существуют по теореме компактности; ни одна счётная нестандартная модель PA не рекурсивна (Тенненбаум).', details: ['Существует по теореме компактности', 'Стандартная часть — начальный отрезок', 'Порядковый тип $\\omega+\\zeta\\eta$ для счётной модели', 'Теорема Тенненбаума'] }
     }
   },
   'model_Z_plus_Z': {
@@ -797,8 +769,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 10,
     synonyms: ['Rado Graph', 'Граф Радо', 'Random Graph'],
     content: {
-      en: { label: 'Rado Graph', description: 'The unique countable ultrahomogeneous graph.', details: ['Zero-one law', 'Categorical'] },
-      ru: { label: 'Граф Радо', description: 'Единственный счетный ультраоднородный граф.', details: ['Закон нуля и единицы', 'Категоричен'] }
+      en: { label: 'Rado Graph', description: 'The unique (up to isomorphism) countable graph with the extension property: for disjoint finite sets $U,V$ of vertices some vertex is adjacent to all of $U$ and to none of $V$. Universal and ultrahomogeneous; the Fraïssé limit of finite graphs.', details: ['Extension property', 'Fraïssé limit of finite graphs', 'Zero-one law', '$\\aleph_0$-categorical theory with QE'] },
+      ru: { label: 'Граф Радо', description: 'Единственный с точностью до изоморфизма счётный граф со свойством расширения: для непересекающихся конечных множеств вершин $U,V$ найдётся вершина, смежная со всеми вершинами $U$ и ни с одной из $V$. Универсален и ультрагомогенен; предел Фраиссе класса конечных графов.', details: ['Свойство расширения', 'Предел Фраиссе конечных графов', 'Закон нуля и единицы', '$\\aleph_0$-категоричная теория с ЭК'] }
     }
   },
   'open_set_topology': {
@@ -862,7 +834,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     synonyms: ['Correctness', 'Корректность', 'Completeness', 'Полнота'],
     content: {
       en: { label: 'Soundness & Completeness', description: 'The bridge between syntax and semantics.', details: ['Validity', 'Model existence'] },
-      ru: { label: 'Корректность и Полнота', description: 'Мост между синтаксисом и семантикой.', details: ['Общезначимость', 'Существование модели'] }
+      ru: { label: 'Корректность и полнота', description: 'Мост между синтаксисом и семантикой.', details: ['Общезначимость', 'Существование модели'] }
     }
   },
   'recursion_concept': {
@@ -882,7 +854,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     synonyms: ['Type', 'Тип'],
     content: {
       en: { label: 'Type (Model Theory)', description: 'Consistent set of formulas describing an element.', details: ['n-types', 'Realization'] },
-      ru: { label: 'Тип (Теория моделей)', description: 'Совместное множество формул, описывающее элемент.', details: ['n-типы', 'Реализация'] }
+      ru: { label: 'Тип (теория моделей)', description: 'Совместное множество формул, описывающее элемент.', details: ['n-типы', 'Реализация'] }
     }
   },
   'complete_type': {
@@ -1061,8 +1033,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Cumulative Hierarchy', 'Кумулятивная иерархия', 'Von Neumann Universe'],
     content: {
-      en: { label: 'Cumulative Hierarchy', description: 'The V universe construction.', details: ['V_alpha', 'Power set iteration'] },
-      ru: { label: 'Кумулятивная иерархия', description: 'Построение универсума V.', details: ['V_alpha', 'Итерация булеана'] }
+      en: { label: 'Cumulative Hierarchy', description: 'The von Neumann hierarchy: $V_0=\\emptyset$, $V_{\\alpha+1}=\\mathcal{P}(V_\\alpha)$, $V_\\lambda=\\bigcup_{\\alpha<\\lambda}V_\\alpha$; by Foundation every set belongs to some $V_\\alpha$.', details: ['$V_\\alpha$', 'Power set iteration', 'Rank of a set', '$V=\\bigcup_\\alpha V_\\alpha$'] },
+      ru: { label: 'Кумулятивная иерархия', description: 'Иерархия фон Неймана: $V_0=\\emptyset$, $V_{\\alpha+1}=\\mathcal{P}(V_\\alpha)$, $V_\\lambda=\\bigcup_{\\alpha<\\lambda}V_\\alpha$; по аксиоме регулярности всякое множество лежит в некотором $V_\\alpha$.', details: ['$V_\\alpha$', 'Итерация булеана', 'Ранг множества', '$V=\\bigcup_\\alpha V_\\alpha$'] }
     }
   },
   'sequence_coding': {
@@ -1081,8 +1053,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 18,
     synonyms: ['Algebraic Structure', 'Алгебраическая структура'],
     content: {
-      en: { label: 'Algebraic Structure', description: 'Set with operations.', details: ['Universal Algebra'] },
-      ru: { label: 'Алгебраическая структура', description: 'Множество с операциями.', details: ['Универсальная алгебра'] }
+      en: { label: 'Algebraic Structure', description: 'A set with a family of finitary operations (possibly also constants and relations); the object of universal algebra and, with relations, of model theory.', details: ['Signature', 'Homomorphisms', 'Substructures and quotients', 'Universal algebra'] },
+      ru: { label: 'Алгебраическая структура', description: 'Множество с семейством операций конечной арности (а также, возможно, констант и отношений); предмет универсальной алгебры, а при наличии отношений — теории моделей.', details: ['Сигнатура', 'Гомоморфизмы', 'Подструктуры и фактор-структуры', 'Универсальная алгебра'] }
     }
   },
   'vector_space': {
@@ -1091,8 +1063,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Vector Space', 'Векторное пространство'],
     content: {
-      en: { label: 'Vector Space', description: 'Module over a field.', details: ['Basis', 'Dimension'] },
-      ru: { label: 'Векторное пространство', description: 'Модуль над полем.', details: ['Базис', 'Размерность'] }
+      en: { label: 'Vector Space', description: 'A module over a field: an abelian group with scalar multiplication satisfying the module axioms. Every vector space has a basis; over ZF this is equivalent to AC (Blass).', details: ['Basis', 'Dimension', 'Existence of bases ⟺ AC (Blass)', 'Infinite spaces over a countable field: uncountably categorical theory'] },
+      ru: { label: 'Векторное пространство', description: 'Модуль над полем: абелева группа с умножением на скаляры, удовлетворяющая аксиомам модуля. Всякое векторное пространство имеет базис; над ZF это равносильно AC (Бласс).', details: ['Базис', 'Размерность', 'Существование базиса ⟺ AC (Бласс)', 'Бесконечные пространства над счётным полем: несчётно категоричная теория'] }
     }
   },
   'module_ring': {
@@ -1111,8 +1083,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Algebra (Structure)', 'Алгебра (структура)'],
     content: {
-      en: { label: 'Algebra', description: 'Module with multiplication.', details: ['Associative', 'Lie'] },
-      ru: { label: 'Алгебра', description: 'Модуль с умножением.', details: ['Ассоциативная', 'Ли'] }
+      en: { label: 'Algebra', description: 'A module $A$ over a commutative ring $K$ with a $K$-bilinear multiplication $A\\times A\\to A$; examples: polynomial rings, matrix algebras, Lie algebras.', details: ['Associative algebras', 'Lie algebras', 'Polynomial and matrix algebras'] },
+      ru: { label: 'Алгебра', description: 'Модуль $A$ над коммутативным кольцом $K$ с $K$-билинейным умножением $A\\times A\\to A$; примеры: кольца многочленов, алгебры матриц, алгебры Ли.', details: ['Ассоциативные алгебры', 'Алгебры Ли', 'Алгебры многочленов и матриц'] }
     }
   },
   'integral_domain': {
@@ -1141,8 +1113,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['PID', 'ОГИ', 'Principal Ideal Domain'],
     content: {
-      en: { label: 'PID', description: 'Principal Ideal Domain.', details: ['Single generator'] },
-      ru: { label: 'ОГИ', description: 'Область главных идеалов.', details: ['Один порождающий'] }
+      en: { label: 'PID', description: 'Principal ideal domain: an integral domain in which every ideal is generated by one element. Every PID is a UFD; $\\mathbb{Z}$ and $K[x]$ are PIDs.', details: ['Every ideal is principal', 'PID ⟹ UFD', 'Examples: $\\mathbb{Z}$, $K[x]$'] },
+      ru: { label: 'ОГИ', description: 'Область главных идеалов: область целостности, в которой каждый идеал порождён одним элементом. Всякая ОГИ факториальна; $\\mathbb{Z}$ и $K[x]$ — ОГИ.', details: ['Все идеалы главные', 'ОГИ ⟹ факториальность', 'Примеры: $\\mathbb{Z}$, $K[x]$'] }
     }
   },
   'euclidean_domain': {
@@ -1161,8 +1133,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Poset', 'ЧУМ', 'Partially Ordered Set'],
     content: {
-      en: { label: 'Poset', description: 'Partially Ordered Set.', details: ['Reflexive', 'Antisymmetric'] },
-      ru: { label: 'ЧУМ', description: 'Частично упорядоченное множество.', details: ['Рефлексивность', 'Антисимметричность'] }
+      en: { label: 'Poset', description: 'Partially ordered set: a set with a reflexive, antisymmetric and transitive relation $\\le$.', details: ['Reflexive', 'Antisymmetric', 'Transitive', 'Hasse diagrams'] },
+      ru: { label: 'ЧУМ', description: 'Частично упорядоченное множество: множество с рефлексивным, антисимметричным и транзитивным отношением $\\le$.', details: ['Рефлексивность', 'Антисимметричность', 'Транзитивность', 'Диаграммы Хассе'] }
     }
   },
   'linear_order': {
@@ -1181,8 +1153,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Lattice', 'Решетка'],
     content: {
-      en: { label: 'Lattice', description: 'Poset with meets and joins.', details: ['Supremum', 'Infimum'] },
-      ru: { label: 'Решетка', description: 'ЧУМ с точными гранями.', details: ['Супремум', 'Инфимум'] }
+      en: { label: 'Lattice', description: 'A poset in which every two elements have a supremum $x\\vee y$ and an infimum $x\\wedge y$; equivalently, an algebra $\\langle L;\\vee,\\wedge\\rangle$ satisfying the lattice identities.', details: ['Supremum and infimum', 'Lattice identities (absorption)', 'Complete lattices'] },
+      ru: { label: 'Решётка', description: 'Частично упорядоченное множество, в котором у любых двух элементов есть точная верхняя грань $x\\vee y$ и точная нижняя грань $x\\wedge y$; равносильно, алгебра $\\langle L;\\vee,\\wedge\\rangle$ с тождествами решётки.', details: ['Точные грани', 'Тождества решётки (поглощение)', 'Полные решётки'] }
     }
   },
   'dist_lattice': {
@@ -1191,8 +1163,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Distributive Lattice', 'Дистрибутивная решетка'],
     content: {
-      en: { label: 'Distributive Lattice', description: 'Lattice with distributivity laws.', details: [] },
-      ru: { label: 'Дистрибутивная решетка', description: 'Решетка с законами дистрибутивности.', details: [] }
+      en: { label: 'Distributive Lattice', description: 'A lattice satisfying $x\\wedge(y\\vee z)=(x\\wedge y)\\vee(x\\wedge z)$. Every distributive lattice is isomorphic to a lattice of sets (Birkhoff, Stone); dual to Priestley spaces.', details: ['Distributive law', 'Representation by lattices of sets', 'Priestley duality'] },
+      ru: { label: 'Дистрибутивная решётка', description: 'Решётка, в которой $x\\wedge(y\\vee z)=(x\\wedge y)\\vee(x\\wedge z)$. Всякая дистрибутивная решётка изоморфна решётке множеств (Биркгоф, Стоун); двойственна пространствам Пристли.', details: ['Закон дистрибутивности', 'Представление решётками множеств', 'Двойственность Пристли'] }
     }
   },
   'auto_group': {
@@ -1201,8 +1173,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Automorphism Group', 'Группа автоморфизмов'],
     content: {
-      en: { label: 'Automorphism Group', description: 'Group of symmetries of a structure.', details: [] },
-      ru: { label: 'Группа автоморфизмов', description: 'Группа симметрий структуры.', details: [] }
+      en: { label: 'Automorphism Group', description: 'The group $\\mathrm{Aut}(\\mathcal{M})$ of all isomorphisms of a structure onto itself. Definable sets are invariant under automorphisms; this is the standard method of proving non-definability.', details: ['Invariance of definable sets', 'Non-definability via automorphisms', 'Svenonius theorem', 'Oligomorphic groups (Ryll-Nardzewski)'] },
+      ru: { label: 'Группа автоморфизмов', description: 'Группа $\\mathrm{Aut}(\\mathcal{M})$ всех изоморфизмов структуры на себя. Определимые множества инвариантны относительно автоморфизмов; на этом основан стандартный способ доказательства неопределимости.', details: ['Инвариантность определимых множеств', 'Неопределимость через автоморфизмы', 'Теорема Свенониуса', 'Олигоморфные группы (Рылль-Нардзевский)'] }
     }
   },
   'diophantine_set': {
@@ -1221,8 +1193,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Saturated Model', 'Насыщенная модель'],
     content: {
-      en: { label: 'Saturated Model', description: 'Model realizing all types.', details: ['Universality', 'Homogeneity'] },
-      ru: { label: 'Насыщенная модель', description: 'Модель, реализующая все типы.', details: ['Универсальность', 'Однородность'] }
+      en: { label: 'Saturated Model', description: 'A model $\\mathcal{M}$ is $\\kappa$-saturated if it realizes every type over every parameter set $A\\subseteq M$ with $|A|<\\kappa$, and saturated if it is $|M|$-saturated. Elementarily equivalent saturated models of the same cardinality are isomorphic.', details: ['κ-saturation', 'Uniqueness in each cardinality', 'Saturated ⟹ strongly homogeneous and universal', 'Example: $\\langle\\mathbb{Q};<\\rangle$'] },
+      ru: { label: 'Насыщенная модель', description: 'Модель $\\mathcal{M}$ называется $\\kappa$-насыщенной, если она реализует всякий тип над любым множеством параметров $A\\subseteq M$ мощности $|A|<\\kappa$, и насыщенной, если она $|M|$-насыщена. Элементарно эквивалентные насыщенные модели одной мощности изоморфны.', details: ['κ-насыщенность', 'Единственность в каждой мощности', 'Насыщенность ⟹ сильная гомогенность и универсальность', 'Пример: $\\langle\\mathbb{Q};<\\rangle$'] }
     }
   },
   'prime_model': {
@@ -1231,8 +1203,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Prime Model', 'Простая модель'],
     content: {
-      en: { label: 'Prime Model', description: 'Model embeddable into any other model.', details: ['Atomic'] },
-      ru: { label: 'Простая модель', description: 'Модель, вложимая в любую другую.', details: ['Атомная'] }
+      en: { label: 'Prime Model', description: 'A model of a complete theory $T$ that elementarily embeds into every model of $T$. For countable $T$, prime models are exactly the countable atomic models; they are unique up to isomorphism.', details: ['Atomic model', 'Unique up to isomorphism', 'For countable $T$: exists ⟺ isolated types are dense', 'Examples: $\\overline{\\mathbb{Q}}$ for $\\mathsf{ACF}_0$, $\\mathbb{N}$ for $\\mathrm{Th}(\\mathbb{N})$'] },
+      ru: { label: 'Простая модель', description: 'Модель полной теории $T$, элементарно вложимая в любую модель $T$. Для счётной $T$ простые модели — это в точности счётные атомарные модели; они единственны с точностью до изоморфизма.', details: ['Атомарная модель', 'Единственность с точностью до изоморфизма', 'Для счётной $T$: существует ⟺ изолированные типы плотны', 'Примеры: $\\overline{\\mathbb{Q}}$ для $\\mathsf{ACF}_0$, $\\mathbb{N}$ для $\\mathrm{Th}(\\mathbb{N})$'] }
     }
   },
   'indiscernibles': {
@@ -1251,8 +1223,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['QE', 'Quantifier Elimination', 'Элиминация кванторов'],
     content: {
-      en: { label: 'Quantifier Elimination', description: 'Formulas equivalent to quantifier-free ones.', details: [] },
-      ru: { label: 'Элиминация кванторов', description: 'Формулы эквивалентны бескванторным.', details: [] }
+      en: { label: 'Quantifier Elimination', description: 'A theory $T$ admits quantifier elimination if every formula is $T$-equivalent to a quantifier-free formula in the same free variables. QE implies model completeness.', details: ['Examples: DLO, ACF, RCF, the random graph', 'QE ⟹ model completeness', 'Criterion via extension of partial isomorphisms'] },
+      ru: { label: 'Элиминация кванторов', description: 'Теория $T$ допускает элиминацию кванторов, если всякая формула $T$-равносильна бескванторной формуле от тех же свободных переменных. ЭК влечёт модельную полноту.', details: ['Примеры: DLO, ACF, RCF, случайный граф', 'ЭК ⟹ модельная полнота', 'Критерий через продолжение частичных изоморфизмов'] }
     }
   },
   'ultraproduct': {
@@ -1271,8 +1243,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Scattered Space', 'Разреженное пространство'],
     content: {
-      en: { label: 'Scattered Space', description: 'Every subset has an isolated point.', details: [] },
-      ru: { label: 'Разреженное пространство', description: 'Каждое подмножество имеет изолированную точку.', details: [] }
+      en: { label: 'Scattered Space', description: 'A topological space in which every nonempty subset has an isolated point; equivalently, the Cantor–Bendixson derivatives reach $\\emptyset$.', details: ['Cantor–Bendixson rank', 'Superatomic Boolean algebras', 'Topological semantics of GL (Esakia)'] },
+      ru: { label: 'Разреженное пространство', description: 'Топологическое пространство, в котором каждое непустое подмножество имеет изолированную точку; равносильно, производные Кантора–Бендиксона достигают $\\emptyset$.', details: ['Ранг Кантора–Бендиксона', 'Суператомные булевы алгебры', 'Топологическая семантика GL (Эсакиа)'] }
     }
   },
   'alexandrov_topology': {
@@ -1291,8 +1263,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Fixed Point Combinator', 'Комбинатор неподвижной точки'],
     content: {
-      en: { label: 'Y Combinator', description: 'Enables recursion in lambda calculus.', details: [] },
-      ru: { label: 'Y-комбинатор', description: 'Обеспечивает рекурсию в лямбда-исчислении.', details: [] }
+      en: { label: 'Y Combinator', description: 'The fixed-point combinator $Y=\\lambda f.(\\lambda x.f(xx))(\\lambda x.f(xx))$: $YF =_\\beta F(YF)$ for every term $F$, which yields recursion in the untyped λ-calculus.', details: ['Fixed-point theorem of the λ-calculus', 'Recursion without names', 'Not typable in the simply typed λ-calculus'] },
+      ru: { label: 'Y-комбинатор', description: 'Комбинатор неподвижной точки $Y=\\lambda f.(\\lambda x.f(xx))(\\lambda x.f(xx))$: $YF =_\\beta F(YF)$ для любого терма $F$; даёт рекурсию в бестиповом λ-исчислении.', details: ['Теорема о неподвижной точке λ-исчисления', 'Рекурсия без имён', 'Не типизируется в просто типизированном λ-исчислении'] }
     }
   },
   'combinators': {
@@ -1319,8 +1291,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['SKI', 'Combinators'],
     content: {
-      en: { label: 'SKI', description: 'S, K, I combinators.', details: ['Combinatory Logic'] },
-      ru: { label: 'SKI', description: 'Комбинаторы S, K, I.', details: ['Комбинаторная логика'] }
+      en: { label: 'SKI', description: 'The combinators $S=\\lambda xyz.xz(yz)$, $K=\\lambda xy.x$, $I=\\lambda x.x$; every closed λ-term translates into a combination of $S$ and $K$ ($I=SKK$).', details: ['Combinatory logic', 'Bracket abstraction', '$I = SKK$'] },
+      ru: { label: 'SKI', description: 'Комбинаторы $S=\\lambda xyz.xz(yz)$, $K=\\lambda xy.x$, $I=\\lambda x.x$; всякий замкнутый λ-терм переводится в комбинацию $S$ и $K$ ($I=SKK$).', details: ['Комбинаторная логика', 'Скобочная абстракция', '$I = SKK$'] }
     }
   },
   'ordinal_omega': {
@@ -1329,8 +1301,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Omega', 'Омега'],
     content: {
-      en: { label: '$\\omega$', description: 'The first infinite ordinal.', details: [] },
-      ru: { label: '$\\omega$', description: 'Первый бесконечный ординал.', details: [] }
+      en: { label: '$\\omega$', description: 'The least infinite ordinal: the set of natural numbers $\\{0,1,2,\\dots\\}$ ordered by $\\in$; the least nonzero limit ordinal, of cardinality $\\aleph_0$.', details: ['von Neumann natural numbers', 'Least nonzero limit ordinal', '$|\\omega|=\\aleph_0$'] },
+      ru: { label: '$\\omega$', description: 'Наименьший бесконечный ординал: множество натуральных чисел $\\{0,1,2,\\dots\\}$, упорядоченное отношением $\\in$; наименьший ненулевой предельный ординал, мощности $\\aleph_0$.', details: ['Натуральные числа фон Неймана', 'Наименьший ненулевой предельный ординал', '$|\\omega|=\\aleph_0$'] }
     }
   },
   'cardinal_aleph1': {
@@ -1339,8 +1311,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Aleph-1', 'Алеф-один'],
     content: {
-      en: { label: '$\\aleph_1$', description: 'The first uncountable cardinal.', details: [] },
-      ru: { label: '$\\aleph_1$', description: 'Первый несчетный кардинал.', details: [] }
+      en: { label: '$\\aleph_1$', description: 'The least uncountable cardinal, i.e. the set $\\omega_1$ of all countable ordinals. The Continuum Hypothesis states $2^{\\aleph_0}=\\aleph_1$.', details: ['$\\aleph_1=\\omega_1$', 'Exists in ZF (Hartogs)', 'CH: $2^{\\aleph_0}=\\aleph_1$'] },
+      ru: { label: '$\\aleph_1$', description: 'Наименьший несчётный кардинал — множество $\\omega_1$ всех счётных ординалов. Континуум-гипотеза утверждает $2^{\\aleph_0}=\\aleph_1$.', details: ['$\\aleph_1=\\omega_1$', 'Существует в ZF (Хартогс)', 'CH: $2^{\\aleph_0}=\\aleph_1$'] }
     }
   },
   'gamma_0': {
@@ -1349,8 +1321,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Gamma-0', 'Гамма-нулевое'],
     content: {
-      en: { label: '$\\Gamma_0$', description: 'Feferman-Schuette ordinal.', details: ['Predicativity'] },
-      ru: { label: '$\\Gamma_0$', description: 'Ординал Фефермана-Шютте.', details: ['Предикативность'] }
+      en: { label: '$\\Gamma_0$', description: 'The Feferman–Schütte ordinal, the least $\\alpha$ with $\\varphi_\\alpha(0)=\\alpha$ in the Veblen hierarchy; the proof-theoretic ordinal of $\\mathsf{ATR}_0$ and the limit of predicative analysis.', details: ['Veblen hierarchy', 'Predicativity (Feferman, Schütte)', 'Ordinal of $\\mathsf{ATR}_0$'] },
+      ru: { label: '$\\Gamma_0$', description: 'Ординал Фефермана–Шютте, наименьшее $\\alpha$ с $\\varphi_\\alpha(0)=\\alpha$ в иерархии Веблена; доказательный ординал $\\mathsf{ATR}_0$ и предел предикативного анализа.', details: ['Иерархия Веблена', 'Предикативность (Феферман, Шютте)', 'Ординал $\\mathsf{ATR}_0$'] }
     }
   },
   'stone_space_types': {
@@ -1365,12 +1337,12 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   },
   'omitting_types': {
     group: Discipline.MODEL_THEORY,
-    kind: NodeKind.CONCEPT, // Could be theorem, but used as method
+    kind: NodeKind.CONCEPT,
     val: 12,
     synonyms: ['Omitting Types', 'Опускание типов'],
     content: {
-      en: { label: 'Omitting Types', description: 'Constructing models omitting non-principal types.', details: [] },
-      ru: { label: 'Опускание типов', description: 'Построение моделей, опускающих неглавные типы.', details: [] }
+      en: { label: 'Omitting Types', description: 'For a countable complete theory $T$, every non-isolated type is omitted in some countable model of $T$; countably many such types can be omitted simultaneously.', details: ['Henkin-style construction', 'Atomic models', 'Isolated types are realized in every model'] },
+      ru: { label: 'Пропуск типов', description: 'Для счётной полной теории $T$ всякий неизолированный тип опускается в некоторой счётной модели $T$; одновременно можно опустить счётное число таких типов.', details: ['Построение в духе Хенкина', 'Атомарные модели', 'Изолированные типы реализуются в любой модели'] }
     }
   },
   'lambda_reductions': {
@@ -1379,8 +1351,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Reductions', 'Редукции'],
     content: {
-      en: { label: 'Reductions', description: 'Beta-reduction rules.', details: [] },
-      ru: { label: 'Редукции', description: 'Правила бета-редукции.', details: [] }
+      en: { label: 'Reductions (λ-calculus)', description: 'Rewriting rules of the λ-calculus: α-conversion (renaming of bound variables), β-reduction $(\\lambda x.M)N \\to M[x:=N]$ and η-conversion.', details: ['α-conversion', 'β-reduction', 'η-conversion', 'Normal forms'] },
+      ru: { label: 'Редукции (λ-исчисление)', description: 'Правила переписывания λ-исчисления: α-конверсия (переименование связанных переменных), β-редукция $(\\lambda x.M)N \\to M[x:=N]$ и η-конверсия.', details: ['α-конверсия', 'β-редукция', 'η-конверсия', 'Нормальные формы'] }
     }
   },
   'inference_rules': {
@@ -1389,8 +1361,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Inference Rules', 'Правила вывода'],
     content: {
-      en: { label: 'Inference Rules', description: 'Modus Ponens, Generalization, etc.', details: [] },
-      ru: { label: 'Правила вывода', description: 'Modus Ponens, Обобщение и т.д.', details: [] }
+      en: { label: 'Inference Rules', description: 'Rules deriving formulas from formulas in a calculus: Modus Ponens ($\\varphi,\\ \\varphi\\to\\psi \\vdash \\psi$), Generalization, and, in natural deduction and sequent calculi, introduction and elimination rules.', details: ['Modus Ponens', 'Generalization', 'Bernays rules for quantifiers', 'Introduction and elimination rules'] },
+      ru: { label: 'Правила вывода', description: 'Правила получения формул из формул в исчислении: Modus Ponens ($\\varphi,\\ \\varphi\\to\\psi \\vdash \\psi$), правило обобщения, а в натуральном выводе и секвенциальных исчислениях — правила введения и удаления.', details: ['Modus Ponens', 'Правило обобщения', 'Правила Бернайса для кванторов', 'Правила введения и удаления'] }
     }
   },
   'curry_howard': {
@@ -1399,18 +1371,18 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 16,
     synonyms: ['Curry-Howard', 'Карри-Ховард', 'Isomorphism'],
     content: {
-      en: { label: 'Curry-Howard', description: 'Propositions as Types.', details: ['Proofs as Programs'] },
-      ru: { label: 'Карри-Ховард', description: 'Утверждения как Типы.', details: ['Доказательства как программы'] }
+      en: { label: 'Curry–Howard', description: 'Correspondence between derivations in intuitionistic natural deduction and terms of the typed λ-calculus: propositions are types, proofs are programs, normalization of proofs is β-reduction.', details: ['Propositions as types', 'Proofs as programs', 'Normalization = computation'] },
+      ru: { label: 'Карри–Ховард', description: 'Соответствие между выводами интуиционистского натурального исчисления и термами типизированного λ-исчисления: высказывания — типы, доказательства — программы, нормализация выводов — β-редукция.', details: ['Высказывания как типы', 'Доказательства как программы', 'Нормализация = вычисление'] }
     }
   },
   'homomorphism_thms': {
     group: Discipline.ALGEBRA,
-    kind: NodeKind.CONCEPT, // Or Theorem group
+    kind: NodeKind.CONCEPT,
     val: 12,
     synonyms: ['Isomorphism Theorems', 'Теоремы об изоморфизме'],
     content: {
-      en: { label: 'Isomorphism Theorems', description: 'Fundamental theorems for groups/rings.', details: [] },
-      ru: { label: 'Теоремы об изоморфизме', description: 'Фундаментальные теоремы для групп/колец.', details: [] }
+      en: { label: 'Isomorphism Theorems', description: 'Theorems relating homomorphisms, kernels and quotients: $A/\\ker f\\cong f(A)$, together with the second and third isomorphism theorems; valid in universal algebra with congruences in place of normal subgroups and ideals.', details: ['First isomorphism theorem', 'Kernels and congruences', 'Correspondence theorem'] },
+      ru: { label: 'Теоремы об изоморфизме', description: 'Теоремы, связывающие гомоморфизмы, ядра и фактор-структуры: $A/\\ker f\\cong f(A)$, а также вторая и третья теоремы об изоморфизме; верны в универсальной алгебре с конгруэнциями вместо нормальных подгрупп и идеалов.', details: ['Первая теорема об изоморфизме', 'Ядра и конгруэнции', 'Теорема о соответствии'] }
     }
   },
 
@@ -1424,7 +1396,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     synonyms: ['Axiom of Choice', 'Аксиома Выбора', 'AC'],
     content: {
       en: { label: 'Axiom of Choice', description: 'Arbitrary cartesian product of non-empty sets is non-empty.', details: ['Independent', 'Zermelo'] },
-      ru: { label: 'Аксиома Выбора', description: 'Произвольное декартово произведение непустых множеств непусто.', details: ['Независима', 'Цермело'] }
+      ru: { label: 'Аксиома выбора', description: 'Произвольное декартово произведение непустых множеств непусто.', details: ['Независима', 'Цермело'] }
     }
   },
   'continuum_hypothesis': {
@@ -1443,8 +1415,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 22,
     synonyms: ['Incompleteness Theorems', 'Теоремы о неполноте', 'Gödel'],
     content: {
-      en: { label: 'Incompleteness Theorems', description: 'No consistent system containing arithmetic can prove its own consistency.', details: ['First Theorem', 'Second Theorem'] },
-      ru: { label: 'Теоремы о неполноте', description: 'Никакая непротиворечивая система с арифметикой не может доказать свою непротиворечивость.', details: ['Первая теорема', 'Вторая теорема'] }
+      en: { label: 'Incompleteness Theorems', description: 'First theorem: every consistent recursively axiomatizable theory interpreting Robinson arithmetic $\\mathsf{Q}$ is incomplete. Second theorem: if such a theory also proves the basic properties of provability (e.g. extends PA), it does not prove its own consistency.', details: ['First theorem (Gödel–Rosser)', 'Second theorem', 'Gödel numbering', 'Diagonal lemma'] },
+      ru: { label: 'Теоремы о неполноте', description: 'Первая теорема: всякая непротиворечивая рекурсивно аксиоматизируемая теория, интерпретирующая арифметику Робинсона $\\mathsf{Q}$, неполна. Вторая теорема: если такая теория доказывает и основные свойства доказуемости (например, расширяет PA), то она не доказывает собственную непротиворечивость.', details: ['Первая теорема (Гёдель, Россер)', 'Вторая теорема', 'Гёделева нумерация', 'Лемма о диагонализации'] }
     }
   },
   'thm_completeness': {
@@ -1473,8 +1445,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 18,
     synonyms: ['Löwenheim-Skolem', 'Лёвенгейм-Сколем'],
     content: {
-      en: { label: 'Löwenheim-Skolem', description: 'If a theory has an infinite model, it has models of all infinite cardinalities.', details: ['Upward', 'Downward'] },
-      ru: { label: 'Лёвенгейм-Сколем', description: 'Если у теории есть бесконечная модель, у нее есть модели всех бесконечных мощностей.', details: ['Вверх', 'Вниз'] }
+      en: { label: 'Löwenheim–Skolem', description: 'If a theory in a language $L$ has an infinite model, then it has models of every infinite cardinality $\\kappa\\ge|L|$ (upward and downward theorems; the downward one yields elementary submodels).', details: ['Upward theorem (compactness)', 'Downward theorem (Skolem functions, Tarski–Vaught test)', 'Skolem paradox'] },
+      ru: { label: 'Теорема Лёвенгейма–Сколема', description: 'Если теория языка $L$ имеет бесконечную модель, то она имеет модели любой бесконечной мощности $\\kappa\\ge|L|$ (восходящая и нисходящая теоремы; нисходящая даёт элементарные подмодели).', details: ['Восходящая теорема (компактность)', 'Нисходящая теорема (функции Сколема, тест Тарского–Вота)', 'Парадокс Сколема'] }
     }
   },
   'thm_cantor': {
@@ -1542,8 +1514,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Los-Vaught Test', 'Тест Воота', 'Критерий Лося-Воота'],
     content: {
-      en: { label: 'Łoś-Vaught Test', description: 'Categoricity + No finite models implies Completeness.', details: [] },
-      ru: { label: 'Тест Воота', description: 'Категоричность + Нет конечных моделей влечет Полноту.', details: [] }
+      en: { label: 'Łoś–Vaught Test', description: 'If a theory in a language $L$ has no finite models and is $\\kappa$-categorical for some infinite $\\kappa\\ge|L|$, then it is complete.', details: ['Completeness from categoricity', 'Examples: DLO, $\\mathsf{ACF}_p$, $T_\\infty$', 'Uses the Löwenheim–Skolem theorem'] },
+      ru: { label: 'Тест Лося–Воота', description: 'Если теория языка $L$ не имеет конечных моделей и $\\kappa$-категорична для некоторой бесконечной мощности $\\kappa\\ge|L|$, то она полна.', details: ['Полнота из категоричности', 'Примеры: DLO, $\\mathsf{ACF}_p$, $T_\\infty$', 'Опирается на теорему Лёвенгейма–Сколема'] }
     }
   },
 // 4. Теорема Рылль-Нардзевского (Главная теорема о СЧЕТНОЙ категоричности)
@@ -1581,8 +1553,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Tarski Undefinability', 'Невыразимость истины'],
     content: {
-      en: { label: 'Tarski Undefinability', description: 'Arithmetical truth is not arithmetically definable.', details: [] },
-      ru: { label: 'Невыразимость истины', description: 'Арифметическая истина не выразима арифметически.', details: [] }
+      en: { label: 'Tarski Undefinability', description: 'The set of Gödel numbers of true arithmetical sentences is not arithmetically definable. The proof uses the diagonal lemma, as in the liar paradox.', details: ['Diagonal lemma', 'Truth vs provability', 'Liar paradox', 'Arithmetical hierarchy'] },
+      ru: { label: 'Невыразимость истины (Тарский)', description: 'Множество гёделевых номеров истинных арифметических предложений не определимо в арифметике. Доказательство использует лемму о диагонализации, как в парадоксе лжеца.', details: ['Лемма о диагонализации', 'Истинность и доказуемость', 'Парадокс лжеца', 'Арифметическая иерархия'] }
     }
   },
   'church_turing': {
@@ -1591,8 +1563,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 16,
     synonyms: ['Church-Turing Thesis', 'Тезис Черча-Тьюринга'],
     content: {
-      en: { label: 'Church-Turing Thesis', description: 'Intuitive computability equals Turing computability.', details: [] },
-      ru: { label: 'Тезис Черча-Тьюринга', description: 'Интуитивная вычислимость равна вычислимости по Тьюрингу.', details: [] }
+      en: { label: 'Church–Turing Thesis', description: 'Every function computable by an effective procedure is Turing computable (equivalently, partial recursive or λ-definable). A thesis, not a theorem: it relates an informal notion to a formal one.', details: ['Effective computability', 'Equivalence of models of computation', 'Informal = formal'] },
+      ru: { label: 'Тезис Чёрча–Тьюринга', description: 'Всякая функция, вычислимая эффективной процедурой, вычислима по Тьюрингу (равносильно, частично рекурсивна или λ-определима). Это тезис, а не теорема: он связывает интуитивное понятие с формальным.', details: ['Эффективная вычислимость', 'Равносильность моделей вычислений', 'Интуитивное = формальное'] }
     }
   },
   'halting_problem': {
@@ -1601,8 +1573,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 16,
     synonyms: ['Halting Problem', 'Проблема остановки'],
     content: {
-      en: { label: 'Halting Problem', description: 'Undecidability of whether a program stops.', details: [] },
-      ru: { label: 'Проблема остановки', description: 'Неразрешимость остановки программы.', details: [] }
+      en: { label: 'Halting Problem', description: 'The set $K_0=\\{(e,x) : \\varphi_e(x)\\downarrow\\}$ of pairs (program, input) on which the program halts is computably enumerable but not computable (Turing, 1936).', details: ['Diagonal argument', 'm-complete c.e. set', 'Reductions to other problems'] },
+      ru: { label: 'Проблема остановки', description: 'Множество $K_0=\\{(e,x) : \\varphi_e(x)\\downarrow\\}$ пар (программа, вход), на которых программа останавливается, перечислимо, но не разрешимо (Тьюринг, 1936).', details: ['Диагональный аргумент', 'm-полное перечислимое множество', 'Сводимость других проблем'] }
     }
   },
   'rice_theorem': {
@@ -1611,8 +1583,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Rice\'s Theorem', 'Теорема Райса'],
     content: {
-      en: { label: 'Rice\'s Theorem', description: 'Any non-trivial semantic property of programs is undecidable.', details: [] },
-      ru: { label: 'Теорема Райса', description: 'Любое нетривиальное семантическое свойство программ неразрешимо.', details: [] }
+      en: { label: 'Rice\'s Theorem', description: 'For every nontrivial property $\\mathcal{C}$ of partial computable functions, the index set $\\{e : \\varphi_e \\in \\mathcal{C}\\}$ is undecidable.', details: ['Index sets', 'Reduction of the halting problem', 'Rice–Shapiro theorem'] },
+      ru: { label: 'Теорема Райса', description: 'Для всякого нетривиального свойства $\\mathcal{C}$ частично вычислимых функций множество индексов $\\{e : \\varphi_e \\in \\mathcal{C}\\}$ неразрешимо.', details: ['Индексные множества', 'Сводимость проблемы остановки', 'Теорема Райса–Шапиро'] }
     }
   },
   'recursion_theorem': {
@@ -1631,8 +1603,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['s-m-n Theorem', 's-m-n теорема'],
     content: {
-      en: { label: 's-m-n Theorem', description: 'Parameterization theorem.', details: [] },
-      ru: { label: 's-m-n теорема', description: 'Теорема о параметризации.', details: [] }
+      en: { label: 's-m-n Theorem', description: 'Parametrization theorem: there is a primitive recursive $s$ with $\\varphi_{s(e,x)}(y)=\\varphi_e(x,y)$, so programs can be specialized to fixed inputs effectively.', details: ['Currying of programs', 'Used in the recursion theorem', 'Primitive recursive specialization'] },
+      ru: { label: 's-m-n теорема', description: 'Теорема о параметризации: существует примитивно рекурсивная функция $s$ с $\\varphi_{s(e,x)}(y)=\\varphi_e(x,y)$, так что программу можно эффективно специализировать на фиксированных входах.', details: ['Каррирование программ', 'Используется в теореме о рекурсии', 'Примитивно рекурсивная специализация'] }
     }
   },
   'church_rosser': {
@@ -1641,8 +1613,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Church-Rosser', 'Черч-Россер'],
     content: {
-      en: { label: 'Church-Rosser', description: 'Confluence of lambda calculus.', details: [] },
-      ru: { label: 'Черч-Россер', description: 'Конфлюэнтность лямбда-исчисления.', details: [] }
+      en: { label: 'Church–Rosser', description: 'Confluence of β-reduction: if $M\\twoheadrightarrow N_1$ and $M\\twoheadrightarrow N_2$, then $N_1$ and $N_2$ reduce to a common term; hence normal forms are unique.', details: ['Confluence', 'Uniqueness of normal forms', 'Consistency of the λ-calculus'] },
+      ru: { label: 'Теорема Чёрча–Россера', description: 'Конфлюэнтность β-редукции: если $M\\twoheadrightarrow N_1$ и $M\\twoheadrightarrow N_2$, то $N_1$ и $N_2$ редуцируются к общему терму; поэтому нормальная форма единственна.', details: ['Конфлюэнтность', 'Единственность нормальной формы', 'Непротиворечивость λ-исчисления'] }
     }
   },
   'thm_chevalley': {
@@ -1651,8 +1623,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Chevalley Theorem', 'Теорема Шевалье'],
     content: {
-      en: { label: 'Chevalley Theorem', description: 'Constructible sets are closed under projection.', details: [] },
-      ru: { label: 'Теорема Шевалье', description: 'Конструктивные множества замкнуты относительно проекции.', details: [] }
+      en: { label: 'Chevalley Theorem', description: 'The image of a constructible set under a polynomial map of varieties over an algebraically closed field is constructible; model-theoretically, this is quantifier elimination for ACF.', details: ['Constructible sets', 'Projection', 'Equivalent to QE for ACF'] },
+      ru: { label: 'Теорема Шевалле', description: 'Образ конструктивного множества при полиномиальном отображении многообразий над алгебраически замкнутым полем конструктивен; в терминах теории моделей это элиминация кванторов для ACF.', details: ['Конструктивные множества', 'Проекция', 'Равносильна ЭК для ACF'] }
     }
   },
   'crt': {
@@ -1661,8 +1633,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Chinese Remainder Theorem', 'КТО', 'Китайская теорема об остатках'],
     content: {
-      en: { label: 'Chinese Remainder Thm', description: 'System of congruences solution.', details: [] },
-      ru: { label: 'Китайская теорема об остатках', description: 'Решение системы сравнений.', details: [] }
+      en: { label: 'Chinese Remainder Theorem', description: 'If $m_1,\\dots,m_k$ are pairwise coprime, the system $x\\equiv a_i \\pmod{m_i}$ has a solution, unique modulo $m_1\\cdots m_k$; used in Gödel’s β-function for coding sequences.', details: ['Pairwise coprime moduli', 'Gödel β-function', 'Provable in PA'] },
+      ru: { label: 'Китайская теорема об остатках', description: 'Если $m_1,\\dots,m_k$ попарно взаимно просты, система $x\\equiv a_i \\pmod{m_i}$ имеет решение, единственное по модулю $m_1\\cdots m_k$; используется в β-функции Гёделя для кодирования последовательностей.', details: ['Попарно взаимно простые модули', 'β-функция Гёделя', 'Доказуема в PA'] }
     }
   },
   'thm_stone': {
@@ -1671,8 +1643,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Stone Representation', 'Теорема Стоуна'],
     content: {
-      en: { label: 'Stone Representation', description: 'Boolean algebras are fields of sets.', details: [] },
-      ru: { label: 'Теорема Стоуна', description: 'Булевы алгебры изоморфны полям множеств.', details: [] }
+      en: { label: 'Stone Representation', description: 'Every Boolean algebra is isomorphic to the algebra of clopen subsets of its Stone space (the space of ultrafilters); this yields a duality between Boolean algebras and Stone spaces. Over ZF it is equivalent to BPI.', details: ['Ultrafilters as points', 'Stone duality', 'Equivalent to BPI'] },
+      ru: { label: 'Теорема Стоуна', description: 'Всякая булева алгебра изоморфна алгебре открыто-замкнутых подмножеств своего стоунова пространства (пространства ультрафильтров); отсюда двойственность булевых алгебр и стоуновых пространств. Над ZF равносильна BPI.', details: ['Ультрафильтры как точки', 'Двойственность Стоуна', 'Равносильна BPI'] }
     }
   },
   'bpi': {
@@ -1681,8 +1653,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['BPI', 'Boolean Prime Ideal Theorem', 'Теорема о простом идеале'],
     content: {
-      en: { label: 'BPI', description: 'Boolean Prime Ideal Theorem. Weaker than AC.', details: [] },
-      ru: { label: 'BPI', description: 'Теорема о простом идеале в булевой алгебре. Слабее AC.', details: [] }
+      en: { label: 'BPI', description: 'Boolean Prime Ideal Theorem: every Boolean algebra has a prime ideal. Over ZF it is strictly weaker than AC (Halpern–Lévy) and equivalent to the ultrafilter theorem and to the compactness theorem.', details: ['Ultrafilter theorem', 'Compactness theorem', 'Weaker than AC (Halpern–Lévy)'] },
+      ru: { label: 'BPI', description: 'Теорема о простом идеале: всякая булева алгебра имеет простой идеал. Над ZF строго слабее AC (Гальперн, Леви) и равносильна теореме об ультрафильтре и теореме компактности.', details: ['Теорема об ультрафильтре', 'Теорема компактности', 'Слабее AC (Гальперн, Леви)'] }
     }
   },
   'thm_knaster': {
@@ -1691,8 +1663,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Knaster-Tarski', 'Кнастер-Тарский'],
     content: {
-      en: { label: 'Knaster-Tarski', description: 'Fixed point theorem for complete lattices.', details: [] },
-      ru: { label: 'Кнастер-Тарский', description: 'Теорема о неподвижной точке для полных решеток.', details: [] }
+      en: { label: 'Knaster–Tarski', description: 'Every monotone map of a complete lattice into itself has a least and a greatest fixed point; the fixed points form a complete lattice.', details: ['Least fixed point', 'Inductive definitions', 'Proof of Cantor–Bernstein'] },
+      ru: { label: 'Теорема Кнастера–Тарского', description: 'Всякое монотонное отображение полной решётки в себя имеет наименьшую и наибольшую неподвижные точки; неподвижные точки образуют полную решётку.', details: ['Наименьшая неподвижная точка', 'Индуктивные определения', 'Доказательство теоремы Кантора–Бернштейна'] }
     }
   },
   'thm_kruskal': {
@@ -1711,8 +1683,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 14,
     synonyms: ['Goodstein Theorem', 'Теорема Гудстейна'],
     content: {
-      en: { label: 'Goodstein Theorem', description: 'Independence result from PA about numerical sequences.', details: [] },
-      ru: { label: 'Теорема Гудстейна', description: 'Независимость от PA утверждения о числовых последовательностях.', details: [] }
+      en: { label: 'Goodstein Theorem', description: 'Every Goodstein sequence (hereditary base-$n$ notation, base increase, subtraction of 1) reaches 0. The statement is true, provable by induction up to $\\varepsilon_0$, and unprovable in PA (Kirby–Paris, 1982).', details: ['Hereditary base notation', 'Ordinals below $\\varepsilon_0$', 'Unprovable in PA (Kirby–Paris)'] },
+      ru: { label: 'Теорема Гудстейна', description: 'Всякая последовательность Гудстейна (наследственная запись по основанию $n$, увеличение основания, вычитание 1) достигает 0. Утверждение истинно, доказуемо индукцией до $\\varepsilon_0$ и недоказуемо в PA (Кирби, Пэрис, 1982).', details: ['Наследственная запись по основанию', 'Ординалы меньше $\\varepsilon_0$', 'Недоказуема в PA (Кирби, Пэрис)'] }
     }
   },
   'cut_elimination': {
@@ -1731,8 +1703,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Countable Choice', 'Счетный выбор'],
     content: {
-      en: { label: 'Countable Choice', description: 'Choice for countable families.', details: [] },
-      ru: { label: 'Счетный выбор', description: 'Выбор для счетных семейств.', details: [] }
+      en: { label: 'Countable Choice', description: 'Every countable family of nonempty sets has a choice function. It implies that a countable union of countable sets is countable; it is weaker than Dependent Choice.', details: ['Countable unions of countable sets', 'Weaker than DC', 'Dedekind-finite vs finite'] },
+      ru: { label: 'Счётный выбор', description: 'Всякое счётное семейство непустых множеств имеет функцию выбора. Влечёт счётность счётного объединения счётных множеств; слабее аксиомы зависимого выбора.', details: ['Счётные объединения счётных множеств', 'Слабее DC', 'Конечность по Дедекинду и конечность'] }
     }
   },
   'axiom_determinacy': {
@@ -1741,8 +1713,8 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 12,
     synonyms: ['Axiom of Determinacy', 'Аксиома детерминированности', 'AD'],
     content: {
-      en: { label: 'Axiom of Determinacy', description: 'Alternative to Choice for games.', details: [] },
-      ru: { label: 'Аксиома детерминированности', description: 'Альтернатива Выбору для игр.', details: [] }
+      en: { label: 'Axiom of Determinacy', description: 'AD: every two-player game of length $\\omega$ on natural numbers with an arbitrary payoff set $A\\subseteq\\omega^\\omega$ is determined. It contradicts AC and implies that all sets of reals are Lebesgue measurable.', details: ['Infinite games', 'Contradicts AC', 'All sets of reals are measurable', 'Consistency from Woodin cardinals'] },
+      ru: { label: 'Аксиома детерминированности', description: 'AD: всякая игра двух игроков длины $\\omega$ на натуральных числах с произвольным множеством выигрышей $A\\subseteq\\omega^\\omega$ детерминирована. Противоречит AC и влечёт измеримость по Лебегу всех множеств вещественных чисел.', details: ['Бесконечные игры', 'Противоречит AC', 'Все множества вещественных чисел измеримы', 'Непротиворечивость через кардиналы Вудина'] }
     }
   },
   'markov_principle': {
@@ -1751,28 +1723,28 @@ const RAW_NODES: Record<string, NodeDefinition> = {
     val: 10,
     synonyms: ['Markov Principle', 'Принцип Маркова'],
     content: {
-      en: { label: 'Markov Principle', description: 'Constructive principle regarding termination.', details: [] },
-      ru: { label: 'Принцип Маркова', description: 'Конструктивный принцип остановки.', details: [] }
+      en: { label: 'Markov Principle', description: 'If it is impossible that a computation runs forever, then it halts; formally $\\neg\\neg\\exists x\\,\\varphi(x)\\to\\exists x\\,\\varphi(x)$ for decidable $\\varphi$. Accepted in Markov’s constructive mathematics, not provable in HA.', details: ['$\\neg\\neg\\exists x\\,\\varphi\\to\\exists x\\,\\varphi$ for decidable $\\varphi$', 'Russian constructive mathematics', 'Independent of HA'] },
+      ru: { label: 'Принцип Маркова', description: 'Если невозможно, чтобы вычисление продолжалось бесконечно, то оно останавливается; формально $\\neg\\neg\\exists x\\,\\varphi(x)\\to\\exists x\\,\\varphi(x)$ для разрешимых $\\varphi$. Принят в конструктивной математике школы Маркова, не доказуем в HA.', details: ['$\\neg\\neg\\exists x\\,\\varphi\\to\\exists x\\,\\varphi$ для разрешимых $\\varphi$', 'Конструктивная математика школы Маркова', 'Не зависит от HA'] }
     }
   },
   'skolem_paradox': {
     group: Discipline.MODEL_THEORY,
-    kind: NodeKind.THEOREM, // or Concept
+    kind: NodeKind.THEOREM,
     val: 12,
     synonyms: ['Skolem Paradox', 'Парадокс Скулема'],
     content: {
-      en: { label: 'Skolem Paradox', description: 'Countable models of set theory.', details: [] },
-      ru: { label: 'Парадокс Скулема', description: 'Счетные модели теории множеств.', details: [] }
+      en: { label: 'Skolem Paradox', description: 'By the downward Löwenheim–Skolem theorem, ZFC (if consistent) has a countable model, although ZFC proves that uncountable sets exist. There is no contradiction: countability is not absolute between the model and the universe.', details: ['Downward Löwenheim–Skolem', 'Relativity of countability', 'Countable transitive models'] },
+      ru: { label: 'Парадокс Сколема', description: 'По нисходящей теореме Лёвенгейма–Сколема ZFC (если она непротиворечива) имеет счётную модель, хотя ZFC доказывает существование несчётных множеств. Противоречия нет: счётность не абсолютна между моделью и универсумом.', details: ['Нисходящая теорема Лёвенгейма–Сколема', 'Относительность счётности', 'Счётные транзитивные модели'] }
     }
   },
   'thm_ef_games': {
     group: Discipline.MODEL_THEORY,
-    kind: NodeKind.CONCEPT, // method
+    kind: NodeKind.CONCEPT,
     val: 14,
     synonyms: ['EF Games', 'Игры ЭФ', 'Ehrenfeucht-Fraisse'],
     content: {
-      en: { label: 'EF Games', description: 'Game theoretic characterization of elementary equivalence.', details: [] },
-      ru: { label: 'Игры ЭФ', description: 'Игровая характеризация элементарной эквивалентности.', details: [] }
+      en: { label: 'Ehrenfeucht–Fraïssé Games', description: 'For a finite relational signature, $\\mathcal{M}\\equiv_n\\mathcal{N}$ (agreement on sentences of quantifier depth $\\le n$) iff Duplicator wins the $n$-round EF game; $\\mathcal{M}\\equiv\\mathcal{N}$ iff Duplicator wins the games of every finite length.', details: ['Quantifier depth', 'Spoiler and Duplicator', 'Partial isomorphisms', 'Proofs of non-definability'] },
+      ru: { label: 'Игры Эренфойхта–Фраиссе', description: 'Для конечной реляционной сигнатуры $\\mathcal{M}\\equiv_n\\mathcal{N}$ (совпадение предложений кванторной глубины $\\le n$) тогда и только тогда, когда Дупликатор выигрывает игру из $n$ ходов; $\\mathcal{M}\\equiv\\mathcal{N}$ тогда и только тогда, когда он выигрывает игры любой конечной длины.', details: ['Кванторная глубина', 'Спойлер и Дупликатор', 'Частичные изоморфизмы', 'Доказательство неопределимости'] }
     }
   },
   'ring_poly': {
@@ -1814,62 +1786,38 @@ const RAW_NODES: Record<string, NodeDefinition> = {
   // ==============================================================================
 // PROOF-THEORETIC ORDINALS (Доказательные ординалы)
 // ==============================================================================
-'church_kleene': {
-  group: Discipline.PROOF_THEORY,
-  kind: NodeKind.STRUCTURE,
-  val: 14,
-  synonyms: ['ω₁^CK', 'Church-Kleene ordinal', 'Ординал Чёрча-Клини'],
-  content: {
-    en: { 
-      label: '$\\omega_₁^{CK}$', 
-      description: 'The supremum of computable ordinals. First non-computable ordinal.',
-      details: ['Hyperarithmetical hierarchy', 'Kleene\'s O', 'Admissible ordinal']
-    },
-    ru: { 
-      label: '$\\omega_₁^{CK}$', 
-      description: 'Супремум вычислимых ординалов. Первый невычислимый ординал.',
-      details: ['Гиперарифметическая иерархия', 'Kleene O', 'Допустимый ординал']
+  'church_kleene': {
+    group: Discipline.PROOF_THEORY,
+    kind: NodeKind.STRUCTURE,
+    val: 14,
+    synonyms: ['ω₁^CK', 'Church-Kleene ordinal', 'Ординал Чёрча-Клини'],
+    content: {
+      en: { label: '$\\omega_1^{\\mathrm{CK}}$', description: 'The Church–Kleene ordinal: the supremum of the order types of computable well-orderings of $\\mathbb{N}$, the least non-computable ordinal. Proof-theoretic ordinals of sound recursively axiomatized theories lie below it.', details: ['Hyperarithmetical hierarchy', 'Kleene\'s $\\mathcal{O}$', 'Least admissible ordinal $>\\omega$'] },
+      ru: { label: '$\\omega_1^{\\mathrm{CK}}$', description: 'Ординал Чёрча–Клини: супремум порядковых типов вычислимых полных порядков на $\\mathbb{N}$, наименьший невычислимый ординал. Доказательные ординалы корректных рекурсивно аксиоматизированных теорий меньше его.', details: ['Гиперарифметическая иерархия', 'Обозначения Клини $\\mathcal{O}$', 'Наименьший допустимый ординал $>\\omega$'] }
     }
-  }
-},
+  },
 
-'ordinal_bachmann_howard': {
-  group: Discipline.PROOF_THEORY,
-  kind: NodeKind.STRUCTURE,
-  val: 12,
-  synonyms: ['Bachmann-Howard ordinal', 'Ординал Бахмана-Ховарда'],
-  content: {
-    en: { 
-      label: 'Bachmann-Howard Ordinal', 
-      description: 'Proof-theoretic ordinal of Kripke-Platek set theory with infinity.',
-      details: ['KP + Infinity', 'Collapsing functions']
-    },
-    ru: { 
-      label: 'Ординал Бахмана-Ховарда', 
-      description: 'Доказательный ординал теории множеств Крипке-Платека с бесконечностью.',
-      details: ['KP + Inf', 'Коллапсирующие функции']
+  'ordinal_bachmann_howard': {
+    group: Discipline.PROOF_THEORY,
+    kind: NodeKind.STRUCTURE,
+    val: 12,
+    synonyms: ['Bachmann-Howard ordinal', 'Ординал Бахмана-Ховарда'],
+    content: {
+      en: { label: 'Bachmann–Howard Ordinal', description: 'The ordinal $\\psi(\\varepsilon_{\\Omega+1})$; the proof-theoretic ordinal of Kripke–Platek set theory with infinity $\\mathsf{KP}\\omega$ and of the theory $\\mathrm{ID}_1$ of one inductive definition.', details: ['$\\mathsf{KP}\\omega$', '$\\mathrm{ID}_1$', 'Collapsing functions'] },
+      ru: { label: 'Ординал Бахмана–Ховарда', description: 'Ординал $\\psi(\\varepsilon_{\\Omega+1})$; доказательный ординал теории множеств Крипке–Платека с бесконечностью $\\mathsf{KP}\\omega$ и теории $\\mathrm{ID}_1$ одного индуктивного определения.', details: ['$\\mathsf{KP}\\omega$', '$\\mathrm{ID}_1$', 'Коллапсирующие функции'] }
     }
-  }
-},
+  },
 
-'ordinal_takeuti_feferman_buchholz': {
-  group: Discipline.PROOF_THEORY,
-  kind: NodeKind.STRUCTURE,
-  val: 12,
-  synonyms: ['ψ₀(Ω_ω)', 'TFB ordinal'],
-  content: {
-    en: { 
-      label: 'Takeuti-Feferman-Buchholz', 
-      description: 'Proof-theoretic ordinal of $\\Pi^1_1-CA_0$ and related systems.',
-      details: ['Extended Veblen', 'Ordinal collapsing']
-    },
-    ru: { 
-      label: 'Ординал Такеути-Феферман-Бухгольц', 
-      description: 'Доказательный ординал $\\Pi^1_1-CA_0$ и связанных систем.',
-      details: ['Расширенный Веблен', 'Коллапс ординалов']
+  'ordinal_takeuti_feferman_buchholz': {
+    group: Discipline.PROOF_THEORY,
+    kind: NodeKind.STRUCTURE,
+    val: 12,
+    synonyms: ['ψ₀(Ω_ω)', 'TFB ordinal'],
+    content: {
+      en: { label: 'Takeuti–Feferman–Buchholz Ordinal', description: 'The ordinal $\\psi_0(\\varepsilon_{\\Omega_\\omega+1})$ in Buchholz notation; the proof-theoretic ordinal of $\\Pi^1_1\\text{-}\\mathsf{CA}_0+\\mathrm{BI}$ and of $\\mathrm{ID}_\\omega$. The weaker $\\Pi^1_1\\text{-}\\mathsf{CA}_0$ has ordinal $\\psi_0(\\Omega_\\omega)$.', details: ['Buchholz ψ-functions', 'Iterated inductive definitions $\\mathrm{ID}_\\omega$', 'Bar induction BI'] },
+      ru: { label: 'Ординал Такеути–Фефермана–Бухгольца', description: 'Ординал $\\psi_0(\\varepsilon_{\\Omega_\\omega+1})$ в обозначениях Бухгольца; доказательный ординал $\\Pi^1_1\\text{-}\\mathsf{CA}_0+\\mathrm{BI}$ и $\\mathrm{ID}_\\omega$. Более слабая система $\\Pi^1_1\\text{-}\\mathsf{CA}_0$ имеет ординал $\\psi_0(\\Omega_\\omega)$.', details: ['ψ-функции Бухгольца', 'Итерированные индуктивные определения $\\mathrm{ID}_\\omega$', 'Бар-индукция BI'] }
     }
-  }
-},
+  },
 
 // ==============================================================================
 // MODEL THEORY ADDITIONS
@@ -2149,43 +2097,27 @@ const RAW_NODES: Record<string, NodeDefinition> = {
 // ==============================================================================
 // SET THEORY: ZF^- and V_{ω+ω}
 // ==============================================================================
-'zf_minus': {
-  group: Discipline.SET_THEORY,
-  kind: NodeKind.THEORY,
-  val: 28,
-  synonyms: ['ZF⁻', 'ZF without Replacement', 'ZF минус подстановка'],
-  content: {
-    en: { 
-      label: '$\\mathsf{ZF}^-$', 
-      description: 'ZF without the Axiom Schema of Replacement.',
-      details: ['Separation only', 'Weaker than ZF', 'Models $V_{\\omega+\\omega}$']
-    },
-    ru: { 
-      label: '$\\mathsf{ZF}^-$', 
-      description: 'ZF без схемы аксиом подстановки.',
-      details: ['Только выделение', 'Слабее ZF', 'Моделируется $V_{\\omega+\\omega}$']
+  'theory_Z': {
+    group: Discipline.SET_THEORY,
+    kind: NodeKind.THEORY,
+    val: 28,
+    synonyms: ['Z', 'Zermelo', 'ZF without Replacement', 'ZF⁻', 'Цермело'],
+    content: {
+      en: { label: 'Zermelo Set Theory $\\mathsf{Z}$', description: 'Extensionality, pairing, union, power set, separation and infinity (modern versions add regularity), without Replacement. $V_{\\omega+\\omega}$ is a model of $\\mathsf{Z}$; $\\mathsf{Z}$ does not prove the existence of the von Neumann ordinal $\\omega+\\omega$.', details: ['Separation instead of Replacement', 'Model $V_{\\omega+\\omega}$', 'Does not prove that $\\omega+\\omega$ exists', 'The notation $\\mathsf{ZF}^-$ is ambiguous in the literature'] },
+      ru: { label: 'Теория Цермело $\\mathsf{Z}$', description: 'Экстенсиональность, пара, объединение, степень, выделение и бесконечность (современные варианты добавляют регулярность), без схемы подстановки. $V_{\\omega+\\omega}$ — модель $\\mathsf{Z}$; $\\mathsf{Z}$ не доказывает существование ординала фон Неймана $\\omega+\\omega$.', details: ['Выделение вместо подстановки', 'Модель $V_{\\omega+\\omega}$', 'Не доказывает существование $\\omega+\\omega$', 'Обозначение $\\mathsf{ZF}^-$ в литературе неоднозначно'] }
     }
-  }
-},
+  },
 
-'model_V_omega_omega': {
-  group: Discipline.SET_THEORY,
-  kind: NodeKind.STRUCTURE,
-  val: 14,
-  synonyms: ['V_{ω+ω}', 'Model up to ω+ω'],
-  content: {
-    en: { 
-      label: '$V_{\\omega+\\omega}$', 
-      description: 'Cumulative hierarchy up to ordinal $\\omega+\\omega$.',
-      details: ['Model of $\\mathsf{ZF}^-$', 'Countable stages', 'Without Replacement']
-    },
-    ru: { 
-      label: '$V_{\\omega+\\omega}$', 
-      description: 'Кумулятивная иерархия до ординала $\\omega+\\omega$.',
-      details: ['Модель $\\mathsf{ZF}^-$', 'Счётные этапы', 'Без подстановки']
+  'model_V_omega_omega': {
+    group: Discipline.SET_THEORY,
+    kind: NodeKind.STRUCTURE,
+    val: 14,
+    synonyms: ['V_{ω+ω}', 'Model up to ω+ω'],
+    content: {
+      en: { label: '$V_{\\omega+\\omega}$', description: 'The stage $V_{\\omega+\\omega}$ of the cumulative hierarchy: a model of Zermelo set theory with Choice in which Replacement fails. Its stages $V_{\\omega+n}$, $n\\ge1$, are uncountable.', details: ['Model of $\\mathsf{ZC}$', 'Replacement fails', 'Contains no ordinal $\\ge\\omega+\\omega$'] },
+      ru: { label: '$V_{\\omega+\\omega}$', description: 'Стадия $V_{\\omega+\\omega}$ кумулятивной иерархии: модель теории Цермело с выбором, в которой не выполняется схема подстановки. Стадии $V_{\\omega+n}$ при $n\\ge1$ несчётны.', details: ['Модель $\\mathsf{ZC}$', 'Схема подстановки не выполняется', 'Не содержит ординалов $\\ge\\omega+\\omega$'] }
     }
-  }
-},
+  },
 'thm_cantor_iso': {
     group: Discipline.MODEL_THEORY, // Или Discipline.LOGIC, если MODEL_THEORY нет
     kind: NodeKind.THEOREM,
@@ -2314,7 +2246,7 @@ const RAW_NODES: Record<string, NodeDefinition> = {
 // 8. * -> * : EQUIVALENT (Изоморфизмы, двойственности)
 // ==============================================================================
 
-const RAW_LINKS = [
+const RAW_LINKS: RawLink[] = [
 // DLO "связана" с теоремой (Теорема описывает свойства моделей DLO)
 { source: 'theory_DLO', target: 'thm_cantor_iso', type: LinkType.RELATED, label: 'Characterized by' },
 // Теорема "использует" метод туда-сюда (это корректно, так как это метод доказательства)
@@ -2388,7 +2320,7 @@ const RAW_LINKS = [
   { source: 'heyting_arithmetic', target: 'intuitionistic_logic', type: LinkType.EXTENDS }, // Арифметика Гейтинга строится НА БАЗЕ Интуиционистской логики
   // Интуиционистская логика базируется на логике высказываний (как и классическая)
   // Но является альтернативой классической логике предикатов
-  { source: 'intuitionistic_logic', target: 'prop_logic', type: LinkType.EXTENDS },
+  { source: 'prop_logic', target: 'intuitionistic_logic', type: LinkType.EXTENDS, label: 'Classical = intuitionistic + excluded middle' },
   // Гёделевский перевод: Интуиционистская логика вкладывается в S4
   { source: 'intuitionistic_logic', target: 'modal_S4', type: LinkType.RELATED },
   // Modal GL как логика доказуемости - ключевая связь!
@@ -2398,7 +2330,7 @@ const RAW_LINKS = [
 
   // --- Set Theory ---
   { source: 'zfc', target: 'pred_logic', type: LinkType.EXTENDS, label: 'Provides formal language' },
-  { source: 'zfc', target: 'theory_HF', type: LinkType.EXTENDS }, // ZFC добавляет бесконечность
+  { source: 'zfc', target: 'theory_HF', type: LinkType.RELATED, label: 'Infinity instead of its negation' },
   { source: 'large_cardinals', target: 'zfc', type: LinkType.EXTENDS }, // Большие кардиналы > ZFC
 
   // --- Algebra (Structures) ---
@@ -2406,7 +2338,7 @@ const RAW_LINKS = [
   { source: 'theory_fields', target: 'theory_rings', type: LinkType.EXTENDS }, // Поле - это кольцо
   { source: 'theory_ACF', target: 'theory_fields', type: LinkType.EXTENDS, label: 'Adds algebraic closure' },
   { source: 'theory_RCF', target: 'theory_fields', type: LinkType.EXTENDS },
-  { source: 'theory_tf_groups', target: 'theory_groups', type: LinkType.EXTENDS, label: 'Adds real closure' },
+  { source: 'theory_tf_groups', target: 'theory_groups', type: LinkType.EXTENDS, label: 'Abelian, divisible, torsion-free' },
   
   // --- Algebra (Concepts) ---
   { source: 'module_ring', target: 'algebraic_structure', type: LinkType.EXTENDS },
@@ -2461,7 +2393,7 @@ const RAW_LINKS = [
   { source: 'model_A', target: 'model_Q', type: LinkType.EXTENDS }, // Алгебраические расширяют Q
   { source: 'surreal_numbers', target: 'model_R', type: LinkType.EXTENDS },
   { source: 'surreal_numbers', target: 'ordinal_arithmetic', type: LinkType.EXTENDS },
-  { source: 'transitive_set', target: 'ordinal_arithmetic', type: LinkType.EXTENDS },
+  { source: 'ordinal_arithmetic', target: 'transitive_set', type: LinkType.EXTENDS, label: 'Transitive sets well-ordered by ∈' },
 
   // ==============================================================================
   // 3. MODELS (Structure -> Theory)
@@ -2472,7 +2404,7 @@ const RAW_LINKS = [
   { source: 'model_Z', target: 'theory_rings', type: LinkType.MODELS },
   { source: 'model_Z', target: 'euclidean_domain', type: LinkType.MODELS },
   { source: 'model_Q', target: 'theory_fields', type: LinkType.MODELS },
-  { source: 'model_Q', target: 'theory_DLO', type: LinkType.MODELS },
+  { source: 'struct_Q_order', target: 'theory_DLO', type: LinkType.MODELS, label: 'Prime and saturated model' },
   { source: 'model_R', target: 'theory_RCF', type: LinkType.MODELS, label: 'Standard model' },
   { source: 'model_C', target: 'theory_ACF', type: LinkType.MODELS, label: 'Standard model' },
   { source: 'model_A', target: 'theory_ACF', type: LinkType.MODELS }, // A - тоже модель ACF
@@ -2482,18 +2414,18 @@ const RAW_LINKS = [
   { source: 'model_L', target: 'continuum_hypothesis', type: LinkType.MODELS }, // L |= CH
   { source: 'surreal_numbers', target: 'theory_RCF', type: LinkType.MODELS },
   { source: 'model_nonstd', target: 'theory_PA', type: LinkType.MODELS },
-  { source: 'model_quine', target: 'set_theory', type: LinkType.MODELS }, // NF models
+  { source: 'set_theory', target: 'theory_NF', type: LinkType.CONTAINS },
 
   { source: 'bool_alg', target: 'prop_logic', type: LinkType.MODELS },
   { source: 'heyting_alg', target: 'intuitionistic_logic', type: LinkType.MODELS },
   { source: 'jsson_tarski_alg', target: 'modal_K', type: LinkType.MODELS },
   { source: 'lindenbaum_alg', target: 'prop_logic', type: LinkType.MODELS }, // Каноническая модель
   // Intuitionistic logic corresponds to the lattice of Open Sets
-  { source: 'intuitionistic_logic', target: 'open_set_topology', type: LinkType.EQUIVALENT, label: 'Heyting Algebra of Open Sets' },
+  { source: 'open_set_topology', target: 'intuitionistic_logic', type: LinkType.MODELS, label: 'Topological semantics (Tarski)' },
   
   { source: 'alexandrov_topology', target: 'modal_S4', type: LinkType.MODELS },
   // S4 is topologically equivalent to the interior operator (Kuratowski)
-  { source: 'modal_S4', target: 'topology', type: LinkType.EQUIVALENT, label: 'Topological Interpretation (McKinsey-Tarski)' },
+  { source: 'modal_S4', target: 'topology', type: LinkType.RELATED, label: 'Topological Interpretation (McKinsey-Tarski)' },
   { source: 'stone_space', target: 'prop_logic', type: LinkType.RELATED }, // Через двойственность
 
   // ==============================================================================
@@ -2512,19 +2444,19 @@ const RAW_LINKS = [
   { source: 'theory_PA', target: 'crt', type: LinkType.PROVES }, // КТО
   { source: 'theory_PA', target: 'sequence_coding', type: LinkType.PROVES }, // Бета-функция
   { source: 'theory_PA', target: 'thm_tarski_undef', type: LinkType.RELATED, label: 'Subject of theorem' },
-  { source: 'pred_logic', target: 'thm_completeness', type: LinkType.PROVES },
-  { source: 'pred_logic', target: 'thm_compactness', type: LinkType.PROVES },
-  { source: 'pred_logic', target: 'thm_lowenheim', type: LinkType.PROVES },
+  { source: 'pred_logic', target: 'thm_completeness', type: LinkType.RELATED, label: 'Metatheorem of first-order logic' },
+  { source: 'pred_logic', target: 'thm_compactness', type: LinkType.RELATED, label: 'Metatheorem of first-order logic' },
+  { source: 'pred_logic', target: 'thm_lowenheim', type: LinkType.RELATED, label: 'Metatheorem of first-order logic' },
   
   // Computability proofs
-  { source: 'comp_theory', target: 'smn_theorem', type: LinkType.PROVES },
-  { source: 'comp_theory', target: 'recursion_theorem', type: LinkType.PROVES },
-  { source: 'comp_theory', target: 'rice_theorem', type: LinkType.PROVES },
+  { source: 'comp_theory', target: 'smn_theorem', type: LinkType.CONTAINS },
+  { source: 'comp_theory', target: 'recursion_theorem', type: LinkType.CONTAINS },
+  { source: 'comp_theory', target: 'rice_theorem', type: LinkType.CONTAINS },
   { source: 'lambda_calc', target: 'church_rosser', type: LinkType.PROVES },
   
   // Algebra & Other
   { source: 'theory_ACF', target: 'thm_chevalley', type: LinkType.PROVES },
-  { source: 'theory_ACF', target: 'thm_morley', type: LinkType.PROVES },
+  { source: 'thm_morley', target: 'theory_ACF', type: LinkType.RELATED, label: 'Example: ACFₚ is uncountably categorical' },
   { source: 'theory_RCF', target: 'thm_tarski_seidenberg', type: LinkType.PROVES },
   { source: 'pi11_ca0', target: 'thm_kruskal', type: LinkType.PROVES },
 
@@ -2545,8 +2477,8 @@ const RAW_LINKS = [
   { source: 'bpi', target: 'ultrafilter', type: LinkType.EQUIVALENT, label: 'BPI ⟺ Ultrafilter Theorem' },
 
   // Структуры и теории
-  { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT }, // Би-интерпретируемость
-  { source: 'aca0', target: 'theory_PA', type: LinkType.EQUIVALENT, label: 'Conservative extension' }, // Консервативность
+  { source: 'theory_PA', target: 'theory_HF', type: LinkType.EQUIVALENT, label: 'Mutually interpretable (Ackermann coding)' },
+  { source: 'aca0', target: 'theory_PA', type: LinkType.EXTENDS, label: 'Conservative extension' },
   { source: 'ordinal_omega', target: 'model_N', type: LinkType.EQUIVALENT },
   { source: 'lambda_calc', target: 'ski_combinators', type: LinkType.EQUIVALENT, label: 'Computational equivalence' }, // Эквивалентность по вычислимости
   
@@ -2638,8 +2570,13 @@ const RAW_LINKS = [
   { source: 'thm_knaster', target: 'lattice', type: LinkType.RELATED },
   { source: 'thm_knaster', target: 'thm_cbs', type: LinkType.PROVES }, // Используется в доказательстве
   { source: 'modal_GL', target: 'scattered_space', type: LinkType.RELATED },
-  { source: 'alexandrov_topology', target: 'poset', type: LinkType.RELATED }, // Связь порядков и топологии
   // Order theory фундаментальна для set theory
+  { source: 'order_theory', target: 'set_theory', type: LinkType.EXTENDS, label: 'Orders are relations on sets' },
+  { source: 'order_theory', target: 'poset', type: LinkType.CONTAINS },
+  { source: 'order_theory', target: 'linear_order', type: LinkType.CONTAINS },
+  { source: 'order_theory', target: 'lattice', type: LinkType.CONTAINS },
+  { source: 'order_theory', target: 'theory_order', type: LinkType.CONTAINS },
+  { source: 'order_theory', target: 'thm_knaster', type: LinkType.CONTAINS },
   { source: 'theory_order', target: 'set_theory', type: LinkType.RELATED, label: 'Well-orderings, ordinals' },
   { source: 'linear_order', target: 'ordinal_arithmetic', type: LinkType.RELATED, label: 'Ordinals are well-orders' },
   { source: 'lattice', target: 'algebra_discipline', type: LinkType.RELATED, label: 'Algebraic structure' },
@@ -2655,8 +2592,8 @@ const RAW_LINKS = [
   { source: 'ordinal_arithmetic', target: 'cardinal_arithmetic', type: LinkType.RELATED, label: 'Uses Alephs'},
   
   // Algebra & Logic (Algebraic Logic)
-  { source: 'cylindric_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },
-  { source: 'polyadic_alg', target: 'pred_logic', type: LinkType.EQUIVALENT },
+  { source: 'cylindric_alg', target: 'pred_logic', type: LinkType.MODELS, label: 'Algebraic semantics for FOL' },
+  { source: 'polyadic_alg', target: 'pred_logic', type: LinkType.MODELS, label: 'Algebraic semantics for FOL' },
   { source: 'cylindric_alg', target: 'bool_alg', type: LinkType.EXTENDS },
 
   // Расширение связей теорем о неполноте
@@ -2702,7 +2639,7 @@ const RAW_LINKS = [
   // Z+Z — модель дискретного линейного порядка
   { source: 'model_Z_plus_Z', target: 'theory_DisLO', type: LinkType.MODELS, label: 'Model of discrete order' },
   // N + ZxQ — порядковый тип нестандартных моделей арифметики
-  { source: 'model_N_ZxQ', target: 'theory_PA', type: LinkType.MODELS, label: 'Order type of non-standard models' },
+  { source: 'model_N_ZxQ', target: 'theory_PA', type: LinkType.RELATED, label: 'Order type of countable non-standard models' },
   // Свяжем с концептом нестандартных моделей
   { source: 'model_N_ZxQ', target: 'model_nonstd', type: LinkType.RELATED, label: 'Specific instance' },
 
@@ -2739,43 +2676,42 @@ const RAW_LINKS = [
   { source: 'ring_poly', target: 'maximal_ideal', type: LinkType.CONTAINS, label: 'Generated by irreducibles' },
 
   // --- Saturated Models (Насыщенные модели) ---
-  { source: 'model_Q', target: 'saturated_model', type: LinkType.MODELS, label: 'Countable saturated model (DLO)' },
+  { source: 'struct_Q_order', target: 'saturated_model', type: LinkType.MODELS, label: 'Countable saturated model (DLO)' },
   { source: 'model_random_graph', target: 'saturated_model', type: LinkType.MODELS, label: 'Countable saturated model' },
   { source: 'model_C', target: 'saturated_model', type: LinkType.MODELS, label: 'Saturated in uncountable cardinals' },
   { source: 'model_nonstd', target: 'saturated_model', type: LinkType.MODELS, label: 'Constructed to be saturated' },
 
   // --- Prime Models (Простые/Атомарные модели) ---
-  { source: 'model_Q', target: 'prime_model', type: LinkType.MODELS, label: 'Prime model of DLO' },
-  { source: 'model_N', target: 'prime_model', type: LinkType.MODELS, label: 'Prime model of PA' },
+  { source: 'struct_Q_order', target: 'prime_model', type: LinkType.MODELS, label: 'Prime model of DLO' },
+  { source: 'model_N', target: 'prime_model', type: LinkType.MODELS, label: 'Prime model of Th(ℕ)' },
   { source: 'model_A', target: 'prime_model', type: LinkType.MODELS, label: 'Prime model of ACF0' },
 
   // --- Quantifier Elimination (QE) Examples ---
   // Хотя QE — свойство теории, связь с моделями полезна для навигации
   { source: 'model_C', target: 'qe', type: LinkType.MODELS, label: 'Chevalley-Tarski Theorem' },
   { source: 'model_R', target: 'qe', type: LinkType.MODELS, label: 'Tarski-Seidenberg Theorem' },
-  { source: 'model_Q', target: 'qe', type: LinkType.MODELS, label: 'Admitted by DLO' },
+  { source: 'struct_Q_order', target: 'qe', type: LinkType.MODELS, label: 'Admitted by DLO' },
 
   // --- Construction Methods ---
   { source: 'model_nonstd', target: 'ultraproduct', type: LinkType.MODELS, label: 'Constructed via ultraproduct' },
-  { source: 'surreal_numbers', target: 'indiscernibles', type: LinkType.MODELS, label: 'Rich structure' },
   
   // --- Stone Spaces Examples ---
   { source: 'bool_alg', target: 'stone_space', type: LinkType.EQUIVALENT, label: 'Stone Duality' },
 
   // --- Transfinite Induction Fixes ---
   // Связываем с Ординалами (это "родная" структура для индукции)
-  { source: 'ordinal_arithmetic', target: 'transfinite_induction', type: LinkType.MODELS, label: 'Defined on well-orders'  },
+  { source: 'ordinal_arithmetic', target: 'transfinite_induction', type: LinkType.RELATED, label: 'Defined on well-orders' },
   // Связываем с теорией ATR0 (она постулирует трансфинитную рекурсию)
   { source: 'atr0', target: 'transfinite_induction', type: LinkType.CONTAINS, label: 'Axiom of Transfinite Recursion' },
   // Связываем с ординалом Epsilon-0 (предел индукции для PA)
-  { source: 'epsilon_0', target: 'transfinite_induction', type: LinkType.MODELS, label: 'Proof-theoretic limit' },
+  { source: 'epsilon_0', target: 'transfinite_induction', type: LinkType.RELATED, label: 'PA ⊢ TI(α) for α < ε₀, PA ⊬ TI(ε₀)' },
   // --- Dedekind Finite Fixes ---
   // Связываем с Кардиналами (это понятие о размере/мощности)
   { source: 'dedekind_finite', target: 'cardinal_arithmetic', type: LinkType.EXTENDS, label: 'Definition of finiteness' },
   // Связываем с Омегой (Dedekind finite <=> нет подмножества равномощного omega)
   { source: 'dedekind_finite', target: 'ordinal_omega', type: LinkType.RELATED, label: 'Contrast with infinity' },
   // Связываем с моделью наследственно конечных множеств
-  { source: 'model_V_omega', target: 'dedekind_finite', type: LinkType.MODELS, label: 'Contains standard finite sets' },
+  { source: 'model_V_omega', target: 'dedekind_finite', type: LinkType.RELATED, label: 'Contains standard finite sets' },
   // Связь с ZFC (в ZFC это эквивалентно обычной конечности)
   { source: 'dedekind_finite', target: 'zfc', type: LinkType.RELATED, label: 'Equivalent to finite in ZFC' },
 
@@ -2792,7 +2728,7 @@ const RAW_LINKS = [
   // Ryll-Nardzewski is a fundamental theorem of Model Theory
   { source: 'model_theory', target: 'thm_ryll', type: LinkType.CONTAINS, label: 'Characterizes omega-categoricity' },
   // The Random Graph is the prime example for this theorem
-  { source: 'model_random_graph', target: 'thm_ryll', type: LinkType.MODELS, label: 'Illustrates' },
+  { source: 'model_random_graph', target: 'thm_ryll', type: LinkType.RELATED, label: 'Illustrates' },
   // --- Set Theory Fixes ---
   // Axiom of Determinacy is a candidate axiom for Set Theory
   { source: 'set_theory', target: 'axiom_determinacy', type: LinkType.CONTAINS, label: 'Alternative axiom'  },
@@ -2816,16 +2752,16 @@ const RAW_LINKS = [
   // ==============================================================================
 // PROOF-THEORETIC ORDINALS CLUSTER
 // ==============================================================================
-{ source: 'epsilon_0', target: 'ordinal_arithmetic', type: LinkType.MODELS },
-{ source: 'church_kleene', target: 'gamma_0', type: LinkType.EXTENDS, label: 'Supremum of hyperarithmetic' },
-{ source: 'ordinal_bachmann_howard', target: 'church_kleene', type: LinkType.EXTENDS },
+  { source: 'ordinal_arithmetic', target: 'epsilon_0', type: LinkType.CONTAINS, label: 'ε₀ is the limit of ω, ω^ω, ω^ω^ω, …' },
+  { source: 'ordinal_bachmann_howard', target: 'gamma_0', type: LinkType.EXTENDS, label: 'Ordinal collapsing beyond the Veblen functions' },
+  { source: 'church_kleene', target: 'ordinal_takeuti_feferman_buchholz', type: LinkType.EXTENDS, label: 'Every recursive ordinal is below ω₁^CK' },
 { source: 'ordinal_takeuti_feferman_buchholz', target: 'ordinal_bachmann_howard', type: LinkType.EXTENDS },
 
 // Связи с теориями
 { source: 'epsilon_0', target: 'theory_PA', type: LinkType.RELATED, label: 'Proof-theoretic ordinal of PA' },
 { source: 'gamma_0', target: 'atr0', type: LinkType.RELATED, label: 'Proof-theoretic ordinal of ATR₀' },
 { source: 'church_kleene', target: 'pi11_ca0', type: LinkType.RELATED, label: 'Related to Π¹₁-CA₀' },
-{ source: 'ordinal_takeuti_feferman_buchholz', target: 'pi11_ca0', type: LinkType.RELATED, label: 'Proof-theoretic ordinal of Π¹₁-CA₀' },
+  { source: 'ordinal_takeuti_feferman_buchholz', target: 'pi11_ca0', type: LinkType.RELATED, label: 'Ordinal of Π¹₁-CA₀ + BI' },
 
 // Computability связи
 { source: 'church_kleene', target: 'comp_theory', type: LinkType.RELATED, label: 'First non-computable ordinal' },
@@ -2839,7 +2775,7 @@ const RAW_LINKS = [
 { source: 'kripke_model', target: 'modal_K4', type: LinkType.MODELS, label: 'Transitive frames' },
 { source: 'kripke_model', target: 'modal_S4', type: LinkType.MODELS, label: 'Reflexive + transitive' },
 { source: 'kripke_model', target: 'modal_S5', type: LinkType.MODELS, label: 'Equivalence relations' },
-{ source: 'kripke_model', target: 'modal_GL', type: LinkType.MODELS, label: 'Transitive + irreflexive + well-founded' },
+  { source: 'kripke_model', target: 'modal_GL', type: LinkType.MODELS, label: 'Transitive conversely well-founded frames' },
 
 // Kripke и топология
 { source: 'kripke_model', target: 'poset', type: LinkType.EXTENDS, label: 'Preorder structure' },
@@ -2873,7 +2809,7 @@ const RAW_LINKS = [
 // COMPUTABILITY: EQUIVALENCES OF COMPUTABLE FUNCTIONS
 // ==============================================================================
 { source: 'comp_theory', target: 'computable_function', type: LinkType.CONTAINS },
-{ source: 'partial_recursive', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Church-Turing equivalence' },
+  { source: 'partial_recursive', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Kleene–Turing equivalence theorem' },
 { source: 'turing_machine', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Turing-computable' },
 { source: 'lambda_calc', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'λ-computable' },
 { source: 'markov_algorithm', target: 'computable_function', type: LinkType.EQUIVALENT, label: 'Markov-computable' },
@@ -2900,17 +2836,15 @@ const RAW_LINKS = [
 // ==============================================================================
 // ZF⁻ AND V_{ω+ω}
 // ==============================================================================
-{ source: 'zfc', target: 'zf_minus', type: LinkType.PROVES, label: 'ZFC without Replacement' },
-{ source: 'zf_minus', target: 'pred_logic', type: LinkType.EXTENDS, label: 'Formulated in FOL' },
-{ source: 'model_V_omega_omega', target: 'zf_minus', type: LinkType.MODELS, label: 'Model of ZF⁻' },
+  { source: 'zfc', target: 'theory_Z', type: LinkType.EXTENDS, label: 'Adds Replacement and Choice' },
+  { source: 'theory_Z', target: 'pred_logic', type: LinkType.EXTENDS, label: 'Formulated in FOL' },
+  { source: 'model_V_omega_omega', target: 'theory_Z', type: LinkType.MODELS, label: 'Model of Zermelo set theory' },
 { source: 'cumulative_hierarchy', target: 'model_V_omega_omega', type: LinkType.CONTAINS, label: 'Stage ω+ω' },
 
 { source: 'model_theory', target: 'algebraic_structure', type: LinkType.RELATED },
-{ source: 'vector_space', target: 'theory_tf_groups', type: LinkType.CONTAINS, label: 'Torsion-free group one can interpret as a Vector space' },
+  { source: 'theory_tf_groups', target: 'vector_space', type: LinkType.RELATED, label: 'Models are the non-trivial ℚ-vector spaces' },
 { source: 'model_Z', target: 'diophantine_set', type: LinkType.CONTAINS },
 
-// Связь DLO и Теоремы Кантора (через RELATED, как мета-теорема о моделях)
-{ source: 'theory_DLO', target: 'thm_cantor_iso', type: LinkType.RELATED, label: 'Characterized by models' },
 // Связь DLO и Омега-категоричности (DLO обладает этим свойством)
 { source: 'concept_aleph0_categorical', target: 'theory_DLO', type: LinkType.RELATED, label: 'Prime example' },
 // Теория делимых абелевых групп без кручения (DAG) обладает несчетной категоричностью (Это классический пример)
@@ -2927,9 +2861,22 @@ const RAW_LINKS = [
 
 ];
 
+// Модули данных: базовый граф и тематические слои. Пересечение id проверяет npm run check.
+export const NODE_MODULES: { name: string; nodes: Record<string, NodeDefinition> }[] = [
+  { name: 'dataService', nodes: RAW_NODES },
+  { name: 'modelTheory', nodes: MODEL_THEORY_NODES },
+  { name: 'maglish', nodes: MAGLISH_NODES },
+];
+
+const ALL_NODES: Record<string, NodeDefinition> = Object.assign({}, ...NODE_MODULES.map(m => m.nodes));
+const ALL_LINKS: RawLink[] = [...RAW_LINKS, ...MODEL_THEORY_LINKS, ...MAGLISH_LINKS];
+
+// Все английские подписи связей (для проверки словаря переводов).
+export const RAW_LINK_LABELS: string[] = ALL_LINKS.flatMap(l => (l.label ? [l.label] : []));
+
 export const getGraphData = (lang: Language = 'en'): GraphData => {
-  const nodes = Object.keys(RAW_NODES).map(id => {
-    const node = RAW_NODES[id];
+  const nodes = Object.keys(ALL_NODES).map(id => {
+    const node = ALL_NODES[id];
     const content = node.content[lang] || node.content['en'];
     return {
       id,
@@ -2939,16 +2886,19 @@ export const getGraphData = (lang: Language = 'en'): GraphData => {
       synonyms: node.synonyms,
       label: content.label,
       description: content.description,
-      details: content.details
+      details: content.details,
+      refs: NODE_REFS[id]
     };
   });
 
-  const links = RAW_LINKS.map(link => {
-    // ИСПРАВЛЕНИЕ:
-    // Для связей типа EXTENDS ("Расширяет") мы меняем направление.
-    // Было: Base -> Extension (Булева -> Модальная)
-    // Стало: Extension -> Base (Модальная -> Булева)
-    // Теперь стрелка значит: "X extends Y" (X наследуется от Y)
+  const localize = (label?: string) =>
+    label && lang === 'ru' ? (LINK_LABELS_RU[label] ?? label) : label;
+
+  const links = ALL_LINKS.map(raw => {
+    const link = { ...raw, label: localize(raw.label) };
+    // В RAW_LINKS связь EXTENDS записана как «расширение → база» (PA → Q).
+    // Для показа направление разворачивается: стрелка идёт от базы
+    // к расширению языка или аксиоматики (Q → PA).
     if (link.type === LinkType.EXTENDS) {
       return { ...link, source: link.target, target: link.source };
     }

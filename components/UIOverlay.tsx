@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { GraphNode, GraphLink, Discipline, LinkType, Language, NodeKind } from '../types';
-import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS, KIND_LABELS } from '../constants';
+import { DISCIPLINE_COLORS, LINK_COLORS, DISCIPLINE_LABELS, LINK_LABELS, KIND_LABELS, KIND_GLYPHS, RELATION_GROUPS, SYMMETRIC_LINKS } from '../constants';
+import { MATERIALS, VIDEOS, NEXUS_URL, SPRINGER_URL, materialUrl, maglishUrl, maglishChapterTitle } from '../services/data/refs';
+import { buildDeepLinkSearch } from '../services/deepLink';
 import Latex from 'react-latex-next';
 
 const cleanForSearch = (str: string) => {
@@ -37,6 +39,7 @@ interface Props {
   
   hiddenGroups: Set<Discipline>;
   onToggleGroup: (group: Discipline) => void;
+  onHoverGroup: (group: Discipline | null) => void;
 
   hiddenKinds: Set<NodeKind>;
   onToggleKind: (kind: NodeKind) => void;
@@ -52,6 +55,7 @@ export const UIOverlay: React.FC<Props> = ({
   onToggleLang,
   hiddenGroups,
   onToggleGroup,
+  onHoverGroup,
   hiddenKinds,
   onToggleKind
 }) => {
@@ -117,32 +121,48 @@ export const UIOverlay: React.FC<Props> = ({
     return new Set(nodes.filter(n => n.kind).map(n => n.kind!));
   }, [nodes]);
 
-  // --- Neighbors (Connected Nodes) Calculation ---
-  const visibleNeighbors = useMemo(() => {
+  // --- Связи выбранного узла, сгруппированные по типу и направлению ---
+  const relationGroups = useMemo(() => {
     if (!selectedNode) return [];
-
-    const neighborIds = new Set<string>();
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    const buckets = new Map<string, { node: GraphNode; label?: string }[]>();
 
     links.forEach(l => {
       const sourceId = typeof l.source === 'object' ? (l.source as any).id : l.source;
       const targetId = typeof l.target === 'object' ? (l.target as any).id : l.target;
-
-      let otherId: string | null = null;
-      if (sourceId === selectedNode.id) otherId = targetId;
-      else if (targetId === selectedNode.id) otherId = sourceId;
-
-      if (otherId) neighborIds.add(otherId);
+      let otherId: string;
+      let dir: 'out' | 'in';
+      if (sourceId === selectedNode.id) { otherId = targetId; dir = 'out'; }
+      else if (targetId === selectedNode.id) { otherId = sourceId; dir = 'in'; }
+      else return;
+      const other = byId.get(otherId);
+      if (!other || hiddenGroups.has(other.group) || (other.kind && hiddenKinds.has(other.kind))) return;
+      const key = `${l.type}:${SYMMETRIC_LINKS.has(l.type) ? 'out' : dir}`;
+      buckets.set(key, [...(buckets.get(key) ?? []), { node: other, label: l.label }]);
     });
 
-    return nodes
-      .filter(n => neighborIds.has(n.id))
-      .filter(n => {
-        const isGroupHidden = hiddenGroups.has(n.group);
-        const isKindHidden = n.kind ? hiddenKinds.has(n.kind) : false;
-        return !isGroupHidden && !isKindHidden;
-      })
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }, [selectedNode, links, nodes, hiddenGroups, hiddenKinds]);
+    return RELATION_GROUPS
+      .map(g => ({
+        key: `${g.type}:${g.dir}`,
+        type: g.type,
+        title: g.title[currentLang],
+        items: (buckets.get(`${g.type}:${g.dir}`) ?? []).sort((a, b) => a.node.label.localeCompare(b.node.label)),
+      }))
+      .filter(g => g.items.length > 0);
+  }, [selectedNode, links, nodes, hiddenGroups, hiddenKinds, currentLang]);
+
+  const [linkCopied, setLinkCopied] = useState(false);
+  const copyNodeLink = async () => {
+    if (!selectedNode) return;
+    const url = `${NEXUS_URL}${buildDeepLinkSearch(selectedNode.id, currentLang)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 1500);
+    } catch {
+      window.prompt(currentLang === 'en' ? 'Link to this node' : 'Ссылка на узел', url);
+    }
+  };
 
   const handleExport = () => {
     const nodesHeader = ['ID', 'Label', 'Group', 'Kind', 'Description', 'Details'];
@@ -307,8 +327,8 @@ export const UIOverlay: React.FC<Props> = ({
             <span className="text-lg">💾</span>
           </button>
           <div className="flex space-x-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 backdrop-blur-md">
-            <button onClick={() => onToggleLang('ru')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'ru' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇷🇺</button>
-            <button onClick={() => onToggleLang('en')} className={`px-3 py-1.5 rounded-md text-xl transition-all ${currentLang === 'en' ? 'bg-slate-700 shadow-md scale-105 grayscale-0' : 'grayscale opacity-50 hover:opacity-100'}`}>🇺🇸</button>
+            <button onClick={() => onToggleLang('ru')} aria-pressed={currentLang === 'ru'} className={`px-3 py-1.5 rounded-md text-sm font-semibold tracking-wide transition-all ${currentLang === 'ru' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}>RU</button>
+            <button onClick={() => onToggleLang('en')} aria-pressed={currentLang === 'en'} className={`px-3 py-1.5 rounded-md text-sm font-semibold tracking-wide transition-all ${currentLang === 'en' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}>EN</button>
           </div>
         </div>
       </div>
@@ -336,7 +356,10 @@ export const UIOverlay: React.FC<Props> = ({
                         <div 
                           key={disc} 
                           className={`flex items-center space-x-2 cursor-pointer transition-opacity duration-200 ${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}`}
-                          onClick={() => onToggleGroup(disc)}
+                          onClick={() => { onHoverGroup(null); onToggleGroup(disc); }}
+                          onMouseEnter={() => { if (!isHidden) onHoverGroup(disc); }}
+                          onMouseLeave={() => onHoverGroup(null)}
+                          title={currentLang === 'en' ? 'Hover to highlight, click to hide' : 'Наведите для подсветки, нажмите, чтобы скрыть'}
                         >
                           <span 
                             className={`w-3 h-3 rounded-full flex-shrink-0 ${isHidden ? 'border border-slate-500' : 'shadow-glow'}`} 
@@ -368,14 +391,8 @@ export const UIOverlay: React.FC<Props> = ({
                           className={`flex items-center space-x-2 cursor-pointer transition-opacity duration-200 ${isHidden ? 'opacity-40' : 'opacity-100 hover:opacity-80'}`}
                           onClick={() => onToggleKind(kind)}
                         >
-                          <span 
-                            className={`w-3 h-3 rounded-sm flex-shrink-0 border flex items-center justify-center`}
-                            style={{
-                              borderColor: isHidden ? '#64748b' : '#94a3b8',
-                              backgroundColor: isHidden ? 'transparent' : '#475569'
-                            }}
-                          >
-                            {!isHidden && <span className="block w-1.5 h-1.5 bg-blue-400 rounded-[1px]"></span>}
+                          <span className={`w-3 text-center text-[13px] leading-none flex-shrink-0 ${isHidden ? 'text-slate-600' : 'text-slate-200'}`}>
+                            {KIND_GLYPHS[kind]}
                           </span>
                           <span className={`text-xs text-slate-300 leading-tight ${isHidden ? 'line-through decoration-slate-500' : ''}`}>
                             {KIND_LABELS[kind][currentLang]}
@@ -425,13 +442,24 @@ export const UIOverlay: React.FC<Props> = ({
              <h2 className="text-2xl font-bold text-white leading-tight pointer-events-none select-text">
                 <Latex>{selectedNode.label}</Latex>
               </h2>
-              <button 
-                onClick={onCloseSidebar} 
-                className="text-slate-400 hover:text-white transition-colors p-1 ml-4 flex-shrink-0"
-                onMouseDown={(e) => e.stopPropagation()} 
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-1 ml-4 flex-shrink-0" onMouseDown={(e) => e.stopPropagation()}>
+                <button
+                  onClick={copyNodeLink}
+                  className="text-slate-400 hover:text-white transition-colors p-1 text-xs"
+                  title={currentLang === 'en' ? 'Copy link to this node' : 'Скопировать ссылку на узел'}
+                >
+                  {linkCopied ? (currentLang === 'en' ? 'Copied' : 'Скопировано') : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1 1"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1-1"/></svg>
+                  )}
+                </button>
+                <button
+                  onClick={onCloseSidebar}
+                  className="text-slate-400 hover:text-white transition-colors p-1"
+                  title={currentLang === 'en' ? 'Close' : 'Закрыть'}
+                >
+                  ✕
+                </button>
+              </div>
           </div>
 
           <div className="p-6 overflow-y-auto flex-1 custom-scrollbar cursor-auto">
@@ -485,40 +513,90 @@ export const UIOverlay: React.FC<Props> = ({
               </div>
             )}
 
-            {/* Connected Nodes (Updated Layout) */}
-            {visibleNeighbors.length > 0 && (
-              <div className="space-y-3">
-                 <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider border-b border-slate-700 pb-1">
-                  {currentLang === 'en' ? 'Related Nodes' : 'Связанные узлы'}
+            {/* Ссылки: книга, материалы mathem.at, лекции */}
+            {selectedNode.refs && (
+              <div className="space-y-4 mb-6">
+                {selectedNode.refs.maglish && selectedNode.refs.maglish.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider border-b border-slate-700 pb-1 mb-2">
+                      {currentLang === 'en' ? 'In the book “Mathematics as a Foreign Language”' : 'В книге «Математика как иностранный»'}
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedNode.refs.maglish.map(sec => (
+                        <a key={sec} href={maglishUrl(sec, currentLang)} target="_blank" rel="noopener noreferrer"
+                           className="text-xs px-2 py-1 rounded border border-amber-500/40 text-amber-200 hover:bg-amber-500/10 transition-colors">
+                          §{sec} · {maglishChapterTitle(sec, currentLang)}
+                        </a>
+                      ))}
+                      <a href={SPRINGER_URL} target="_blank" rel="noopener noreferrer"
+                         className="text-xs px-2 py-1 rounded border border-slate-600 text-slate-300 hover:bg-slate-800 transition-colors">
+                        Springer
+                      </a>
+                    </div>
+                  </div>
+                )}
+                {selectedNode.refs.materials && selectedNode.refs.materials.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold text-sky-400 uppercase tracking-wider border-b border-slate-700 pb-1 mb-2">
+                      {currentLang === 'en' ? 'Materials on mathem.at' : 'Материалы на mathem.at'}
+                    </h3>
+                    <ul className="space-y-1">
+                      {selectedNode.refs.materials.map(slug => (
+                        <li key={slug}>
+                          <a href={materialUrl(slug, currentLang)} target="_blank" rel="noopener noreferrer" className="text-sm text-sky-200 hover:text-white underline decoration-sky-500/40 underline-offset-2">
+                            {MATERIALS[slug].title[currentLang]}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {selectedNode.refs.videos && selectedNode.refs.videos.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider border-b border-slate-700 pb-1 mb-2">
+                      {currentLang === 'en' ? 'Video' : 'Видео'}
+                    </h3>
+                    <ul className="space-y-1">
+                      {selectedNode.refs.videos.map(key => (
+                        <li key={key}>
+                          <a href={VIDEOS[key].url} target="_blank" rel="noopener noreferrer" className="text-sm text-rose-200 hover:text-white underline decoration-rose-500/40 underline-offset-2">
+                            {VIDEOS[key].title[currentLang]}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Связи, сгруппированные по типу и направлению */}
+            {relationGroups.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider border-b border-slate-700 pb-1">
+                  {currentLang === 'en' ? 'Connections' : 'Связи'}
                 </h3>
-                <div className="">
-                  {visibleNeighbors.map(node => {
-                    const groupLabel = DISCIPLINE_LABELS[node.group][currentLang];
-                    const kindLabel = node.kind ? KIND_LABELS[node.kind][currentLang] : '';
-                    const metaInfo = `[${groupLabel}${kindLabel ? `, ${kindLabel}` : ''}]`;
-                    
-                    return (
-                      <div 
+                {relationGroups.map(group => (
+                  <div key={group.key}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="h-[3px] w-4 rounded flex-shrink-0" style={{ backgroundColor: LINK_COLORS[group.type] }} />
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{group.title}</span>
+                    </div>
+                    {group.items.map(({ node, label }) => (
+                      <button
                         key={node.id}
                         onClick={() => handleSelectNode(node)}
-                        className="px-2 py-2 border-b border-slate-800 last:border-0 flex items-center justify-between group transition-all cursor-pointer hover:bg-slate-800"
+                        className="w-full text-left px-2 py-1.5 rounded flex items-start gap-2 hover:bg-slate-800 transition-colors"
                       >
-                         <div className="flex items-center gap-2 overflow-hidden">
-                           <span 
-                             className="w-2 h-2 rounded-full flex-shrink-0"
-                             style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }}
-                           />
-                           <span className="text-sm truncate text-slate-200 group-hover:text-white transition-colors">
-                             <Latex>{node.label}</Latex>
-                           </span>
-                         </div>
-                         <span className="text-[10px] text-slate-500 ml-2 flex-shrink-0 uppercase tracking-wide">
-                           {metaInfo}
-                         </span>
-                      </div>
-                    );
-                  })}
-                </div>
+                        <span className="w-2 h-2 mt-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: DISCIPLINE_COLORS[node.group] }} />
+                        <span className="min-w-0">
+                          <span className="block text-sm text-slate-200"><Latex>{node.label}</Latex></span>
+                          {label && <span className="block text-xs text-slate-500 leading-snug">{label}</span>}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ))}
               </div>
             )}
 

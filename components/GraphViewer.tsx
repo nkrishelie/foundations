@@ -1,16 +1,47 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
-import { GraphData, GraphNode, GraphLink, LinkType } from '../types';
+import { Discipline, FocusRequest, GraphData, GraphNode, Language, LinkType, NodeKind } from '../types';
 import { DISCIPLINE_COLORS, LINK_COLORS, LINK_LABELS } from '../constants';
 import { NavigationControls } from './NavigationControls';
+import { computeFocusSet } from '../services/focus';
 
 interface Props {
   data: GraphData;
   onNodeClick: (node: GraphNode) => void;
-  searchQuery: string;
+  onBackgroundClick: () => void;
+  focusRequest: FocusRequest | null;
   activeLanguage: string;
+  selectedNodeId: string | null;
+  highlightGroup: Discipline | null;
+}
+
+const endId = (end: any): string => (typeof end === 'object' && end !== null ? end.id : end);
+
+const hexToRgba = (hex: string, alpha: number): string => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+};
+
+// Прозрачность приглушённых узлов и подписей при подсветке.
+const DIM_NODE = 0.12;
+const DIM_LABEL = 0.06;
+const SYMMETRIC = new Set<LinkType>([LinkType.EQUIVALENT, LinkType.RELATED]);
+
+// Форма узла по виду (см. KIND_GLYPHS): объёмы фигур близки к объёму шара радиуса r.
+const geometryFor = (kind: NodeKind | undefined, r: number): THREE.BufferGeometry => {
+  switch (kind) {
+    case NodeKind.THEORY: return new THREE.BoxGeometry(r * 1.6, r * 1.6, r * 1.6);
+    case NodeKind.THEOREM: return new THREE.OctahedronGeometry(r * 1.4);
+    case NodeKind.STRUCTURE: return new THREE.TetrahedronGeometry(r * 1.8);
+    default: return new THREE.SphereGeometry(r, 16, 16);
+  }
+};
+
+interface NodeObject {
+  mesh: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhysicalMaterial>;
+  label: any;
 }
 
 // Функция очистки LaTeX
@@ -74,88 +105,144 @@ const cleanLabel = (label: string): string => {
     .trim();
 };
 
-export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, activeLanguage }) => {
+export const GraphViewer: React.FC<Props> = ({
+  data, onNodeClick, onBackgroundClick, focusRequest, activeLanguage, selectedNodeId, highlightGroup
+}) => {
   const graphRef = useRef<any>(null);
+  // Актуальные данные для эффекта фокусировки без подписки на их изменения.
+  const dataRef = useRef(data);
+  dataRef.current = data;
   const isInited = useRef(false);
 
-// === НАСТРОЙКА ФИЗИКИ И КАМЕРЫ ===
+  // === НАСТРОЙКА ФИЗИКИ (только при первой загрузке) ===
   useEffect(() => {
-    // Если данных нет, ничего не делаем
-    if (!data || data.nodes.length === 0) return;
-
+    if (!data || data.nodes.length === 0 || isInited.current) return;
     const fg = graphRef.current;
     if (!fg) return;
+    const timer = setTimeout(() => {
+      fg.d3Force('charge')?.strength(-150);
+      fg.d3Force('link')?.distance((link: any) => (link.type === LinkType.RELATED ? 90 : 60));
+      fg.d3ReheatSimulation();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [data]);
 
-    // Мы применяем настройки ТОЛЬКО если это "свежий" граф (первая загрузка или смена языка).
-    // Если isInited.current === true, значит это просто фильтрация, 
-    // и мы не должны сбрасывать камеру или перезапускать физику.
-    if (!isInited.current) {
-      const timer = setTimeout(() => {
-        // 1. Настройка сил (чтобы граф был широким)
-        fg.d3Force('charge')?.strength(-150);
-        fg.d3Force('link')?.distance((link: any) => {
-          if (link.type === 'RELATED') return 90; 
-          return 60; 
-        });
+  // === ПОДСВЕТКА ===
+  const focusSet = useMemo(
+    () => computeFocusSet(data, selectedNodeId, highlightGroup),
+    [data, selectedNodeId, highlightGroup]
+  );
 
-        // 2. Ставим камеру далеко, чтобы избежать "взрыва" на весь экран
-        fg.cameraPosition({ x: 0, y: 0, z: 1600 }); 
-        
-        // 3. Запускаем симуляцию
-        fg.d3ReheatSimulation();
-      }, 100);
+  const nodeObjects = useRef(new Map<string, NodeObject>());
+  const focusRef = useRef<Set<string> | null>(null);
+  focusRef.current = focusSet;
 
-      return () => clearTimeout(timer);
-    }
-    
-    // При фильтрации (else) ничего делать не нужно —
-    // библиотека сама плавно скроет/покажет узлы.
+  const applyNodeStyle = (id: string, obj: NodeObject) => {
+    const dim = !!focusRef.current && !focusRef.current.has(id);
+    obj.mesh.material.opacity = dim ? DIM_NODE : 1;
+    obj.label.material.opacity = dim ? DIM_LABEL : 1;
+  };
 
-  }, [data, activeLanguage]); // Добавили activeLanguage для надежности
-  
-  // === ПОИСК И ФОКУСИРОВКА ===
   useEffect(() => {
-    if (searchQuery && graphRef.current && data.nodes.length > 0) {
-      const normalizeForSearch = (str: string) => {
-        if (!str) return '';
-        return str
-          .toLowerCase()
-          .replace(/\\mathbb{([a-z])}/g, '$1')
-          .replace(/\\mathsf{([a-z0-9]+)}/g, '$1')
-          .replace(/\\mathbf{([a-z0-9]+)}/g, '$1')
-          .replace(/\\mathrm{([a-z0-9]+)}/g, '$1')
-          .replace(/ℕ/g, 'n').replace(/ℤ/g, 'z').replace(/ℚ/g, 'q')
-          .replace(/ℝ/g, 'r').replace(/ℂ/g, 'c').replace(/𝔸/g, 'a')
-          .replace(/×/g, 'x')
-          .replace(/[\$\\\{\}\s]/g, '')
-          .replace(/\s/g, '');
-      };
+    nodeObjects.current.forEach((obj, id) => applyNodeStyle(id, obj));
+  }, [focusSet]);
 
-      const q = normalizeForSearch(searchQuery);
-      const foundNode = data.nodes.find(n => {
-        if (normalizeForSearch(n.id).includes(q)) return true;
-        if (normalizeForSearch(n.label).includes(q)) return true;
-        if (n.synonyms?.some(s => normalizeForSearch(s).includes(q))) return true;
-        return false;
-      });
+  const inFocus = useCallback((link: any): boolean => {
+    if (!focusSet) return false;
+    const a = endId(link.source), b = endId(link.target);
+    return highlightGroup ? focusSet.has(a) && focusSet.has(b) : a === selectedNodeId || b === selectedNodeId;
+  }, [focusSet, highlightGroup, selectedNodeId]);
 
-      if (foundNode) {
-        const nodeSize = foundNode.val || 1;
-        const distance = nodeSize > 20 ? 60 : 40; 
-        const distRatio = 1 + distance/Math.hypot(foundNode.x || 1, foundNode.y || 1, foundNode.z || 1);
-        
-        const targetPos = (foundNode.x || foundNode.y || foundNode.z) 
-          ? { x: foundNode.x * distRatio, y: foundNode.y * distRatio, z: foundNode.z * distRatio }
-          : { x: 0, y: 0, z: distance };
+  const linkColor = useCallback((link: any) => {
+    const base = LINK_COLORS[link.type as LinkType] || '#94a3b8';
+    if (!focusSet) return hexToRgba(base, link.type === LinkType.RELATED ? 0.35 : 0.6);
+    return hexToRgba(base, inFocus(link) ? 0.95 : 0.04);
+  }, [focusSet, inFocus]);
 
-        graphRef.current.cameraPosition(
-          targetPos,
-          { x: foundNode.x, y: foundNode.y, z: foundNode.z },
-          2000
-        );
-      }
+  const linkWidth = useCallback((link: any) => {
+    if (inFocus(link)) return 1.6;
+    return link.type === LinkType.RELATED ? 0.25 : 0.6;
+  }, [inFocus]);
+
+  const linkParticles = useCallback(
+    (link: any) => (inFocus(link) && !SYMMETRIC.has(link.type) ? 3 : 0),
+    [inFocus]
+  );
+
+  const linkArrowLength = useCallback(
+    (link: any) => (SYMMETRIC.has(link.type) ? 0 : inFocus(link) ? 5 : 3.5),
+    [inFocus]
+  );
+
+  // === ОБЪЕКТЫ УЗЛОВ ===
+  // Функция стабильна: объекты создаются один раз на узел, подсветка меняет только прозрачность.
+  const nodeThreeObject = useCallback((node: any) => {
+    const color = DISCIPLINE_COLORS[node.group as Discipline] || '#cccccc';
+    const size = node.val || 1;
+    const isMain = size >= 20;
+    const isRoot = node.kind === NodeKind.DISCIPLINE;
+    const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5;
+
+    const group = new THREE.Group();
+    const material = new THREE.MeshPhysicalMaterial({
+      color,
+      emissive: color,
+      emissiveIntensity: isMain ? 0.7 : 0.25,
+      roughness: 0.4,
+      metalness: 0.1,
+      transparent: true,
+      opacity: 1,
+    });
+    const mesh = new THREE.Mesh(geometryFor(node.kind, radius), material);
+    group.add(mesh);
+
+    // Подпись светлым текстом на тёмной подложке; рамка цвета раздела связывает её с узлом.
+    const SpriteTextClass = (SpriteText as any).default || SpriteText;
+    const label = new SpriteTextClass(cleanLabel(node.label));
+    label.color = '#e2e8f0';
+    label.fontWeight = isRoot ? '700' : isMain ? '600' : '500';
+    label.textHeight = isRoot ? 7 : isMain ? 3 + size / 10 : 2 + size / 20;
+    label.backgroundColor = 'rgba(2,6,23,0.72)';
+    label.borderColor = color;
+    label.borderWidth = isRoot ? 0.6 : 0.3;
+    label.borderRadius = 3;
+    label.padding = isRoot ? 2 : 1;
+    label.position.y = radius + label.textHeight * 0.6 + 1.2;
+    label.material.depthTest = false;
+    label.material.depthWrite = false;
+    label.renderOrder = 999;
+    group.add(label);
+
+    const obj: NodeObject = { mesh, label };
+    nodeObjects.current.set(node.id, obj);
+    applyNodeStyle(node.id, obj);
+    return group;
+  }, []);
+
+  // === ФОКУСИРОВКА ===
+  const flyTo = (node: GraphNode) => {
+    const nodeSize = node.val || 1;
+    const distance = nodeSize > 20 ? 70 : 50;
+    const fx = node.x ?? 0, fy = node.y ?? 0, fz = node.z ?? 0;
+    const distRatio = 1 + distance / Math.hypot(fx || 1, fy || 1, fz || 1);
+    const targetPos = (fx || fy || fz)
+      ? { x: fx * distRatio, y: fy * distRatio, z: fz * distRatio }
+      : { x: 0, y: 0, z: distance };
+    graphRef.current?.cameraPosition(targetPos, { x: fx, y: fy, z: fz }, 2000);
+  };
+
+  // Срабатывает только на новый запрос: фильтры и смена языка камеру не двигают.
+  // До окончания первой раскладки запрос откладывается (адрес ?node= при загрузке).
+  const pendingFocusRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!focusRequest || !graphRef.current) return;
+    if (!isInited.current) {
+      pendingFocusRef.current = focusRequest.nodeId;
+      return;
     }
-  }, [searchQuery, data]);
+    const foundNode = dataRef.current.nodes.find(n => n.id === focusRequest.nodeId);
+    if (foundNode) flyTo(foundNode);
+  }, [focusRequest]);
 
   // --- НАВИГАЦИЯ ---
   const handleRotate = (h: number, v: number) => {
@@ -183,11 +270,48 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
     );
   };
 
+  // Сброс: весь граф в кадре.
   const handleReset = () => {
-    // Возврат в исходную далекую позицию
-    graphRef.current?.cameraPosition({ x: 0, y: 0, z: 1600 }, { x: 0, y: 0, z: 0 }, 1000);
+    graphRef.current?.zoomToFit(1000, 40);
   };
-  
+
+  const nodeLabel = useCallback((node: any) => `
+    <div class="px-3 py-1 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
+      <div class="text-slate-100 font-medium text-sm whitespace-nowrap">${cleanLabel(node.label)}</div>
+    </div>
+  `, []);
+
+  const linkLabel = useCallback((link: any) => {
+    const displayLabel = link.label
+      ? link.label
+      : (LINK_LABELS[link.type as LinkType]?.[activeLanguage as Language] || String(link.type));
+    const ends = `${cleanLabel(link.source?.label ?? '')} → ${cleanLabel(link.target?.label ?? '')}`;
+    return `
+      <div class="px-2 py-1 bg-black/80 border border-slate-700 rounded shadow-sm backdrop-blur-sm pointer-events-none">
+        <div class="text-slate-100 text-xs font-medium text-center whitespace-nowrap">${ends}</div>
+        <div class="text-slate-300 text-[10px] uppercase tracking-wide font-semibold text-center">${displayLabel}</div>
+      </div>
+    `;
+  }, [activeLanguage]);
+
+  const handleNodeClick = useCallback((node: any) => {
+    flyTo(node);
+    onNodeClick(node);
+  }, [onNodeClick]);
+
+  const handleEngineStop = useCallback(() => {
+    const first = !isInited.current;
+    isInited.current = true;
+    const pending = pendingFocusRef.current;
+    if (pending) {
+      pendingFocusRef.current = null;
+      const node = dataRef.current.nodes.find(n => n.id === pending);
+      if (node) flyTo(node);
+    } else if (first) {
+      graphRef.current?.zoomToFit(800, 40);
+    }
+  }, []);
+
   if (!data || !data.nodes || data.nodes.length === 0) {
     return <div className="w-full h-full flex items-center justify-center text-white">Loading Graph...</div>;
   }
@@ -195,131 +319,32 @@ export const GraphViewer: React.FC<Props> = ({ data, onNodeClick, searchQuery, a
   return (
     <div className="relative w-full h-full">
       <ForceGraph3D
-        // key={activeLanguage} <--- УБРАЛИ ЭТОТ КЛЮЧ!
         ref={graphRef}
         graphData={data}
-        
-        // Взаимодействие
-        onNodeClick={(node: any) => {
-          const distance = 40;
-          const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+        onBackgroundClick={onBackgroundClick}
+        onNodeClick={handleNodeClick}
 
-          const newPos = (node.x || node.y || node.z)
-            ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
-            : { x: 0, y: 0, z: distance };
-
-          graphRef.current.cameraPosition(
-            newPos,
-            { x: node.x, y: node.y, z: node.z },
-            3000 
-          );
-          onNodeClick(node);
-        }}
-
-        // Оптимизация физики
         warmupTicks={50}
         cooldownTicks={50}
         d3VelocityDecay={0.2}
         d3AlphaDecay={0.05}
-        
-        // Колбек остановки: только для первой загрузки
-        onEngineStop={() => {
-            isInited.current = true;
-        }}
+        onEngineStop={handleEngineStop}
 
-        // Всплывашка
-        nodeLabel={(node: any) => {
-          const labelText = cleanLabel(node.label);
-          return `
-            <div class="px-3 py-1 bg-slate-900/90 border border-slate-600 rounded-lg shadow-xl backdrop-blur-sm">
-              <div class="text-slate-100 font-medium text-sm whitespace-nowrap">
-                ${labelText}
-              </div>
-            </div>
-          `;
-        }}
-
-        // === НОВОЕ: Тултип для связей (с поддержкой кастомного текста) ===
-        linkLabel={(link: any) => {
-          // 1. Пытаемся взять кастомное описание из данных связи
-          const customLabel = link.label;
-
-          // 2. Если его нет, берем стандартное название типа
-          const displayLabel = customLabel 
-            ? customLabel 
-            : (LINK_LABELS[link.type as LinkType]?.[activeLanguage as Language] || String(link.type));
-
-          // Возвращаем HTML
-          return `
-            <div class="px-2 py-1 bg-black/80 border border-slate-700 rounded shadow-sm backdrop-blur-sm pointer-events-none">
-              <div class="text-slate-200 text-[10px] uppercase tracking-wide font-semibold text-center">
-                ${displayLabel}
-              </div>
-            </div>
-          `;
-        }}
+        nodeLabel={nodeLabel}
+        nodeThreeObject={nodeThreeObject}
+        linkLabel={linkLabel}
         linkHoverPrecision={5}
 
-        // Отрисовка узлов
-        nodeThreeObject={(node: any) => {
-          const color = DISCIPLINE_COLORS[node.group as any] || '#cccccc';
-          const size = (node.val || 1);
-          const isMain = size >= 20;
-          
-          const group = new THREE.Group();
-          
-          const radius = isMain ? Math.pow(size, 0.4) * 1.2 : Math.pow(size, 0.4) * 0.8 + 1.5; 
-          const geometry = new THREE.SphereGeometry(radius, 16, 16); 
-          
-          const material = new THREE.MeshPhysicalMaterial({
-            color: color,
-            emissive: color,
-            emissiveIntensity: isMain ? 0.7 : 0.1,
-            roughness: 0.4,
-            metalness: 0.1,
-          });
-          
-          const sphere = new THREE.Mesh(geometry, material);
-          group.add(sphere);
-
-          // Текст
-          const SpriteTextClass = (SpriteText as any).default || SpriteText;
-          if (SpriteTextClass) {
-            const cleanText = cleanLabel(node.label);
-            const sprite = new SpriteTextClass(cleanText);
-            
-            sprite.color = color;
-            sprite.textHeight = isMain ? 3 + (size / 10) : 1.5 + (size / 20);
-            sprite.position.y = radius + sprite.textHeight * 0.6 + 1.0;
-            
-            sprite.backgroundColor = '#00000080';
-            sprite.padding = 1;
-            sprite.borderRadius = 3;
-            sprite.material.depthTest = false;
-            sprite.material.depthWrite = false;
-            sprite.renderOrder = 999;
-            
-            group.add(sprite);
-          }
-          return group;
-        }}
-
-        // Настройки связей
-        linkColor={(link: any) => LINK_COLORS[link.type as LinkType] || '#ffffff'}
-        linkWidth={(link: any) => link.type === LinkType.RELATED ? 0.3 : 1.5}
-
-        // Частицы: Отключаем для EQUIVALENT и RELATED, чтобы убрать направленность
-        linkDirectionalParticles={(link: any) => (link.type === LinkType.RELATED || link.type === LinkType.EQUIVALENT) ? 0 : 2}
-        linkDirectionalParticleSpeed={0.005}
-        linkDirectionalParticleWidth={(link: any) => (link.type === LinkType.RELATED || link.type === LinkType.EQUIVALENT) ? 0 : 1.5}
-
-        // Стрелки: Отключаем для EQUIVALENT и RELATED, чтобы убрать направленность
-        linkDirectionalArrowLength={(link: any) => {
-          if (link.type === LinkType.EQUIVALENT || link.type === LinkType.RELATED) return 0;
-          return 4;
-        }}
+        linkOpacity={1}
+        linkColor={linkColor}
+        linkWidth={linkWidth}
+        linkDirectionalParticles={linkParticles}
+        linkDirectionalParticleSpeed={0.006}
+        linkDirectionalParticleWidth={1.6}
+        linkDirectionalArrowLength={linkArrowLength}
         linkDirectionalArrowRelPos={1}
-        
+        linkDirectionalArrowColor={linkColor}
+
         backgroundColor="#000005"
         showNavInfo={false}
         controlType="trackball"
